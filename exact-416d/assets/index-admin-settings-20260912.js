@@ -39088,6 +39088,7 @@
       const spotifyId = track.spotifyId || String(track.videoId).replace(/^spotify:/, "");
       return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("iframe", { title: track.title, src: `https://open.spotify.com/embed/track/${spotifyId}`, className: "h-[352px] w-full", allow: "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", loading: "lazy" });
     }
+    if (track.source === "deezer") return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("iframe", { title: track.title, src: `https://widget.deezer.com/widget/dark/track/${track.videoId}`, className: "h-[300px] w-full", allow: "autoplay; clipboard-write; encrypted-media", loading: "lazy" });
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("iframe", { title: track.title, src: `https://www.youtube-nocookie.com/embed/${track.videoId}?autoplay=1&rel=0`, className: "aspect-video w-full", allow: "autoplay; encrypted-media", allowFullScreen: true });
   }
   function DjRequestRow({ request, onStatus, onPreview, onProof, onDriveSearch, onDriveCancel, searchingDrive, readOnly, t }) {
