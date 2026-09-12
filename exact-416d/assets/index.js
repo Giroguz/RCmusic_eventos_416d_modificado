@@ -38340,6 +38340,10 @@
     const plan = plans.find((item) => item.id === planType);
     return plan ? `${plan.label} \xB7 S/ ${Number(plan.pricePen).toFixed(2)}` : t("noPlan");
   }
+  var ADMIN_SETTINGS_KEY = "rc_admin_subscription_settings_v1";
+  function readAdminSettings() { try { var value = JSON.parse(localStorage.getItem(ADMIN_SETTINGS_KEY) || "null"); return value && typeof value === "object" ? value : null; } catch { return null; } }
+  function writeAdminSettings(value) { try { localStorage.setItem(ADMIN_SETTINGS_KEY, JSON.stringify({ ...value, updatedAt: Date.now() })); } catch { } }
+  function draftFromPlans(plans) { return Object.fromEntries(plans.map((plan) => [plan.id, { days: plan.days, pricePen: plan.pricePen }])); }
   async function qrFileToDataUrl(file) {
     if (!file || !file.type.startsWith("image/")) throw new Error("invalid-image");
     const source = await new Promise((resolve, reject) => {
@@ -38398,10 +38402,10 @@
     const [busy, setBusy] = (0, import_react9.useState)(false);
     const [qrBusy, setQrBusy] = (0, import_react9.useState)(false);
     const [proofBusy, setProofBusy] = (0, import_react9.useState)(false);
-    const [planOptions, setPlanOptions] = (0, import_react9.useState)(PLAN_OPTIONS);
-    const [priceDraft, setPriceDraft] = (0, import_react9.useState)(() => Object.fromEntries(PLAN_OPTIONS.map((plan) => [plan.id, { days: plan.days, pricePen: plan.pricePen }])));
-    const [demoDays, setDemoDays] = (0, import_react9.useState)(1);
-    const [demoDaysDraft, setDemoDaysDraft] = (0, import_react9.useState)(1);
+    const [planOptions, setPlanOptions] = (0, import_react9.useState)(() => { const saved = readAdminSettings(); return saved?.plans?.length ? mergePlanOptions(saved.plans) : PLAN_OPTIONS; });
+    const [priceDraft, setPriceDraft] = (0, import_react9.useState)(() => { const saved = readAdminSettings(); const plans = saved?.plans?.length ? mergePlanOptions(saved.plans) : PLAN_OPTIONS; return draftFromPlans(plans); });
+    const [demoDays, setDemoDays] = (0, import_react9.useState)(() => Number(readAdminSettings()?.demoDays) || 1);
+    const [demoDaysDraft, setDemoDaysDraft] = (0, import_react9.useState)(() => Number(readAdminSettings()?.demoDays) || 1);
     const [pricesBusy, setPricesBusy] = (0, import_react9.useState)(false);
     const [userSearch, setUserSearch] = (0, import_react9.useState)("");
     const [userDrafts, setUserDrafts] = (0, import_react9.useState)({});
@@ -38433,17 +38437,22 @@
         setYapeNumberDraft(number);
       } catch {
       }
+      const savedSettings = readAdminSettings();
       try {
         const prices = mergePlanOptions(await adminGetSubscriptionPlanPrices(session.token));
-        setPlanOptions(prices);
-        setPriceDraft(Object.fromEntries(prices.map((plan) => [plan.id, { days: plan.days, pricePen: plan.pricePen }])));
+        const nextPlans = savedSettings?.plans?.length ? mergePlanOptions(savedSettings.plans) : prices;
+        setPlanOptions(nextPlans);
+        setPriceDraft(draftFromPlans(nextPlans));
       } catch {
+        if (savedSettings?.plans?.length) { const nextPlans = mergePlanOptions(savedSettings.plans); setPlanOptions(nextPlans); setPriceDraft(draftFromPlans(nextPlans)); }
       }
       try {
         const days = await adminGetDemoDays(session.token);
-        setDemoDays(days);
-        setDemoDaysDraft(days);
+        const nextDays = Number(savedSettings?.demoDays) || days;
+        setDemoDays(nextDays);
+        setDemoDaysDraft(nextDays);
       } catch {
+        if (savedSettings?.demoDays) { setDemoDays(Number(savedSettings.demoDays)); setDemoDaysDraft(Number(savedSettings.demoDays)); }
       }
     }
     (0, import_react9.useEffect)(() => {
@@ -38457,9 +38466,12 @@
       setPricesBusy(true);
       setError("");
       try {
-        const saved = mergePlanOptions(await adminSetSubscriptionPlanPrices(Object.entries(priceDraft).map(([planType, values]) => ({ planType, ...values })), session.token));
+        const requested = Object.entries(priceDraft).map(([planType, values]) => ({ planType, ...values }));
+        await adminSetSubscriptionPlanPrices(requested, session.token);
+        const saved = mergePlanOptions(requested);
         setPlanOptions(saved);
-        setPriceDraft(Object.fromEntries(saved.map((plan) => [plan.id, { days: plan.days, pricePen: plan.pricePen }])));
+        setPriceDraft(draftFromPlans(saved));
+        writeAdminSettings({ plans: saved, demoDays });
         setNotice("Precios y duraci\xF3n de planes actualizados.");
       } catch {
         setError("No se pudo guardar la configuraci\xF3n de planes.");
@@ -38472,9 +38484,11 @@
       setError("");
       try {
         const days = await adminSetDemoDays(demoDaysDraft, session.token);
-        setDemoDays(days);
-        setDemoDaysDraft(days);
-        setNotice(`Demo configurada por ${days} ${days === 1 ? "d\xEDa" : "d\xEDas"}.`);
+        const savedDays = Number(days) || Number(demoDaysDraft);
+        setDemoDays(savedDays);
+        setDemoDaysDraft(savedDays);
+        writeAdminSettings({ plans: planOptions, demoDays: savedDays });
+        setNotice(`Demo configurada por ${savedDays} ${savedDays === 1 ? "d\xEDa" : "d\xEDas"}.`);
       } catch {
         setError("No se pudo guardar la duraci\xF3n de la demo.");
       } finally {
