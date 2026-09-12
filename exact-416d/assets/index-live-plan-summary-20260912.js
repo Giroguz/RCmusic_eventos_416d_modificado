@@ -37814,7 +37814,7 @@
     return plans.find((plan) => plan.id === planType) || null;
   }
   function mergePlanOptions(rows = []) {
-    const byType = Object.fromEntries(rows.map((row) => [row.plan_type || row.planType, row]));
+    const byType = Object.fromEntries(rows.map((row) => [row.plan_type || row.planType || row.id, row]));
     return PLAN_OPTIONS.map((plan) => ({ ...plan, days: Number(byType[plan.id]?.days) || plan.days, pricePen: Number(byType[plan.id]?.price_pen ?? byType[plan.id]?.pricePen) || plan.pricePen }));
   }
   function formatCountdown(expiresAt2, now = Date.now()) {
