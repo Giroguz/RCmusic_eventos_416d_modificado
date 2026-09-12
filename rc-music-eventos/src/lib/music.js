@@ -1,92 +1,15 @@
-const MOCK_TRACKS = [
-  { id: 'dQw4w9WgXcQ', title: 'Never Gonna Give You Up', artist: 'Rick Astley', duration: '3:33', source: 'youtube' },
-  { id: '9bZkp7q19f0', title: 'Gangnam Style', artist: 'PSY', duration: '4:13', source: 'youtube' },
-  { id: 'kJQP7kiw5Fk', title: 'Despacito', artist: 'Luis Fonsi ft. Daddy Yankee', duration: '4:42', source: 'youtube' },
-  { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran', duration: '4:24', source: 'youtube' },
-  { id: 'fJ9rUzIMcZQ', title: 'Bohemian Rhapsody', artist: 'Queen', duration: '5:55', source: 'youtube' },
-  { id: 'OPf0YbXqDm0', title: 'Uptown Funk', artist: 'Mark Ronson ft. Bruno Mars', duration: '4:30', source: 'youtube' },
-]
-
-export const MUSIC_PROVIDERS = [{ id: 'youtube', label: 'YouTube' }]
-
-function formatDuration(seconds) {
-  const total = Number(seconds)
-  if (!Number.isFinite(total) || total <= 0) return '—'
-  const minutes = Math.floor(total / 60)
-  const remainder = Math.floor(total % 60).toString().padStart(2, '0')
-  return `${minutes}:${remainder}`
-}
-
-export function withMedia(track) {
-  if (track.source === 'spotify') {
-    return { ...track, thumbnail: track.thumbnail || '', spotifyUrl: track.url || `https://open.spotify.com/track/${track.id}`, embedUrl: `https://open.spotify.com/embed/track/${track.id}` }
-  }
-  if (track.source === 'deezer' || track.source === 'soundcloud') {
-    return { ...track, thumbnail: track.thumbnail || '', externalUrl: track.url || '', previewUrl: track.previewUrl || '' }
-  }
-  return { ...track, source: 'youtube', thumbnail: track.thumbnail || `https://img.youtube.com/vi/${track.id}/hqdefault.jpg`, videoUrl: track.videoUrl || `https://www.youtube-nocookie.com/embed/${track.id}?autoplay=1&rel=0` }
-}
-
-function decodeHtml(value = '') {
-  if (typeof document === 'undefined') return value
-  const element = document.createElement('textarea')
-  element.innerHTML = value
-  return element.value
-}
-
-async function searchYoutube(query) {
-  const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY
-  if (!apiKey) {
-    const normalized = query.toLowerCase()
-    const matched = MOCK_TRACKS.filter((track) => `${track.title} ${track.artist}`.toLowerCase().includes(normalized))
-    const fallback = matched.length ? matched : MOCK_TRACKS.slice(0, 4).map((track, index) => ({ ...track, title: `${query} — selección ${index + 1}` }))
-    return fallback.map(withMedia)
-  }
-  const params = new URLSearchParams({ part: 'snippet', maxResults: '8', q: query, type: 'video', videoCategoryId: '10', key: apiKey })
-  const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`)
-  if (!response.ok) throw new Error('No se pudo consultar YouTube')
-  const data = await response.json()
-  return (data.items || []).filter((item) => item.id?.videoId).map((item) => withMedia({ id: item.id.videoId, title: decodeHtml(item.snippet.title), artist: decodeHtml(item.snippet.channelTitle), duration: 'YouTube', source: 'youtube' }))
-}
-
-async function searchDeezer(query) {
-  const response = await fetch(`https://api.deezer.com/search?q=${encodeURIComponent(query)}&limit=8`)
-  if (!response.ok) return []
-  const data = await response.json()
-  return (data.data || []).map((track) => withMedia({ id: String(track.id), title: track.title, artist: track.artist?.name || 'Deezer', duration: formatDuration(track.duration), thumbnail: track.album?.cover_medium || track.album?.cover, previewUrl: track.preview, url: track.link, source: 'deezer' }))
-}
-
-async function searchSoundCloud(query) {
-  const clientId = import.meta.env.VITE_SOUNDCLOUD_CLIENT_ID
-  if (!clientId) return []
-  const params = new URLSearchParams({ q: query, limit: '8', client_id: clientId })
-  const response = await fetch(`https://api-v2.soundcloud.com/search/tracks?${params}`)
-  if (!response.ok) return []
-  const data = await response.json()
-  return (data.collection || []).map((track) => withMedia({ id: String(track.id), title: track.title, artist: track.user?.username || 'SoundCloud', duration: formatDuration(Number(track.duration || 0) / 1000), thumbnail: track.artwork_url || track.user?.avatar_url, previewUrl: track.stream_url || '', url: track.permalink_url, source: 'soundcloud' }))
-}
-
-async function searchSpotify(query) {
-  const apiBase = import.meta.env.VITE_SPOTIFY_API_BASE_URL
-  if (!apiBase) return []
-  const response = await fetch(`${apiBase.replace(/\/$/, '')}/spotify-search?q=${encodeURIComponent(query)}`)
-  if (!response.ok) return []
-  const data = await response.json()
-  return (data.tracks || []).map((track) => withMedia({ id: track.id, title: track.title, artist: track.artist, duration: track.duration, thumbnail: track.thumbnail, url: track.url, source: 'spotify' }))
-}
-
-function externalSearch(provider, query) {
-  const urls = {
-    spotify: `https://open.spotify.com/search/${encodeURIComponent(query)}`,
-    soundcloud: `https://soundcloud.com/search/sounds?q=${encodeURIComponent(query)}`,
-    deezer: `https://www.deezer.com/search/${encodeURIComponent(query)}`,
-  }
-  const labels = { spotify: 'Spotify', soundcloud: 'SoundCloud', deezer: 'Deezer' }
-  return { id: `external-${provider}-${encodeURIComponent(query)}`, title: `Buscar “${query}” en ${labels[provider]}`, artist: 'Abrir resultados del proveedor', duration: '', source: provider, external: true, externalUrl: urls[provider], thumbnail: '' }
-}
-
-export async function searchTracks(query) {
-  const normalized = query.trim()
-  if (!normalized) return []
-  return searchYoutube(normalized)
-}
+const MOCK_TRACKS=[{id:'dQw4w9WgXcQ',title:'Never Gonna Give You Up',artist:'Rick Astley',duration:'3:33',source:'youtube'},{id:'9bZkp7q19f0',title:'Gangnam Style',artist:'PSY',duration:'4:13',source:'youtube'}]
+export const MUSIC_PROVIDERS=[{id:'spotify',label:'Spotify'},{id:'deezer',label:'Deezer'},{id:'soundcloud',label:'SoundCloud'},{id:'youtube',label:'YouTube'}]
+const api=String(import.meta.env.VITE_MUSIC_API_BASE_URL||import.meta.env.VITE_SPOTIFY_API_BASE_URL||'').replace(/\/$/,''),CACHE='rcMusicSearchCache:v3',TTL=7*24*60*60*1000,LIMIT=120,pending=new Map()
+const norm=q=>q.trim().replace(/\s+/g,' ').toLowerCase()
+const duration=s=>{const n=Number(s);if(!Number.isFinite(n)||n<=0)return'—';return`${Math.floor(n/60)}:${String(Math.floor(n%60)).padStart(2,'0')}`}
+const media=t=>t.source==='spotify'?{...t,thumbnail:t.thumbnail||'',spotifyUrl:t.spotifyUrl||t.url||`https://open.spotify.com/track/${t.id}`,embedUrl:t.embedUrl||`https://open.spotify.com/embed/track/${t.id}`}:(t.source==='deezer'||t.source==='soundcloud')?{...t,thumbnail:t.thumbnail||'',externalUrl:t.externalUrl||t.url||'',previewUrl:t.previewUrl||''}:{...t,source:'youtube',thumbnail:t.thumbnail||`https://img.youtube.com/vi/${t.id}/hqdefault.jpg`,videoUrl:t.videoUrl||`https://www.youtube-nocookie.com/embed/${t.id}?autoplay=1&rel=0`}
+function readCache(key){try{const c=JSON.parse(localStorage.getItem(CACHE)||'{}'),v=c[key];if(!v)return null;if(Date.now()-v.at>TTL){delete c[key];localStorage.setItem(CACHE,JSON.stringify(c));return null}return v.data}catch{return null}}
+function writeCache(key,data){try{const c=JSON.parse(localStorage.getItem(CACHE)||'{}');c[key]={at:Date.now(),data};const keys=Object.keys(c).sort((a,b)=>c[b].at-c[a].at).slice(0,LIMIT);localStorage.setItem(CACHE,JSON.stringify(Object.fromEntries(keys.map(k=>[k,c[k]]))))}catch{}}
+async function cached(key,fn){const old=readCache(key);if(old)return old;if(pending.has(key))return pending.get(key);const p=fn().then(x=>x||[]).catch(()=>[]).then(x=>{writeCache(key,x);return x}).finally(()=>pending.delete(key));pending.set(key,p);return p}
+function decode(v=''){if(typeof document==='undefined')return v;const e=document.createElement('textarea');e.innerHTML=v;return e.value}
+async function deezer(q){const endpoint=api?`${api}/deezer-search?q=${encodeURIComponent(q)}`:`https://api.deezer.com/search?q=${encodeURIComponent(q)}&limit=8`;const r=await fetch(endpoint);if(!r.ok)return[];const d=await r.json(),items=d.tracks||d.data||[];return items.map(t=>media({id:String(t.id),title:t.title,artist:t.artist?.name||t.artist||'Deezer',duration:t.duration?duration(t.duration):'Deezer',thumbnail:t.thumbnail||t.album?.cover_medium||t.album?.cover,previewUrl:t.previewUrl||t.preview,externalUrl:t.externalUrl||t.link||`https://www.deezer.com/track/${t.id}`,source:'deezer'}))}
+async function spotify(q){if(!api)return[];const r=await fetch(`${api}/spotify-search?q=${encodeURIComponent(q)}`);if(!r.ok)return[];const d=await r.json();return(d.tracks||[]).map(t=>media({id:t.id,title:t.title,artist:t.artist,duration:t.duration,thumbnail:t.thumbnail,url:t.url,source:'spotify'}))}
+async function soundcloud(q){const endpoint=api?`${api}/soundcloud-search?q=${encodeURIComponent(q)}`:import.meta.env.VITE_SOUNDCLOUD_CLIENT_ID?`https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(q)}&limit=8&client_id=${import.meta.env.VITE_SOUNDCLOUD_CLIENT_ID}`:'';if(!endpoint)return[];const r=await fetch(endpoint);if(!r.ok)return[];const d=await r.json(),items=d.tracks||d.collection||[];return items.map(t=>media({id:String(t.id),title:t.title,artist:t.artist||t.user?.username||'SoundCloud',duration:t.duration?duration(Number(t.duration)/1000):'SoundCloud',thumbnail:t.thumbnail||t.artwork_url||t.user?.avatar_url,previewUrl:t.previewUrl||t.preview||'',externalUrl:t.externalUrl||t.permalink_url||'',source:'soundcloud'}))}
+async function youtube(q){if(!api){const m=MOCK_TRACKS.filter(t=>`${t.title} ${t.artist}`.toLowerCase().includes(q));return(m.length?m:MOCK_TRACKS).map(media)}const r=await fetch(`${api}/youtube-search?q=${encodeURIComponent(q)}`);if(!r.ok)return[];const d=await r.json();return(d.tracks||d.items||[]).map(t=>media(t.id?.videoId?{id:t.id.videoId,title:decode(t.snippet?.title),artist:decode(t.snippet?.channelTitle),source:'youtube'}:t))}
+export async function searchTracks(query){const q=norm(query);if(!q)return[];const all=readCache(`all:${q}`);if(all)return all;for(const [name,fn] of [['spotify',spotify],['deezer',deezer],['soundcloud',soundcloud]]){const result=await cached(`${name}:${q}`,()=>fn(q));if(result.length){writeCache(`all:${q}`,result);return result}}const result=await cached(`youtube:${q}`,()=>youtube(q));writeCache(`all:${q}`,result);return result}
