@@ -37315,12 +37315,11 @@
   }
   function SearchResult({ track, onPreview, onRequest, t }) {
     const sourceLabel = { youtube: "YouTube", deezer: "Deezer", soundcloud: "SoundCloud", spotify: "Spotify" }[track.source] || track.source;
-    const sourceMark = { youtube: "YT", deezer: "DZ", soundcloud: "SC", spotify: "SP" }[track.source] || "—";
     if (track.external) return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[.035] p-3", children: [
       /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "min-w-0", children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex flex-wrap items-center gap-2", children: [
           /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "break-words text-sm font-semibold", children: track.title }),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { "aria-label": `Resultado de ${sourceLabel}`, className: "inline-flex h-4 min-w-4 items-center justify-center rounded bg-white/10 px-1 text-[7px] font-bold uppercase tracking-wide text-white/45", children: sourceMark })
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { "aria-label": `Resultado de ${sourceLabel}`, className: "inline-flex h-4 min-w-4 items-center justify-center rounded bg-white/10 px-1 text-[7px] font-bold uppercase leading-none tracking-normal whitespace-nowrap text-white/45", children: sourceLabel })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-1 text-xs text-white/50", children: track.artist })
       ] }),
@@ -37334,7 +37333,7 @@
       /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "min-w-0 py-0.5", children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex min-w-0 flex-wrap items-center gap-1.5", children: [
           /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "search-result__title min-w-0 text-[13px] font-semibold leading-[1.2]", style: { display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 2, overflow: "hidden" }, children: track.title }),
-          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { title: `Resultado de ${sourceLabel}`, "aria-label": `Resultado de ${sourceLabel}`, className: "inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded bg-white/10 px-1 text-[7px] font-bold uppercase tracking-wide text-white/45", children: sourceMark })
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { title: `Resultado de ${sourceLabel}`, "aria-label": `Resultado de ${sourceLabel}`, className: "inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded bg-white/10 px-1 text-[7px] font-bold uppercase leading-none tracking-normal whitespace-nowrap text-white/45", children: sourceLabel })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-1 text-[11px] leading-4 text-white/55", style: { display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 2, overflow: "hidden" }, children: track.artist })
       ] }),
