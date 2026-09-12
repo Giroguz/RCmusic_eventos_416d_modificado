@@ -37331,7 +37331,10 @@
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "absolute inset-0 grid place-items-center bg-black/20", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "grid h-6 w-6 place-items-center rounded-full bg-white text-ink shadow-lg", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Play, { size: 11, fill: "currentColor" }) }) })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "min-w-0 py-0.5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "search-result__title text-[13px] font-semibold leading-[1.2]", style: { display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 2, overflow: "hidden" }, children: track.title }),
+        /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex min-w-0 flex-wrap items-center gap-1.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "search-result__title min-w-0 text-[13px] font-semibold leading-[1.2]", style: { display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 2, overflow: "hidden" }, children: track.title }),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { title: `Resultado de ${sourceLabel}`, className: "inline-flex shrink-0 items-center rounded-md bg-white/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-white/45", children: sourceLabel })
+        ] }),
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-1 text-[11px] leading-4 text-white/55", style: { display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 2, overflow: "hidden" }, children: track.artist })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { type: "button", onClick: () => onRequest(track), className: "shrink-0 rounded-lg bg-neon/10 px-2.5 py-2 text-[10px] font-bold text-neon transition hover:bg-neon hover:text-ink sm:px-3 sm:text-xs", children: t("order") })
