@@ -39082,13 +39082,32 @@
     if (failed) return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("img", { src: "/music-placeholder.svg", alt: alt || "M\xFAsica", className });
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("img", { src, alt, className, onError: () => setFailed(true) });
   }
+  function DeezerPreview2({ track }) {
+    const [previewUrl, setPreviewUrl] = (0, import_react10.useState)("");
+    const [fallbackUrl, setFallbackUrl] = (0, import_react10.useState)(`https://www.deezer.com/track/${track.videoId}`);
+    (0, import_react10.useEffect)(() => {
+      let active = true;
+      setPreviewUrl("");
+      fetch(`/api/deezer-track?id=${encodeURIComponent(track.videoId)}`).then((response) => response.ok ? response.json() : null).then((data) => {
+        if (!active) return;
+        setPreviewUrl(data?.preview || "");
+        if (data?.link) setFallbackUrl(data.link);
+      }).catch(() => {
+      });
+      return () => {
+        active = false;
+      };
+    }, [track.videoId]);
+    if (previewUrl) return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("audio", { controls: true, autoPlay: true, src: previewUrl, className: "w-full", onError: () => setPreviewUrl("") });
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "grid min-h-40 place-items-center gap-3 p-8 text-center text-sm text-white/55", children: [/* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Buscando la vista previa de Deezer..." }), /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("a", { href: fallbackUrl, target: "_blank", rel: "noreferrer", className: "rounded-xl bg-violet-500 px-4 py-2 font-bold text-white", children: "Ir a Deezer" })] });
+  }
   function PreviewFrame2({ track }) {
     if (track.source === "unknown") return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("div", { className: "grid min-h-40 place-items-center p-8 text-center text-sm text-white/55", children: "Este pedido no tiene una vista previa disponible." });
     if (track.source === "spotify" || String(track.videoId || "").startsWith("spotify:")) {
       const spotifyId = track.spotifyId || String(track.videoId).replace(/^spotify:/, "");
       return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("iframe", { title: track.title, src: `https://open.spotify.com/embed/track/${spotifyId}`, className: "h-[352px] w-full", allow: "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", loading: "lazy" });
     }
-    if (track.source === "deezer") return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("iframe", { title: track.title, src: `https://widget.deezer.com/widget/dark/track/${track.videoId}`, className: "h-[300px] w-full", allow: "autoplay; clipboard-write; encrypted-media", loading: "lazy" });
+    if (track.source === "deezer") return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(DeezerPreview2, { track });
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("iframe", { title: track.title, src: `https://www.youtube-nocookie.com/embed/${track.videoId}?autoplay=1&rel=0`, className: "aspect-video w-full", allow: "autoplay; encrypted-media", allowFullScreen: true });
   }
   function DjRequestRow({ request, onStatus, onPreview, onProof, onDriveSearch, onDriveCancel, searchingDrive, readOnly, t }) {
