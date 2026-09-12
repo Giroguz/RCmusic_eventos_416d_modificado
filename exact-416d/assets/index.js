@@ -39899,7 +39899,7 @@
   function App() {
     const [screen, setScreen] = (0, import_react11.useState)(() => {
       try {
-        return window.location.hash.slice(1) || window.history.state?.screen || readRouteStack().at(-1)?.screen || "home";
+        return window.location.hash.slice(1) || "home";
       } catch {
         return "home";
       }
@@ -39907,7 +39907,7 @@
     const screenRef = (0, import_react11.useRef)(screen);
     const [activeEvent, setActiveEvent] = (0, import_react11.useState)(() => {
       try {
-        return window.history.state?.activeEvent || readRouteStack().at(-1)?.activeEvent || null;
+        return window.location.hash.slice(1) === "attendee" ? window.history.state?.activeEvent || null : null;
       } catch {
         return null;
       }
@@ -39937,11 +39937,13 @@
     }, [screen]);
     (0, import_react11.useEffect)(() => {
       const current = window.history.state;
-      const stack = readRouteStack();
-      writeRouteStack(stack);
-      const initial = stack.at(-1) || { screen: "home", activeEvent: null };
-      if (!current?.[HISTORY_KEY]) {
-        window.history.replaceState({ ...current, [HISTORY_KEY]: true, screen: initial.screen, activeEvent: initial.activeEvent || null, routeIndex: stack.length - 1, appRoot: stack.length === 1 }, "", routeHash(initial.screen));
+      const explicitHash = window.location.hash.slice(1);
+      const currentScreen = explicitHash || "home";
+      const currentEvent = currentScreen === "attendee" ? activeEvent || null : null;
+      const routeTrail = explicitHash ? [{ screen: currentScreen, activeEvent: currentEvent }] : [{ screen: "home", activeEvent: null }];
+      writeRouteStack(routeTrail);
+      if (!current?.[HISTORY_KEY] || !explicitHash) {
+        window.history.replaceState({ ...current, [HISTORY_KEY]: true, screen: currentScreen, activeEvent: currentEvent, routeTrail, routeIndex: 0, appRoot: true }, "", routeHash(currentScreen));
       }
       const restorePreviousRoute = (event) => {
       const state = event?.state || window.history.state;
