@@ -33019,7 +33019,7 @@
     const data = await response.json();
     return (data.items || []).filter((item) => item.id?.videoId).map((item) => withMedia({ id: item.id.videoId, title: decodeHtml(item.snippet.title), artist: decodeHtml(item.snippet.channelTitle), duration: "YouTube", source: "youtube" }));
   }
-  var SEARCH_CACHE_KEY = "rcMusicSearchCache:v3";
+  var SEARCH_CACHE_KEY = "rcMusicSearchCache:v4";
   var SEARCH_CACHE_TTL = 7 * 24 * 60 * 60 * 1e3;
   var SEARCH_CACHE_LIMIT = 120;
   var SEARCH_PENDING = /* @__PURE__ */ new Map();
