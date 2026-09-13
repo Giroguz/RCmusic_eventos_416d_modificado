@@ -38867,15 +38867,11 @@
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Destinos de notificaci\xF3n" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Cambia el correo y el n\xF9mero de WhatsApp que recibir\xE1n avisos de solicitudes de planes y c\xF3digos." })
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Configura el n\xF9mero de WhatsApp que recibir\xE1 avisos de solicitudes de planes y c\xF3digos." })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: saveNotificationSettings, disabled: notificationBusy, className: "rounded-xl bg-turquoise px-3 py-2.5 text-xs font-bold text-ink hover:brightness-110", children: notificationBusy ? "Guardando\x2026" : "Guardar destinos" })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 grid gap-3 sm:grid-cols-2", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "block", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mb-1 block text-[11px] font-semibold text-white/60", children: "Correo de notificaci\xF3n" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "email", value: notificationEmail, onChange: (e) => setNotificationEmail(e.target.value), className: "input-dark", placeholder: "correo@ejemplo.com" })
-          ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 max-w-md", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "block", children: [
             /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mb-1 block text-[11px] font-semibold text-white/60", children: "WhatsApp de notificaci\xF3n" }),
             /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "tel", inputMode: "tel", value: notificationWhatsapp, onChange: (e) => setNotificationWhatsapp(e.target.value), className: "input-dark", placeholder: "519xxxxxxxx" })
