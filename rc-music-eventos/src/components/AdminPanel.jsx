@@ -100,14 +100,14 @@ export default function AdminPanel({ session, onClose }) {
   async function activateDj(e) { e.preventDefault(); const draft = activationDraft; if (!draft.displayName.trim() || !draft.email.includes('@') || !draft.planType) { setActivationMessage('Completa nombre, correo y plan antes de activar.'); return } setActivationBusy(true); setActivationMessage(''); try { const result = await adminActivateDj(draft.djId, { email: draft.email.trim().toLowerCase(), displayName: draft.displayName.trim(), accessCode: draft.accessCode.trim(), planType: draft.planType }, session.token); let message = `Acceso activado para ${draft.displayName}. Código generado: ${result.generatedCode}`; if (draft.driveAccess) { try { await grantDriveFolderAccess(draft.email.trim().toLowerCase()); message += ' Permiso de lectura de Drive otorgado.' } catch { message += ' El acceso a Drive quedó pendiente de autorización.' } } setActivationDraft((current) => ({ ...current, djId: result.id || current.djId, accessCode: '', generatedCode: result.generatedCode || '' })); setActivationMessage(message); setNotice('DJ activado correctamente.'); await load() } catch { setActivationMessage('No se pudo activar el acceso. Revisa las migraciones de Supabase y los datos.'); setError('No se pudo activar el acceso del DJ.') } finally { setActivationBusy(false) } }
   async function create(e) { e.preventDefault(); setBusy(true); setError(''); setGeneratedCode(''); try { const result = await adminCreateDj({ ...form, planType: 'none' }, session.token); setGeneratedCode(result.generatedCode || ''); setNotice(`Usuario creado: ${result.email}. Código generado listo para compartir.`); setForm({ email: '', displayName: '' }); await load() } catch { setError(t('createDjError')) } finally { setBusy(false) } }
   async function action(fn) { setBusy(true); setError(''); try { const result = await fn(); if (result?.generatedCode) setGeneratedCode(result.generatedCode); await load() } catch { setError(t('updateDjError')) } finally { setBusy(false) } }
-  function draftFor(dj) { return { planType: dj.planType || 'none', extraDays: '', email: dj.email || '', displayName: dj.displayName || '', blocked: Boolean(dj.blocked) } }
+  function draftFor(dj) { return { planType: 'none', extraDays: '', email: dj.email || '', displayName: dj.displayName || '', blocked: Boolean(dj.blocked) } }
   function updateUserDraft(dj, patch) { setUserDrafts((current) => ({ ...current, [dj.id]: { ...draftFor(dj), ...current[dj.id], ...patch } })) }
   async function saveDjChanges(dj) {
     const draft = { ...draftFor(dj), ...(userDrafts[dj.id] || {}) }
     const selectedPlan = draft.planType || 'none'; const extraDays = Number(draft.extraDays || 0); const selectedBlocked = Boolean(draft.blocked)
     const nextEmail = String(draft.email || '').trim().toLowerCase(); const nextDisplayName = String(draft.displayName || '').trim()
     const contactChanged = nextEmail !== String(dj.email || '').toLowerCase() || nextDisplayName !== String(dj.displayName || '')
-    const planChanged = selectedPlan !== (dj.planType || 'none'); const blockChanged = selectedBlocked !== Boolean(dj.blocked)
+    const planChanged = selectedPlan !== 'none'; const blockChanged = selectedBlocked !== Boolean(dj.blocked)
     const needsActivation = !dj.isActive && selectedPlan !== 'none'
     if (!planChanged && !extraDays && !needsActivation && !contactChanged && !blockChanged) { setNotice('No hay cambios pendientes para este usuario.'); return }
     if (!nextEmail.includes('@') || !nextDisplayName) { setError('Completa un correo y nombre válidos antes de guardar.'); return }
@@ -118,7 +118,7 @@ export default function AdminPanel({ session, onClose }) {
       if (planChanged || needsActivation) await adminSetDjPlan(dj.id, selectedPlan, session.token)
       if (extraDays > 0) await adminExtendDjPlan(dj.id, extraDays, session.token)
       if (blockChanged) await adminSetDjState(dj.id, selectedBlocked ? { approved: false, blocked: true } : { approved: true, blocked: false }, session.token)
-      setNotice(`Cambios guardados para ${nextDisplayName}.`); setUserDrafts((current) => ({ ...current, [dj.id]: { planType: selectedPlan, extraDays: '', email: nextEmail, displayName: nextDisplayName, blocked: selectedBlocked } })); await load()
+      setNotice(`Cambios guardados para ${nextDisplayName}.`); setUserDrafts((current) => ({ ...current, [dj.id]: { planType: 'none', extraDays: '', email: nextEmail, displayName: nextDisplayName, blocked: selectedBlocked } })); await load()
     } catch { setError('No se pudieron guardar los cambios del usuario.') } finally { setBusy(false) }
   }
   async function deleteDj(dj) {
