@@ -40068,9 +40068,18 @@
       const restorePreviousRoute = (event) => {
       const state = event?.state || window.history.state;
       if (state?.[HISTORY_KEY]) {
+        const historyScreen = state.screen || screenRef.current || "home";
+        if (historyScreen === "dj-login" || historyScreen === "attendee-join") {
+          const homeTrail = [{ screen: "home", activeEvent: null }];
+          writeRouteStack(homeTrail);
+          window.history.replaceState({ ...state, [HISTORY_KEY]: true, screen: "home", activeEvent: null, routeTrail: homeTrail, routeIndex: 0, appRoot: true }, "", routeHash("home"));
+          setActiveEvent(null);
+          setScreen("home");
+          return;
+        }
         const trail = Array.isArray(state.routeTrail) && state.routeTrail.length ? state.routeTrail : readRouteStack();
         writeRouteStack(trail);
-        setScreen(state.screen || screenRef.current || "home");
+        setScreen(historyScreen);
         setActiveEvent(state.activeEvent || null);
         return;
       }
