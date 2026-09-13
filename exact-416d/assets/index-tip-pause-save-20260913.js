@@ -40008,14 +40008,22 @@
   function routeHash(screen) {
     return `#${screen || "home"}`;
   }
+  function pageWasRefreshed() {
+    try {
+      return performance.getEntriesByType("navigation")[0]?.type === "reload";
+    } catch {
+      return false;
+    }
+  }
+  function initialScreen() {
+    try {
+      return pageWasRefreshed() ? "home" : window.location.hash.slice(1) || "home";
+    } catch {
+      return "home";
+    }
+  }
   function App() {
-    const [screen, setScreen] = (0, import_react11.useState)(() => {
-      try {
-        return window.location.hash.slice(1) || "home";
-      } catch {
-        return "home";
-      }
-    });
+    const [screen, setScreen] = (0, import_react11.useState)(initialScreen);
     const screenRef = (0, import_react11.useRef)(screen);
     const [activeEvent, setActiveEvent] = (0, import_react11.useState)(() => {
       try {
@@ -40049,7 +40057,7 @@
     }, [screen]);
     (0, import_react11.useEffect)(() => {
       const current = window.history.state;
-      const explicitHash = window.location.hash.slice(1);
+      const explicitHash = pageWasRefreshed() ? "" : window.location.hash.slice(1);
       const currentScreen = explicitHash || "home";
       const currentEvent = currentScreen === "attendee" ? activeEvent || null : null;
       const routeTrail = explicitHash ? [{ screen: currentScreen, activeEvent: currentEvent }] : [{ screen: "home", activeEvent: null }];
