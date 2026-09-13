@@ -26776,10 +26776,7 @@
         ] })
       ] }) }),
       /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("main", { children }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("footer", { className: "mx-auto max-w-6xl px-4 py-8 text-center text-xs text-white/30 sm:px-6 lg:px-8", children: [
-        "RC music_eventos \xB7 ",
-        t("footerTagline")
-      ] })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("footer", { className: "mx-auto max-w-6xl px-4 py-8 text-center text-xs text-white/30 sm:px-6 lg:px-8", children: "RCmusic_eventos" })
     ] });
   }
   function PageContainer({ children, className = "" }) {
