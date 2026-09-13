@@ -69,10 +69,10 @@ begin
   select case p_plan_type when 'fifteen' then fifteen_days when 'monthly' then monthly_days when 'annual' then annual_days else null end into p_days from public.subscription_settings where id=true;
   update public.dj_accounts set
     plan_type=p_plan_type,
-    plan_started_at=case when p_plan_type='none' then null else now() end,
-    plan_expires_at=case when p_days is null then null else now()+make_interval(days => p_days) end,
-    plan_paused_remaining_seconds=case when blocked and p_days is not null then (p_days::bigint * 86400) else 0 end,
-    plan_paused_at=case when blocked and p_days is not null then now() else null end
+    plan_started_at=case when p_plan_type='none' then null else coalesce(plan_started_at, now()) end,
+    plan_expires_at=case when p_days is null then null else greatest(coalesce(plan_expires_at, now()), now())+make_interval(days => p_days) end,
+    plan_paused_remaining_seconds=case when blocked and p_days is not null then coalesce(plan_paused_remaining_seconds, greatest(0,floor(extract(epoch from coalesce(plan_expires_at,now())-now()))::bigint)) + (p_days::bigint * 86400) else 0 end,
+    plan_paused_at=case when blocked and p_days is not null then coalesce(plan_paused_at, now()) else null end
   where id=p_dj_id and role='dj' returning * into d;
   return query select d.id,d.email,d.display_name,d.role,d.approved,d.blocked,d.plan_type,d.plan_started_at,d.plan_expires_at,0,
     case when d.blocked then greatest(0,floor(coalesce(d.plan_paused_remaining_seconds,0)/86400)::integer)
