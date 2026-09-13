@@ -38996,7 +38996,7 @@
               ] })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "flex gap-2", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("select", { value: userDrafts[dj.id]?.planType ?? dj.planType ?? "none", onChange: (e) => updateUserDraft(dj, { planType: e.target.value }), disabled: busy, className: "input-dark min-w-0 flex-1 py-2 text-xs", "aria-label": "Seleccionar nuevo plan", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "flex gap-2", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("select", { value: userDrafts[dj.id]?.planType ?? "none", onChange: (e) => updateUserDraft(dj, { planType: e.target.value }), disabled: busy, className: "input-dark min-w-0 flex-1 py-2 text-xs", "aria-label": "Seleccionar nuevo plan", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: "none", children: "Sin plan" }),
                 planOptions.map((plan) => /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("option", { value: plan.id, children: planLabel(plan.id, t, planOptions) }, plan.id))
               ] }) }),
