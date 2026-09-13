@@ -38691,7 +38691,7 @@
       }
     }
     function draftFor(dj) {
-      return { planType: dj.planType || "none", extraDays: "", email: dj.email || "", displayName: dj.displayName || "", blocked: Boolean(dj.blocked) };
+      return { planType: "none", extraDays: "", email: dj.email || "", displayName: dj.displayName || "", blocked: Boolean(dj.blocked) };
     }
     function updateUserDraft(dj, patch) {
       setUserDrafts((current) => ({ ...current, [dj.id]: { ...draftFor(dj), ...current[dj.id], ...patch } }));
@@ -38704,7 +38704,7 @@
       const nextEmail = String(draft.email || "").trim().toLowerCase();
       const nextDisplayName = String(draft.displayName || "").trim();
       const contactChanged = nextEmail !== String(dj.email || "").toLowerCase() || nextDisplayName !== String(dj.displayName || "");
-      const planChanged = selectedPlan !== (dj.planType || "none");
+      const planChanged = selectedPlan !== "none";
       const blockChanged = selectedBlocked !== Boolean(dj.blocked);
       const needsActivation = !dj.isActive && selectedPlan !== "none";
       if (!planChanged && !extraDays && !needsActivation && !contactChanged && !blockChanged) {
@@ -38723,7 +38723,7 @@
         if (extraDays > 0) await adminExtendDjPlan(dj.id, extraDays, session.token);
         if (blockChanged) await adminSetDjState(dj.id, selectedBlocked ? { approved: false, blocked: true } : { approved: true, blocked: false }, session.token);
         setNotice(`Cambios guardados para ${nextDisplayName}.`);
-        setUserDrafts((current) => ({ ...current, [dj.id]: { planType: selectedPlan, extraDays: "", email: nextEmail, displayName: nextDisplayName, blocked: selectedBlocked } }));
+        setUserDrafts((current) => ({ ...current, [dj.id]: { planType: "none", extraDays: "", email: nextEmail, displayName: nextDisplayName, blocked: selectedBlocked } }));
         await load();
       } catch {
         setError("No se pudieron guardar los cambios del usuario.");
