@@ -40018,6 +40018,14 @@
   function pageWasRefreshed() {
     return navigationType() === "reload";
   }
+  function historyRestoredPanel() {
+    try {
+      const hash = window.location.hash.slice(1);
+      return navigationType() === "back_forward" && (hash === "attendee" || hash === "dj" || hash === "developer");
+    } catch {
+      return false;
+    }
+  }
   function historyRestoredLogin() {
     try {
       const hash = window.location.hash.slice(1);
@@ -40026,9 +40034,12 @@
       return false;
     }
   }
+  function shouldReturnHomeFromHistory() {
+    return pageWasRefreshed() || historyRestoredLogin() || historyRestoredPanel();
+  }
   function initialScreen() {
     try {
-      return pageWasRefreshed() || historyRestoredLogin() ? "home" : window.location.hash.slice(1) || "home";
+      return shouldReturnHomeFromHistory() ? "home" : window.location.hash.slice(1) || "home";
     } catch {
       return "home";
     }
@@ -40068,7 +40079,7 @@
     }, [screen]);
     (0, import_react11.useEffect)(() => {
       const current = window.history.state;
-      const explicitHash = pageWasRefreshed() || historyRestoredLogin() ? "" : window.location.hash.slice(1);
+      const explicitHash = shouldReturnHomeFromHistory() ? "" : window.location.hash.slice(1);
       const currentScreen = explicitHash || "home";
       const currentEvent = currentScreen === "attendee" ? activeEvent || null : null;
       const routeTrail = explicitHash ? [{ screen: currentScreen, activeEvent: currentEvent }] : [{ screen: "home", activeEvent: null }];
