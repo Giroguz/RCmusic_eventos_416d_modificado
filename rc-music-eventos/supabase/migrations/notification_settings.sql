@@ -3,9 +3,11 @@ alter table public.subscription_settings add column if not exists notification_e
 alter table public.subscription_settings add column if not exists notification_whatsapp text;
 insert into public.subscription_settings(id, notification_email, notification_whatsapp)
 values (true, 'gianfranguz@gmail.com', '51989211755')
-on conflict (id) do update set
-  notification_email = coalesce(public.subscription_settings.notification_email, excluded.notification_email),
-  notification_whatsapp = coalesce(public.subscription_settings.notification_whatsapp, excluded.notification_whatsapp);
+on conflict (id) do nothing;
+update public.subscription_settings
+set notification_email = coalesce(notification_email, 'gianfranguz@gmail.com'),
+    notification_whatsapp = coalesce(notification_whatsapp, '51989211755')
+where id=true;
 
 drop function if exists public.admin_get_notification_settings(text);
 create or replace function public.admin_get_notification_settings(p_token text)
