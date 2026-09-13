@@ -23,7 +23,7 @@ begin
     case when d.blocked then greatest(0,floor(coalesce(d.plan_paused_remaining_seconds,0)/86400)::integer)
          when d.plan_expires_at is null then 0 else greatest(0,floor(extract(epoch from d.plan_expires_at-now())/86400)::integer) end,
     (d.approved and not d.blocked and (d.role='admin' or d.plan_expires_at>now())),
-    null::text,
+    coalesce(nullif(d.access_code_display,''),nullif(d.demo_code,'')),
     case when d.blocked then coalesce(d.plan_paused_remaining_seconds,0) else null end
   from public.dj_accounts d order by d.created_at desc;
 end $$;
@@ -37,19 +37,19 @@ declare a public.dj_accounts; d public.dj_accounts;
 begin
   select * into a from public._dj_access(p_token);
   if coalesce(a.role,'') <> 'admin' or a.email <> 'djgianfrancoromerodechosica@gmail.com' then raise exception 'Admin only'; end if;
-  update public.dj_accounts set
+  update public.dj_accounts as dja set
     approved = p_approved,
     blocked = p_blocked,
     plan_paused_remaining_seconds = case
-      when p_blocked and not blocked then greatest(0,floor(extract(epoch from coalesce(plan_expires_at,now())-now()))::bigint)
-      when p_blocked then coalesce(plan_paused_remaining_seconds,0)
+      when p_blocked and not dja.blocked then greatest(0,floor(extract(epoch from coalesce(dja.plan_expires_at,now())-now()))::bigint)
+      when p_blocked then coalesce(dja.plan_paused_remaining_seconds,0)
       else 0 end,
-    plan_paused_at = case when p_blocked and not blocked then now() when p_blocked then plan_paused_at else null end,
+    plan_paused_at = case when p_blocked and not dja.blocked then now() when p_blocked then dja.plan_paused_at else null end,
     plan_expires_at = case
-      when not p_blocked and blocked and coalesce(plan_paused_remaining_seconds,0) > 0
-        then now() + make_interval(secs => plan_paused_remaining_seconds::double precision)
-      else plan_expires_at end
-  where id=p_dj_id and role='dj' returning * into d;
+      when not p_blocked and dja.blocked and coalesce(dja.plan_paused_remaining_seconds,0) > 0
+        then now() + make_interval(secs => dja.plan_paused_remaining_seconds::double precision)
+      else dja.plan_expires_at end
+  where dja.id=p_dj_id and dja.role='dj' returning dja.* into d;
   return query select d.id,d.email,d.display_name,d.role,d.approved,d.blocked,d.plan_type,d.plan_started_at,d.plan_expires_at,0,
     case when d.blocked then greatest(0,floor(coalesce(d.plan_paused_remaining_seconds,0)/86400)::integer)
          when d.plan_expires_at is null then 0 else greatest(0,floor(extract(epoch from d.plan_expires_at-now())/86400)::integer) end,
@@ -91,15 +91,15 @@ begin
   select * into a from public._dj_access(p_token);
   if coalesce(a.role,'') <> 'admin' or a.email <> 'djgianfrancoromerodechosica@gmail.com' then raise exception 'Admin only'; end if;
   if p_days not between 1 and 3650 then raise exception 'Invalid extension'; end if;
-  update public.dj_accounts set
-    approved=case when blocked then approved else true end,
-    blocked=blocked,
-    plan_type=case when plan_type in ('monthly','annual','fifteen') then plan_type else 'monthly' end,
-    plan_started_at=coalesce(plan_started_at, now()),
-    plan_expires_at=greatest(coalesce(plan_expires_at, now()), now()) + make_interval(days => p_days),
-    plan_paused_remaining_seconds=case when blocked then coalesce(plan_paused_remaining_seconds,0)+(p_days::bigint*86400) else 0 end,
-    plan_paused_at=case when blocked then coalesce(plan_paused_at,now()) else null end
-  where id=p_dj_id and role='dj' returning * into d;
+  update public.dj_accounts as dja set
+    approved=case when dja.blocked then dja.approved else true end,
+    blocked=dja.blocked,
+    plan_type=case when dja.plan_type in ('monthly','annual','fifteen') then dja.plan_type else 'monthly' end,
+    plan_started_at=coalesce(dja.plan_started_at, now()),
+    plan_expires_at=greatest(coalesce(dja.plan_expires_at, now()), now()) + make_interval(days => p_days),
+    plan_paused_remaining_seconds=case when dja.blocked then coalesce(dja.plan_paused_remaining_seconds,0)+(p_days::bigint*86400) else 0 end,
+    plan_paused_at=case when dja.blocked then coalesce(dja.plan_paused_at,now()) else null end
+  where dja.id=p_dj_id and dja.role='dj' returning dja.* into d;
   if d.id is null then raise exception 'DJ not found'; end if;
   return query select d.id,d.email,d.display_name,d.role,d.approved,d.blocked,d.plan_type,d.plan_started_at,d.plan_expires_at,0,
     case when d.blocked then greatest(0,floor(coalesce(d.plan_paused_remaining_seconds,0)/86400)::integer)
