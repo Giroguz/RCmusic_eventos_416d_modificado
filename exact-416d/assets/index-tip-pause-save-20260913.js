@@ -32754,6 +32754,18 @@
     if (error) throw error;
     return data || "";
   }
+  async function adminGetNotificationSettings(token) {
+    if (!supabase || !token) throw new Error("Admin session required");
+    const { data, error } = await supabase.rpc("admin_get_notification_settings", { p_token: token });
+    if (error) throw error;
+    return Array.isArray(data) ? data[0] || {} : data || {};
+  }
+  async function adminSetNotificationSettings(input, token) {
+    if (!supabase || !token) throw new Error("Admin session required");
+    const { data, error } = await supabase.rpc("admin_set_notification_settings", { p_token: token, p_notification_email: input.email || null, p_notification_whatsapp: input.whatsapp || null });
+    if (error) throw error;
+    return Array.isArray(data) ? data[0] || {} : data || {};
+  }
   async function getSubscriptionPlanPrices() {
     try {
       const saved = JSON.parse(localStorage.getItem("rc_admin_subscription_settings_v1") || "null");
@@ -38427,6 +38439,9 @@
     const [subscriptionQr, setSubscriptionQr] = (0, import_react9.useState)("");
     const [yapeNumber, setYapeNumber] = (0, import_react9.useState)("");
     const [yapeNumberDraft, setYapeNumberDraft] = (0, import_react9.useState)("");
+    const [notificationEmail, setNotificationEmail] = (0, import_react9.useState)("");
+    const [notificationWhatsapp, setNotificationWhatsapp] = (0, import_react9.useState)("");
+    const [notificationBusy, setNotificationBusy] = (0, import_react9.useState)(false);
     const [notice, setNotice] = (0, import_react9.useState)("");
     const [error, setError] = (0, import_react9.useState)("");
     const [busy, setBusy] = (0, import_react9.useState)(false);
@@ -38465,6 +38480,12 @@
         const number = await adminGetSubscriptionYapeNumber(session.token);
         setYapeNumber(number);
         setYapeNumberDraft(number);
+      } catch {
+      }
+      try {
+        const destinations = await adminGetNotificationSettings(session.token);
+        setNotificationEmail(destinations.notification_email || "");
+        setNotificationWhatsapp(destinations.notification_whatsapp || "");
       } catch {
       }
       const savedSettings = readAdminSettings();
@@ -38540,6 +38561,20 @@
         setError("No se pudo guardar el n\xFAmero de Yape.");
       } finally {
         setQrBusy(false);
+      }
+    }
+    async function saveNotificationSettings() {
+      setNotificationBusy(true);
+      setError("");
+      try {
+        const result = await adminSetNotificationSettings({ email: notificationEmail.trim(), whatsapp: notificationWhatsapp.trim() }, session.token);
+        setNotificationEmail(result.notification_email || "");
+        setNotificationWhatsapp(result.notification_whatsapp || "");
+        setNotice("Destinos de notificaci\xF3n guardados.");
+      } catch {
+        setError("No se pudieron guardar los destinos de notificaci\xF3n.");
+      } finally {
+        setNotificationBusy(false);
       }
     }
     async function saveSubscriptionQr(file) {
@@ -38827,6 +38862,25 @@
           subscriptionQr && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: removeSubscriptionQr, disabled: qrBusy, className: "ml-2 rounded-xl px-3 py-2.5 text-xs font-bold text-red-200 hover:bg-red-400/10", children: "Quitar QR" })
         ] }),
         subscriptionQr && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("img", { src: subscriptionQr, alt: "QR de Yape para suscripciones", className: "h-24 w-24 rounded-xl bg-white p-2 object-contain sm:h-32 sm:w-32" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-notification-settings", className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/10 p-3 sm:p-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Destinos de notificaci\xF3n" }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Cambia el correo y el n\xF9mero de WhatsApp que recibir\xE1n avisos de solicitudes de planes y c\xF3digos." })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: saveNotificationSettings, disabled: notificationBusy, className: "rounded-xl bg-turquoise px-3 py-2.5 text-xs font-bold text-ink hover:brightness-110", children: notificationBusy ? "Guardando\x2026" : "Guardar destinos" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 grid gap-3 sm:grid-cols-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "block", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mb-1 block text-[11px] font-semibold text-white/60", children: "Correo de notificaci\xF3n" }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "email", value: notificationEmail, onChange: (e) => setNotificationEmail(e.target.value), className: "input-dark", placeholder: "correo@ejemplo.com" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "block", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mb-1 block text-[11px] font-semibold text-white/60", children: "WhatsApp de notificaci\xF3n" }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "tel", inputMode: "tel", value: notificationWhatsapp, onChange: (e) => setNotificationWhatsapp(e.target.value), className: "input-dark", placeholder: "519xxxxxxxx" })
+          ] })
+        ] })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "mb-5 rounded-2xl border border-violet-300/20 bg-violet-300/[.06] p-3 sm:mb-7 sm:p-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
