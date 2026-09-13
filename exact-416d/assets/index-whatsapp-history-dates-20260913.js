@@ -26863,7 +26863,7 @@
         ] })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col gap-3 border-t border-white/10 pt-5 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "font-semibold tracking-wide", children: "RCmusic_eventos • Dj. Gianfranco Romero" }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "font-semibold tracking-wide", children: "RCmusic_eventos" }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", "aria-label": "Redes sociales", children: [
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { title: "Facebook", className: "grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[.04] text-white/60", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SocialIcon, { type: "facebook" }) }),
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { title: "TikTok", className: "grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[.04] text-white/60", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SocialIcon, { type: "tiktok" }) }),
