@@ -40008,16 +40008,27 @@
   function routeHash(screen) {
     return `#${screen || "home"}`;
   }
-  function pageWasRefreshed() {
+  function navigationType() {
     try {
-      return performance.getEntriesByType("navigation")[0]?.type === "reload";
+      return performance.getEntriesByType("navigation")[0]?.type || "";
+    } catch {
+      return "";
+    }
+  }
+  function pageWasRefreshed() {
+    return navigationType() === "reload";
+  }
+  function historyRestoredLogin() {
+    try {
+      const hash = window.location.hash.slice(1);
+      return navigationType() === "back_forward" && (hash === "dj-login" || hash === "attendee-join");
     } catch {
       return false;
     }
   }
   function initialScreen() {
     try {
-      return pageWasRefreshed() ? "home" : window.location.hash.slice(1) || "home";
+      return pageWasRefreshed() || historyRestoredLogin() ? "home" : window.location.hash.slice(1) || "home";
     } catch {
       return "home";
     }
@@ -40057,7 +40068,7 @@
     }, [screen]);
     (0, import_react11.useEffect)(() => {
       const current = window.history.state;
-      const explicitHash = pageWasRefreshed() ? "" : window.location.hash.slice(1);
+      const explicitHash = pageWasRefreshed() || historyRestoredLogin() ? "" : window.location.hash.slice(1);
       const currentScreen = explicitHash || "home";
       const currentEvent = currentScreen === "attendee" ? activeEvent || null : null;
       const routeTrail = explicitHash ? [{ screen: currentScreen, activeEvent: currentEvent }] : [{ screen: "home", activeEvent: null }];
