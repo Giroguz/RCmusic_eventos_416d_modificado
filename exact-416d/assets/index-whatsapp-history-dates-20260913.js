@@ -32594,7 +32594,14 @@
       storeDjSession(null);
       return null;
     }
-    return { token, ...access };
+    const session = { token, ...access };
+    if (access.role !== "admin" && (!access.plan_expires_at || new Date(access.plan_expires_at).getTime() <= Date.now())) {
+      storeDjSession(session);
+      const expired = new Error("DJ plan expired");
+      expired.access = session;
+      throw expired;
+    }
+    return session;
   }
   async function signOutDj(token = getStoredDjSession()?.token) {
     if (supabase && token) await supabase.rpc("dj_logout", { p_token: token }).catch(() => {
@@ -38331,6 +38338,12 @@
         }
         onLogin(access);
       } catch (err) {
+        if (err?.message === "DJ plan expired") {
+          setPlanExpired(true);
+          setExpiredSession(err.access || null);
+          setError(t("planExpired"));
+          return;
+        }
         setError(err?.message === "SUPABASE_REQUIRED" ? t("supabaseRequired") : err?.message === "DEVELOPER_ACCESS_REQUIRED" ? "Este acceso es exclusivo para el desarrollador. Ingresa con el usuario y la clave de administrador." : err?.message === "LOGIN_TIMEOUT" ? "El servidor tard\xF3 demasiado en responder. Revisa la conexi\xF3n y vuelve a pulsar Ingresar." : t("loginError"));
       } finally {
         setSubmitting(false);
@@ -39786,7 +39799,7 @@
             setActiveId((current) => freshEvents.some((event) => event.id === current) ? current : freshEvents[0]?.id);
           }
         } catch (error) {
-          setLoadError(error?.message === "SESSION_EXPIRED" ? "La sesi\xF3n del DJ venci\xF3. Vuelve a ingresar con tu correo y c\xF3digo." : "No se pudo cargar el Panel de DJ. Revisa tu conexi\xF3n e int\xE9ntalo nuevamente.");
+          setLoadError(error?.message === "DJ plan expired" ? "🔒 Tu plan no está activo. Renueva o solicita un plan para ingresar al Panel de DJ." : error?.message === "SESSION_EXPIRED" ? "La sesi\xF3n del DJ venci\xF3. Vuelve a ingresar con tu correo y c\xF3digo." : "No se pudo cargar el Panel de DJ. Revisa tu conexi\xF3n e int\xE9ntalo nuevamente.");
         } finally {
           setLoading(false);
         }
