@@ -39672,6 +39672,13 @@
     const [qrLoading, setQrLoading] = (0, import_react10.useState)(false);
     const activeEvent = events.find((event) => event.id === activeId) || events[0];
     const DJ_OVERLAY_KEY = "rcMusicDjOverlay";
+    function restorePageScroll() {
+      document.body.style.overflow = "auto";
+      document.body.style.overscrollBehavior = "auto";
+      document.body.style.touchAction = "auto";
+      document.documentElement.style.overflow = "auto";
+      document.documentElement.style.overscrollBehavior = "auto";
+    }
     function syncDjOverlay(state = window.history.state) {
       const overlay = state?.[DJ_OVERLAY_KEY] || "";
       setShowAdmin(overlay === "admin");
@@ -39683,7 +39690,7 @@
       setPaymentProof(overlay === "payment" ? state?.djOverlayData || "" : "");
       setDownloadOptions(overlay === "downloads" ? state?.djOverlayData || null : null);
       setChatOpen(overlay === "chat");
-      if (!overlay) document.body.style.overflow = "";
+      if (!overlay) restorePageScroll();
     }
     function openDjOverlay(name, data = null) {
       const current = window.history.state || {};
@@ -39708,7 +39715,7 @@
         setPaymentProof("");
         setDownloadOptions(null);
         setChatOpen(false);
-        document.body.style.overflow = "";
+        restorePageScroll();
         return;
       }
       fallback?.();
