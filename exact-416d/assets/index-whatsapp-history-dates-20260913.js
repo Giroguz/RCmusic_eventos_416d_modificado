@@ -38547,7 +38547,18 @@
     const [paypalCurrency, setPaypalCurrency] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.paypalCurrency || "USD"; } catch { return "USD"; } });
     const [paypalLink, setPaypalLink] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.paypalLink || JSON.parse(localStorage.getItem("rc_paypal_settings_v1") || "null")?.link || ""; } catch { return ""; } });
     const [paymentAccordion, setPaymentAccordion] = (0, import_react9.useState)("");
-    const [clientControlOpen, setClientControlOpen] = (0, import_react9.useState)(true);
+    const [clientControlOpen, setClientControlOpen] = (0, import_react9.useState)(false);
+    const [adminAccordionOpen, setAdminAccordionOpen] = (0, import_react9.useState)({ summary: false, pricing: false, payment: false, history: false, proofs: false, activation: false });
+    function toggleAdminAccordion(key) {
+      setAdminAccordionOpen((current) => ({ ...current, [key]: !current[key] }));
+    }
+    function adminAccordionHeader(title, key) {
+      const open = Boolean(adminAccordionOpen[key]);
+      return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => toggleAdminAccordion(key), className: "flex w-full items-center justify-between gap-3 text-left", "aria-expanded": open, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "font-bold text-turquoise", children: title }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-turquoise/50 bg-black/20 text-xl font-black text-turquoise", children: open ? "−" : "+" })
+      ] });
+    }
     const [yapeHolder, setYapeHolder] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.yapeHolder || ""; } catch { return ""; } });
     const [mercadoLink, setMercadoLink] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.mercadoLink || ""; } catch { return ""; } });
     const [mercadoPublicKey, setMercadoPublicKey] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.mercadoPublicKey || ""; } catch { return ""; } });
@@ -38971,6 +38982,74 @@
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "break-words", children: notice })
       ] }),
       error && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mb-3 rounded-xl border border-red-400/20 bg-red-400/10 px-3 py-2 text-xs text-red-200 sm:text-sm", children: error }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-summary", className: "mb-5 rounded-2xl border border-violet-300/20 bg-violet-300/[.06] p-3 sm:mb-7 sm:p-4", children: [
+        adminAccordionHeader("Resumen", "summary"),
+        adminAccordionOpen.summary && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mb-4 grid grid-cols-2 gap-2 sm:mb-5 sm:gap-3 xl:grid-cols-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: UsersRound, label: "Usuarios DJ", value: djUsers.length, active: summaryTarget === "all", onClick: () => {
+          setSummaryTarget("all");
+          setUserSearch("");
+        } }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: Gauge, label: "Planes activos", value: activeDjs, tone: "emerald", active: summaryTarget === "active", onClick: () => setSummaryTarget("active") }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: UserCheck, label: "Por autorizar", value: pendingDjs, tone: "amber", active: summaryTarget === "pending", onClick: () => setSummaryTarget("pending") }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: WalletCards, label: "Solicitudes pendientes", value: pendingProofs, tone: "turquoise", active: summaryTarget === "proofs", onClick: () => setSummaryTarget("proofs") })
+      ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-pricing", className: "mb-5 rounded-2xl border border-violet-300/20 bg-violet-300/[.06] p-3 sm:mb-7 sm:p-4", children: [
+        adminAccordionHeader("Precios y duración", "pricing"),
+        adminAccordionOpen.pricing && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "mb-5 rounded-2xl border border-violet-300/20 bg-violet-300/[.06] p-3 sm:mb-7 sm:p-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "flex items-center gap-2 font-bold text-violet-100", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(WalletCards, { size: 17 }),
+            " Precios y duraci\xF3n"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Configura cu\xE1nto cuesta cada plan y cu\xE1ntos d\xEDas agrega al acceso." })
+        ] }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 grid gap-3 rounded-2xl border border-violet/20 bg-violet/10 p-3 sm:p-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Planes disponibles" }),
+            planOptions.map((plan) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "mt-1 text-xs font-bold text-violet-100 sm:text-sm", children: [plan.label, " · S/ ", Number(plan.pricePen).toFixed(2), " · ", plan.days, " días"] }, plan.id))
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "grid gap-2 text-xs leading-5 text-white/65 sm:text-sm", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "rounded-xl border border-turquoise/20 bg-turquoise/10 px-3 py-2", children: ["✓ ", "Cuando el plan vence, el Panel DJ y el catálogo privado quedan restringidos automáticamente."] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "rounded-xl border border-magenta/20 bg-magenta/10 px-3 py-2", children: ["↻ ", "Al guardar un nuevo plan, el desarrollador debe volver a autorizar al DJ y su estado pasará a “Autorizado · vigente”."] })
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-turquoise/25 bg-turquoise/10 p-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Duraci\xF3n de la demo gratuita" }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs text-white/50", children: "Los nuevos usuarios recibir\xE1n acceso completo durante estos d\xEDas." })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex items-end gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-[11px] text-white/50", children: [
+              "D\xEDas",
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "1", max: "3650", value: demoDaysDraft, onChange: (e) => { const value = e.target.value; setDemoDaysDraft(value); writeAdminSettings({ plans: planOptions, demoDays: Number(value) || 1 }); }, className: "input-dark mt-1 w-24 px-3 py-2 text-sm" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: saveDemoDays, disabled: pricesBusy, className: "btn-primary px-3 py-2 text-xs", children: pricesBusy ? "Guardando\u2026" : "Guardar demo" })
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mt-4 grid grid-cols-3 gap-2 sm:gap-3", children: planOptions.map((plan) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "min-w-0 rounded-xl border border-white/10 bg-black/20 p-2 sm:rounded-2xl sm:p-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "truncate text-sm font-bold text-white sm:text-base", children: plan.label }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-2 grid grid-cols-2 gap-1.5 sm:mt-3 sm:gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "min-w-0 text-[10px] text-white/45 sm:text-[11px]", children: [
+              "D\xEDas",
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "1", max: "3650", value: priceDraft[plan.id]?.days || "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], days: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); writeAdminSettings({ plans: nextPlans, demoDays }); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "min-w-0 text-[10px] text-white/45 sm:text-[11px]", children: [
+              "Precio S/",
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "0", step: "0.01", value: priceDraft[plan.id]?.pricePen || "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], pricePen: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); writeAdminSettings({ plans: nextPlans, demoDays }); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
+            ] })
+          ] })
+        ] }, plan.id)) }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mt-4 flex justify-end border-t border-white/10 pt-4", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: savePlanPrices, disabled: pricesBusy, className: "btn-primary px-4 py-2.5 text-xs", children: pricesBusy ? "Guardando\u2026" : "Guardar planes" }) })
+      ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-payment-methods", className: "mb-5 rounded-2xl border border-sky-300/20 bg-sky-300/[.06] p-3 sm:mb-7 sm:p-4", children: [
+        adminAccordionHeader("Métodos de pago", "payment"),
+        adminAccordionOpen.payment && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3", children: [
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "mb-4 rounded-2xl border border-sky-300/20 bg-sky-300/[.06] p-3 sm:mb-5 sm:p-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-sky-100", children: "Métodos de pago" }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Activa cada método y toca + para desplegar su configuración. Toca − para retraerla." }),
@@ -39020,62 +39099,12 @@
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: savePaypalSettings, className: "btn-primary mt-3 w-full py-2.5 text-xs sm:w-auto sm:px-6", children: "Guardar PayPal" })
         ] })
+      ] })
+        ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mb-4 grid grid-cols-2 gap-2 sm:mb-5 sm:gap-3 xl:grid-cols-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: UsersRound, label: "Usuarios DJ", value: djUsers.length, active: summaryTarget === "all", onClick: () => {
-          setSummaryTarget("all");
-          setUserSearch("");
-        } }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: Gauge, label: "Planes activos", value: activeDjs, tone: "emerald", active: summaryTarget === "active", onClick: () => setSummaryTarget("active") }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: UserCheck, label: "Por autorizar", value: pendingDjs, tone: "amber", active: summaryTarget === "pending", onClick: () => setSummaryTarget("pending") }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: WalletCards, label: "Solicitudes pendientes", value: pendingProofs, tone: "turquoise", active: summaryTarget === "proofs", onClick: () => setSummaryTarget("proofs") })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "mb-5 rounded-2xl border border-violet-300/20 bg-violet-300/[.06] p-3 sm:mb-7 sm:p-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "flex items-center gap-2 font-bold text-violet-100", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(WalletCards, { size: 17 }),
-            " Precios y duraci\xF3n"
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Configura cu\xE1nto cuesta cada plan y cu\xE1ntos d\xEDas agrega al acceso." })
-        ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 grid gap-3 rounded-2xl border border-violet/20 bg-violet/10 p-3 sm:p-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Planes disponibles" }),
-            planOptions.map((plan) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "mt-1 text-xs font-bold text-violet-100 sm:text-sm", children: [plan.label, " · S/ ", Number(plan.pricePen).toFixed(2), " · ", plan.days, " días"] }, plan.id))
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "grid gap-2 text-xs leading-5 text-white/65 sm:text-sm", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "rounded-xl border border-turquoise/20 bg-turquoise/10 px-3 py-2", children: ["✓ ", "Cuando el plan vence, el Panel DJ y el catálogo privado quedan restringidos automáticamente."] }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "rounded-xl border border-magenta/20 bg-magenta/10 px-3 py-2", children: ["↻ ", "Al guardar un nuevo plan, el desarrollador debe volver a autorizar al DJ y su estado pasará a “Autorizado · vigente”."] })
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-turquoise/25 bg-turquoise/10 p-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Duraci\xF3n de la demo gratuita" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs text-white/50", children: "Los nuevos usuarios recibir\xE1n acceso completo durante estos d\xEDas." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex items-end gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-[11px] text-white/50", children: [
-              "D\xEDas",
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "1", max: "3650", value: demoDaysDraft, onChange: (e) => { const value = e.target.value; setDemoDaysDraft(value); writeAdminSettings({ plans: planOptions, demoDays: Number(value) || 1 }); }, className: "input-dark mt-1 w-24 px-3 py-2 text-sm" })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: saveDemoDays, disabled: pricesBusy, className: "btn-primary px-3 py-2 text-xs", children: pricesBusy ? "Guardando\u2026" : "Guardar demo" })
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mt-4 grid grid-cols-3 gap-2 sm:gap-3", children: planOptions.map((plan) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "min-w-0 rounded-xl border border-white/10 bg-black/20 p-2 sm:rounded-2xl sm:p-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "truncate text-sm font-bold text-white sm:text-base", children: plan.label }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-2 grid grid-cols-2 gap-1.5 sm:mt-3 sm:gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "min-w-0 text-[10px] text-white/45 sm:text-[11px]", children: [
-              "D\xEDas",
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "1", max: "3650", value: priceDraft[plan.id]?.days || "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], days: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); writeAdminSettings({ plans: nextPlans, demoDays }); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "min-w-0 text-[10px] text-white/45 sm:text-[11px]", children: [
-              "Precio S/",
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "0", step: "0.01", value: priceDraft[plan.id]?.pricePen || "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], pricePen: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); writeAdminSettings({ plans: nextPlans, demoDays }); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
-            ] })
-          ] })
-        ] }, plan.id)) }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mt-4 flex justify-end border-t border-white/10 pt-4", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: savePlanPrices, disabled: pricesBusy, className: "btn-primary px-4 py-2.5 text-xs", children: pricesBusy ? "Guardando\u2026" : "Guardar planes" }) })
-      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-notification-history-content", className: "mb-5 rounded-2xl border border-violet-300/20 bg-violet-300/[.06] p-3 sm:mb-7 sm:p-4", children: [
+        adminAccordionHeader("Historial de notificaciones WhatsApp", "history"),
+        adminAccordionOpen.history && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3", children: [
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-notification-history", className: "mb-5 rounded-2xl border border-violet-300/20 bg-violet-300/[.06] p-3 sm:mb-7 sm:p-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
@@ -39119,7 +39148,12 @@
           ] }, item.id)),
           !filteredNotificationHistory.length && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "rounded-xl border border-dashed border-white/10 px-4 py-5 text-center text-sm text-white/40", children: "No hay avisos registrados." })
         ] })
+      ] })
+        ] })
       ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-proofs-content", className: "mb-5 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-3 sm:mb-7 sm:p-4", children: [
+        adminAccordionHeader("Comprobantes de pago", "proofs"),
+        adminAccordionOpen.proofs && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3", children: [
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-proofs", className: "mb-5 scroll-mt-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-3 sm:mb-7 sm:p-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
@@ -39168,7 +39202,12 @@
           ] }, proof.id)),
           !proofList.length && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "rounded-xl border border-dashed border-white/10 px-4 py-5 text-center text-sm text-white/40", children: "No hay comprobantes registrados." })
         ] })
+      ] })
+        ] })
       ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-activation-content", className: "mb-5 rounded-2xl border border-turquoise/25 bg-turquoise/10 p-3 sm:mb-7 sm:p-4", children: [
+        adminAccordionHeader("Activación manual del acceso", "activation"),
+        adminAccordionOpen.activation && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3", children: [
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-activation", className: "mb-5 scroll-mt-3 rounded-2xl border border-turquoise/25 bg-turquoise/10 p-3 sm:mb-7 sm:p-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-start justify-between gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
@@ -39217,6 +39256,8 @@
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "submit", disabled: activationBusy, className: "btn-primary sm:col-span-2", children: activationBusy ? "Activando\u2026" : "Activar acceso y guardar" })
         ] }),
         activationMessage && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-3 rounded-xl border border-white/10 bg-black/15 px-3 py-2 text-xs leading-5 text-turquoise", children: activationMessage })
+      ] })
+        ] })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-client-control", className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/10 p-3 sm:mb-7 sm:p-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => setClientControlOpen((open) => !open), className: "flex w-full items-center justify-between gap-3 text-left", "aria-expanded": clientControlOpen, children: [
