@@ -38018,8 +38018,13 @@
         /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mb-2 text-xs font-bold text-violet-100", children: "Métodos de pago" }),
         /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "grid gap-2 sm:grid-cols-3", children: [
           [["yape", "Yape", "Pago manual", paymentSettings.yapeEnabled], ["mercado", "Mercado Pago", "Checkout seguro", paymentSettings.mercadoEnabled], ["paypal", "PayPal", "Pago online", paymentSettings.paypalEnabled]].map(([value, label, hint, enabled]) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { type: "button", disabled: !enabled, onClick: () => { if (enabled) { setPaymentMethod(value); setProofMessage(""); } }, className: `rounded-xl border p-2.5 text-left transition ${paymentMethod === value ? "border-violet-200 bg-violet-300/20 text-violet-100" : "border-white/10 bg-black/20 text-white/65 hover:border-violet-200/50"} ${!enabled ? "cursor-not-allowed opacity-35" : ""}`, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "block text-xs font-bold", children: label }),
-            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "mt-1 block text-[10px] text-white/45", children: enabled ? hint : "No disponible" })
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "flex items-center gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: `grid h-7 w-7 place-items-center rounded-lg text-[10px] font-black ${value === "yape" ? "bg-[#7d2c91] text-white" : value === "mercado" ? "bg-[#ffe600] text-[#173b8f]" : "bg-[#0070ba] text-white"}`, children: value === "yape" ? "Y" : value === "mercado" ? "MP" : "P" }),
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "block text-xs font-bold", children: label }),
+                /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "mt-1 block text-[10px] text-white/45", children: enabled ? hint : "No disponible" })
+              ] })
+            ] })
           ] }, value))
         ] }),
         paymentMethod === "mercado" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-2 rounded-xl border border-white/10 bg-black/20 p-2.5 text-[11px] leading-5 text-white/60", children: "Mercado Pago abrirá el checkout seguro cuando el enlace esté configurado por el desarrollador." }),
@@ -38918,7 +38923,7 @@
       error && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mb-3 rounded-xl border border-red-400/20 bg-red-400/10 px-3 py-2 text-xs text-red-200 sm:text-sm", children: error }),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "mb-4 rounded-2xl border border-sky-300/20 bg-sky-300/[.06] p-3 sm:mb-5 sm:p-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-sky-100", children: "Métodos de pago" }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Activa los métodos que verá el usuario. PayPal puede trabajar con pago automático y moneda en dólares." }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Activa PayPal, define el correo receptor y guarda el enlace de pago para mostrarlo junto a Yape y Mercado Pago." }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 grid gap-2 sm:grid-cols-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => setYapeEnabled(!yapeEnabled), className: `flex items-center justify-between rounded-xl border p-3 text-left text-xs font-bold transition ${yapeEnabled ? "border-cyan-300/60 bg-cyan-300/10 text-cyan-100" : "border-white/10 bg-black/20 text-white/55"}`, children: ["Yape", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `h-5 w-9 rounded-full p-0.5 ${yapeEnabled ? "bg-cyan-300" : "bg-white/20"}`, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `block h-4 w-4 rounded-full bg-white transition ${yapeEnabled ? "translate-x-4" : ""}` }) })] }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => setMercadoEnabled(!mercadoEnabled), className: `flex items-center justify-between rounded-xl border p-3 text-left text-xs font-bold transition ${mercadoEnabled ? "border-cyan-300/60 bg-cyan-300/10 text-cyan-100" : "border-white/10 bg-black/20 text-white/55"}`, children: ["Mercado Pago", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `h-5 w-9 rounded-full p-0.5 ${mercadoEnabled ? "bg-cyan-300" : "bg-white/20"}`, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `block h-4 w-4 rounded-full bg-white transition ${mercadoEnabled ? "translate-x-4" : ""}` }) })] }),
@@ -38936,7 +38941,7 @@
             ] })] }),
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-[11px] text-white/55", children: ["Enlace de pago PayPal", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: paypalLink, onChange: (e) => setPaypalLink(e.target.value), placeholder: "https://paypal.me/...", className: "input-dark mt-1 w-full px-3 py-2 text-xs" })] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: savePaypalSettings, className: "btn-primary mt-3 w-full py-2.5 text-xs sm:w-auto sm:px-6", children: "Guardar configuración" })
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: savePaypalSettings, className: "btn-primary mt-3 w-full py-2.5 text-xs sm:w-auto sm:px-6", children: "Guardar PayPal" })
         ] })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mb-4 grid grid-cols-2 gap-2 sm:mb-5 sm:gap-3 xl:grid-cols-4", children: [
