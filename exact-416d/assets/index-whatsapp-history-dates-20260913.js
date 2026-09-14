@@ -37940,7 +37940,7 @@
     const [proofMessage, setProofMessage] = (0, import_react8.useState)("");
     const [paymentMethod, setPaymentMethod] = (0, import_react8.useState)("paypal");
     const [paymentSettings, setPaymentSettings] = (0, import_react8.useState)(() => {
-      try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || localStorage.getItem("rc_paypal_settings_v1") || "null") || { yapeEnabled: true, mercadoEnabled: false, paypalEnabled: true, paypalAutomatic: true, paypalEmail: "", paypalCurrency: "USD", paypalLink: "" }; } catch { return { yapeEnabled: true, mercadoEnabled: false, paypalEnabled: true, paypalAutomatic: true, paypalEmail: "", paypalCurrency: "USD", paypalLink: "" }; }
+      try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || localStorage.getItem("rc_paypal_settings_v1") || "null") || { yapeEnabled: true, mercadoEnabled: false, paypalEnabled: true, paypalAutomatic: true, yapeHolder: "", mercadoLink: "", mercadoPublicKey: "", paypalEmail: "", paypalCurrency: "USD", paypalLink: "" }; } catch { return { yapeEnabled: true, mercadoEnabled: false, paypalEnabled: true, paypalAutomatic: true, yapeHolder: "", mercadoLink: "", mercadoPublicKey: "", paypalEmail: "", paypalCurrency: "USD", paypalLink: "" }; }
     });
     (0, import_react8.useEffect)(() => {
       fetch("https://open.er-api.com/v6/latest/PEN").then((response) => response.json()).then((data) => {
@@ -38027,7 +38027,11 @@
             ] })
           ] }, value))
         ] }),
-        paymentMethod === "mercado" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-2 rounded-xl border border-white/10 bg-black/20 p-2.5 text-[11px] leading-5 text-white/60", children: "Mercado Pago abrirá el checkout seguro cuando el enlace esté configurado por el desarrollador." }),
+        paymentMethod === "mercado" && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "mt-2 rounded-xl border border-sky-300/20 bg-sky-300/10 p-2.5 text-[11px] leading-5 text-white/70", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "font-bold text-sky-100", children: "Mercado Pago" }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-1", children: paymentSettings.mercadoLink ? "Continúa al checkout seguro para completar tu pago." : "El desarrollador todavía debe configurar el enlace de Mercado Pago." }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", disabled: !paymentSettings.mercadoLink, onClick: () => { if (paymentSettings.mercadoLink) window.location.href = paymentSettings.mercadoLink; }, className: "mt-2 rounded-lg bg-[#009ee3] px-3 py-2 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-40", children: "Abrir Mercado Pago" })
+        ] }),
         paymentMethod === "paypal" && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "mt-2 rounded-xl border border-sky-300/20 bg-sky-300/10 p-2.5 text-[11px] leading-5 text-white/70", children: [
           /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "font-bold text-sky-100", children: "Paga con PayPal" }),
           /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-1", children: paymentSettings.paypalEnabled && paymentSettings.paypalEmail ? `Cuenta receptora: ${paymentSettings.paypalEmail} · ${paymentSettings.paypalCurrency}` : "El desarrollador todavía debe configurar el enlace de PayPal." }),
@@ -38041,6 +38045,10 @@
           yapeNumber && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "mt-1 block text-xs font-bold text-ink/75", children: [
             "N\xFAmero: ",
             yapeNumber
+          ] }),
+          paymentSettings.yapeHolder && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("span", { className: "mt-1 block text-xs font-bold text-ink/75", children: [
+            "Titular: ",
+            paymentSettings.yapeHolder
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "mt-1 block text-xs text-ink/60", children: "Escanea el QR o usa el n\xFAmero y luego sube aqu\xED tu comprobante." })
         ] })
@@ -38519,11 +38527,31 @@
     const [paypalEmail, setPaypalEmail] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.paypalEmail || ""; } catch { return ""; } });
     const [paypalCurrency, setPaypalCurrency] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.paypalCurrency || "USD"; } catch { return "USD"; } });
     const [paypalLink, setPaypalLink] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.paypalLink || JSON.parse(localStorage.getItem("rc_paypal_settings_v1") || "null")?.link || ""; } catch { return ""; } });
+    const [yapeHolder, setYapeHolder] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.yapeHolder || ""; } catch { return ""; } });
+    const [mercadoLink, setMercadoLink] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.mercadoLink || ""; } catch { return ""; } });
+    const [mercadoPublicKey, setMercadoPublicKey] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.mercadoPublicKey || ""; } catch { return ""; } });
+    function paymentSettingsPayload() {
+      return { yapeEnabled, mercadoEnabled, paypalEnabled, paypalAutomatic, yapeHolder: yapeHolder.trim(), mercadoLink: mercadoLink.trim(), mercadoPublicKey: mercadoPublicKey.trim(), paypalEmail: paypalEmail.trim(), paypalCurrency, paypalLink: paypalLink.trim() };
+    }
+    async function saveYapeSettings() {
+      try {
+        await adminSetSubscriptionYapeNumber(yapeNumberDraft.trim(), session.token);
+        setYapeNumber(yapeNumberDraft.trim());
+        localStorage.setItem("rc_payment_settings_v1", JSON.stringify(paymentSettingsPayload()));
+        setNotice("Configuración de Yape guardada.");
+      } catch {
+        setError("No se pudo guardar el número de Yape. Inténtalo nuevamente.");
+      }
+    }
+    function saveMercadoSettings() {
+      localStorage.setItem("rc_payment_settings_v1", JSON.stringify(paymentSettingsPayload()));
+      setNotice("Configuración de Mercado Pago guardada.");
+    }
     function savePaypalSettings() {
-      const settings = { yapeEnabled, mercadoEnabled, paypalEnabled, paypalAutomatic, paypalEmail: paypalEmail.trim(), paypalCurrency, paypalLink: paypalLink.trim() };
+      const settings = paymentSettingsPayload();
       localStorage.setItem("rc_payment_settings_v1", JSON.stringify(settings));
       localStorage.setItem("rc_paypal_settings_v1", JSON.stringify({ enabled: paypalEnabled, email: paypalEmail.trim(), link: paypalLink.trim() }));
-      setNotice("Configuración de métodos de pago guardada en este dispositivo.");
+      setNotice("Configuración de PayPal guardada en este dispositivo.");
     }
     async function load() {
       try {
@@ -38928,6 +38956,33 @@
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => setYapeEnabled(!yapeEnabled), className: `flex items-center justify-between rounded-xl border p-3 text-left text-xs font-bold transition ${yapeEnabled ? "border-cyan-300/60 bg-cyan-300/10 text-cyan-100" : "border-white/10 bg-black/20 text-white/55"}`, children: ["Yape", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `h-5 w-9 rounded-full p-0.5 ${yapeEnabled ? "bg-cyan-300" : "bg-white/20"}`, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `block h-4 w-4 rounded-full bg-white transition ${yapeEnabled ? "translate-x-4" : ""}` }) })] }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => setMercadoEnabled(!mercadoEnabled), className: `flex items-center justify-between rounded-xl border p-3 text-left text-xs font-bold transition ${mercadoEnabled ? "border-cyan-300/60 bg-cyan-300/10 text-cyan-100" : "border-white/10 bg-black/20 text-white/55"}`, children: ["Mercado Pago", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `h-5 w-9 rounded-full p-0.5 ${mercadoEnabled ? "bg-cyan-300" : "bg-white/20"}`, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `block h-4 w-4 rounded-full bg-white transition ${mercadoEnabled ? "translate-x-4" : ""}` }) })] }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => setPaypalEnabled(!paypalEnabled), className: `flex items-center justify-between rounded-xl border p-3 text-left text-xs font-bold transition ${paypalEnabled ? "border-cyan-300/60 bg-cyan-300/10 text-cyan-100" : "border-white/10 bg-black/20 text-white/55"}`, children: ["PayPal", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `h-5 w-9 rounded-full p-0.5 ${paypalEnabled ? "bg-cyan-300" : "bg-white/20"}`, children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: `block h-4 w-4 rounded-full bg-white transition ${paypalEnabled ? "translate-x-4" : ""}` }) })] })
+        ] }),
+        yapeEnabled && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 rounded-2xl border border-white/10 bg-black/20 p-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "text-sm font-bold text-white", children: "Configuración de Yape" }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs text-white/55", children: "Sube el QR y registra el número y el nombre del titular que verá el usuario." }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 grid gap-3 sm:grid-cols-[auto_1fr]", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex items-center gap-3", children: [
+              subscriptionQr ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("img", { src: subscriptionQr, alt: "QR de Yape", className: "h-24 w-24 rounded-xl bg-white object-contain p-1" }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "grid h-24 w-24 place-items-center rounded-xl border border-dashed border-white/20 text-center text-[10px] text-white/40", children: "Sin QR" }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-col gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "btn-primary cursor-pointer px-3 py-2 text-xs", children: [qrBusy ? "Procesando…" : "Subir o reemplazar QR", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "file", accept: "image/png,image/jpeg,image/webp", disabled: qrBusy, onChange: (e) => { saveSubscriptionQr(e.target.files?.[0]); e.target.value = ""; }, className: "sr-only" })] }),
+                subscriptionQr && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: removeSubscriptionQr, disabled: qrBusy, className: "rounded-lg border border-red-300/20 px-3 py-2 text-xs text-red-200 disabled:opacity-40", children: "Quitar QR" })
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "grid gap-3 sm:grid-cols-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-[11px] text-white/55", children: ["Número de Yape", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: yapeNumberDraft, onChange: (e) => setYapeNumberDraft(e.target.value), placeholder: "999 888 777", className: "input-dark mt-1 w-full px-3 py-2 text-xs" })] }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-[11px] text-white/55", children: ["Nombre del titular", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: yapeHolder, onChange: (e) => setYapeHolder(e.target.value), placeholder: "Nombre del titular", className: "input-dark mt-1 w-full px-3 py-2 text-xs" })] }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: saveYapeSettings, className: "btn-primary px-4 py-2 text-xs sm:col-span-2 sm:w-fit", children: "Guardar Yape" })
+            ] })
+          ] })
+        ] }),
+        mercadoEnabled && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 rounded-2xl border border-white/10 bg-black/20 p-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "text-sm font-bold text-white", children: "Configuración de Mercado Pago" }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs text-white/55", children: "Configura el enlace que abrirá el usuario para pagar mediante el checkout seguro." }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 grid gap-3 sm:grid-cols-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-[11px] text-white/55", children: ["Enlace de pago Mercado Pago", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: mercadoLink, onChange: (e) => setMercadoLink(e.target.value), placeholder: "https://link.mercadopago.com/...", className: "input-dark mt-1 w-full px-3 py-2 text-xs" })] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-[11px] text-white/55", children: ["Public Key (opcional)", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: mercadoPublicKey, onChange: (e) => setMercadoPublicKey(e.target.value), placeholder: "APP_USR-...", className: "input-dark mt-1 w-full px-3 py-2 text-xs" })] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: saveMercadoSettings, className: "btn-primary px-4 py-2 text-xs sm:col-span-2 sm:w-fit", children: "Guardar Mercado Pago" })
+          ] })
         ] }),
         paypalEnabled && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 rounded-2xl border border-white/10 bg-black/20 p-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "text-sm font-bold text-white", children: "Configuración de PayPal" }),
