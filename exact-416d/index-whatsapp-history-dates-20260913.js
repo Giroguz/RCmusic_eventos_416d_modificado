@@ -38156,6 +38156,8 @@
     const [error, setError] = (0, import_react8.useState)("");
     const [submitting, setSubmitting] = (0, import_react8.useState)(false);
     const [planExpired, setPlanExpired] = (0, import_react8.useState)(false);
+    const [noActivePlan, setNoActivePlan] = (0, import_react8.useState)(false);
+    const [showPlanWindow, setShowPlanWindow] = (0, import_react8.useState)(false);
     const [expiredSession, setExpiredSession] = (0, import_react8.useState)(null);
     const [showTrial, setShowTrial] = (0, import_react8.useState)(false);
     const [trialName, setTrialName] = (0, import_react8.useState)("");
@@ -38315,6 +38317,8 @@
       setSubmitting(true);
       setError("");
       setPlanExpired(false);
+      setNoActivePlan(false);
+      setShowPlanWindow(false);
       setExpiredSession(null);
       try {
         if (!supabaseEnabled) throw new Error("SUPABASE_REQUIRED");
@@ -38331,6 +38335,21 @@
         }
         onLogin(access);
       } catch (err) {
+        if (err?.message === "DJ plan expired") {
+          const access = err.access || null;
+          const expiresAt = access?.plan_expires_at ? new Date(access.plan_expires_at).getTime() : NaN;
+          const hasExpiredPeriod = Number.isFinite(expiresAt) && expiresAt <= Date.now();
+          setExpiredSession(access);
+          if (hasExpiredPeriod) {
+            setPlanExpired(true);
+            setShowPlanWindow(true);
+            setError("Tu plan ha vencido");
+          } else {
+            setNoActivePlan(true);
+            setError("Tu plan no está activo");
+          }
+          return;
+        }
         setError(err?.message === "SUPABASE_REQUIRED" ? t("supabaseRequired") : err?.message === "DEVELOPER_ACCESS_REQUIRED" ? "Este acceso es exclusivo para el desarrollador. Ingresa con el usuario y la clave de administrador." : err?.message === "LOGIN_TIMEOUT" ? "El servidor tard\xF3 demasiado en responder. Revisa la conexi\xF3n y vuelve a pulsar Ingresar." : t("loginError"));
       } finally {
         setSubmitting(false);
@@ -38359,6 +38378,7 @@
               setEmail(e.target.value);
               setError("");
               setPlanExpired(false);
+              setNoActivePlan(false);
             }, className: "input-dark pl-11", placeholder: t("emailPlaceholder"), autoComplete: "username" })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("label", { className: "mb-2 mt-4 block text-sm font-semibold text-white/75", children: developerMode ? "Clave de desarrollador" : t("accessCode") }),
@@ -38368,14 +38388,15 @@
               setCode(e.target.value);
               setError("");
               setPlanExpired(false);
+              setNoActivePlan(false);
             }, className: "input-dark pl-11 pr-12", placeholder: developerMode ? "Clave de administrador" : "C\xF3digo personal", autoComplete: "one-time-code" }),
             /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: () => setShow(!show), className: "absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-white/35 hover:text-white", "aria-label": show ? "Ocultar c\xF3digo" : "Mostrar c\xF3digo", children: show ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(EyeOff, { size: 18 }) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Eye, { size: 18 }) })
           ] }),
           error && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "mt-3 rounded-xl border border-red-400/20 bg-red-400/10 px-3 py-2 text-sm text-red-200", children: [
             /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { children: error }),
-            planExpired && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-3 font-semibold text-turquoise", children: "Adquirir un plan:" }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(PlanCards, { token: expiredSession?.token, email, code })
+            (planExpired || noActivePlan) && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-3 font-semibold text-turquoise", children: planExpired ? "Adquiere un plan para volver a ingresar:" : "Solicita o adquiere un plan para activar tu acceso:" }),
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: () => setShowPlanWindow(true), className: "mt-3 inline-flex items-center gap-2 rounded-xl bg-turquoise px-4 py-2.5 text-xs font-bold text-ink", children: ["Adquirir un plan", /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ArrowRight, { size: 15 })] })
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { type: "submit", disabled: submitting, className: "btn-primary mt-5 w-full disabled:cursor-wait disabled:opacity-60", children: [
@@ -38398,7 +38419,7 @@
           setRecoveryVerified(false);
           setRecoveryStep("email");
           setRecoveryMessage("");
-        }, className: "mt-4 w-full text-xs text-white/45 underline underline-offset-4 hover:text-turquoise", children: "¿Olvidaste tu contraseña? Recuperarla por correo" }) : email.trim() ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: requestAdminCodeByEmail, className: "mt-4 w-full text-xs text-white/45 underline underline-offset-4 hover:text-turquoise", children: "¿Olvidaste tu código? Solicitar al administrador" }) : null,
+        }, className: "mt-4 w-full text-xs text-white/45 underline underline-offset-4 hover:text-turquoise", children: "¿Olvidaste tu contraseña? Recuperarla por correo" }) : email.trim() && !planExpired && !noActivePlan ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: requestAdminCodeByEmail, className: "mt-4 w-full text-xs text-white/45 underline underline-offset-4 hover:text-turquoise", children: "¿Olvidaste tu código? Solicitar al administrador" }) : null,
         /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: () => {
           setShowTrial(true);
           setTrialError("");
@@ -38406,6 +38427,16 @@
           setTrialCode("");
           setTrialStep("details");
         }, className: "mt-4 w-full rounded-xl border border-turquoise/30 bg-turquoise/10 px-4 py-3 text-sm font-bold text-turquoise hover:bg-turquoise/15", children: language === "en" ? `Try free demo \xB7 ${demoDays} ${demoDays === 1 ? "day" : "days"}` : `Probar demo gratis \xB7 ${demoDays} ${demoDays === 1 ? "d\xEDa" : "d\xEDas"}` })
+      ] }) }),
+      showPlanWindow && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/80 p-4 backdrop-blur-sm", onMouseDown: () => setShowPlanWindow(false), children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "glass my-6 w-full max-w-2xl rounded-[2rem] p-5 sm:p-7", onMouseDown: (e) => e.stopPropagation(), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex items-start justify-between gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("h2", { className: "font-display text-2xl font-bold text-white", children: planExpired ? "Tu plan ha vencido" : "Tu plan no está activo" }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-2 text-sm leading-6 text-white/55", children: "Elige un plan y revisa las formas de pago disponibles para recuperar tu acceso al Panel de DJ." })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: () => setShowPlanWindow(false), className: "rounded-xl border border-white/10 px-3 py-2 text-xs font-bold text-white/60 hover:text-white", children: "Cerrar" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(PlanCards, { token: expiredSession?.token, email, code })
       ] }) }),
       showRecovery && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-black/75 p-4 backdrop-blur-sm", onMouseDown: () => setShowRecovery(false), children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "glass w-full max-w-md rounded-[2rem] p-6", onMouseDown: (e) => e.stopPropagation(), children: [
         /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("h2", { className: "font-display text-2xl font-bold", children: "Recuperar clave de desarrollador" }),
