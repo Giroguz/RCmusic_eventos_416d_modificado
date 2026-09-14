@@ -37723,7 +37723,14 @@
                 /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/70", children: "Escanea el código QR, deja tu propina y adjunta el comprobante antes de enviar tu pedido." }),
                 event.qrImage && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("img", { src: event.qrImage, alt: "QR de propina", className: "mx-auto mt-3 h-28 w-28 rounded-xl bg-white object-contain p-1" }),
                 /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-2 text-center text-xs font-bold text-white", children: event.yapeNumber || "Yape" }),
-                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, type: "file", accept: "image/*", onChange: handleProofUpload, className: "input-dark mt-3 text-xs" })
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "mt-3", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "mb-2 text-sm font-bold text-white/85", children: ["Comprobante o captura del pago ", /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "text-fuchsia-400", children: "*" })] }),
+                  /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "flex min-h-16 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-dashed border-fuchsia-400/70 bg-fuchsia-950/20 px-4 py-4 text-sm font-bold text-fuchsia-400 transition hover:bg-fuchsia-950/35", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ImagePlus, { size: 20, "aria-hidden": "true" }),
+                    "Subir comprobante",
+                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, type: "file", accept: "image/*", onChange: handleProofUpload, className: "hidden" })
+                  ] })
+                ] })
               ] }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "text-xs text-white/60", children: "Escribe tu pedido manualmente" }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: manualSong, onChange: (e) => setManualSong(e.target.value), className: "input-dark", placeholder: "Canción" }),
