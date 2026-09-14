@@ -40546,7 +40546,8 @@
       const state = event?.state || window.history.state;
       if (state?.[HISTORY_KEY]) {
         const historyScreen = state.screen || screenRef.current || "home";
-        if (historyScreen === "dj-login" || historyScreen === "attendee-join") {
+        const cameFromAnotherAppRoute = historyScreen !== "home" && historyScreen !== screenRef.current;
+        if (cameFromAnotherAppRoute) {
           const homeTrail = [{ screen: "home", activeEvent: null }];
           writeRouteStack(homeTrail);
           window.history.replaceState({ ...state, [HISTORY_KEY]: true, screen: "home", activeEvent: null, routeTrail: homeTrail, routeIndex: 0, appRoot: true }, "", routeHash("home"));
