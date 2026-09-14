@@ -39692,7 +39692,16 @@
       syncDjOverlay(next);
     }
     function closeDjOverlay(fallback) {
-      if (window.history.state?.[DJ_OVERLAY_KEY]) { window.history.back(); return; }
+      const current = window.history.state || {};
+      if (current[DJ_OVERLAY_KEY]) {
+        const next = { ...current };
+        delete next[DJ_OVERLAY_KEY];
+        delete next.djOverlayData;
+        window.history.replaceState(next, "", window.location.href);
+        syncDjOverlay(next);
+        document.body.style.overflow = "";
+        return;
+      }
       fallback?.();
     }
     (0, import_react10.useEffect)(() => {
