@@ -38554,7 +38554,7 @@
     }
     function adminAccordionHeader(title, key) {
       const open = Boolean(adminAccordionOpen[key]);
-      const Icon = key === "summary" ? UsersRound : key === "pricing" ? WalletCards : key === "payment" ? CreditCard : key === "history" ? MessageCircle : key === "proofs" ? FileCheck2 : KeyRound;
+      const Icon = key === "summary" ? UsersRound : key === "pricing" ? WalletCards : key === "payment" ? WalletCards : key === "history" ? MessageCircle : key === "proofs" ? FileCheck2 : KeyRound;
       return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => toggleAdminAccordion(key), className: "flex w-full items-center justify-between gap-3 text-left", "aria-expanded": open, children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "flex items-center gap-2 font-bold text-turquoise", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Icon, { size: 17, className: "shrink-0" }),
