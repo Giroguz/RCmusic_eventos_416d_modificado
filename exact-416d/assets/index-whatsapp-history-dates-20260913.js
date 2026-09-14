@@ -37938,6 +37938,10 @@
     const [proofName, setProofName] = (0, import_react8.useState)("");
     const [proofBusy, setProofBusy] = (0, import_react8.useState)(false);
     const [proofMessage, setProofMessage] = (0, import_react8.useState)("");
+    const [paymentMethod, setPaymentMethod] = (0, import_react8.useState)("yape");
+    const [paypalSettings, setPaypalSettings] = (0, import_react8.useState)(() => {
+      try { return JSON.parse(localStorage.getItem("rc_paypal_settings_v1") || "null") || { enabled: false, email: "", link: "" }; } catch { return { enabled: false, email: "", link: "" }; }
+    });
     (0, import_react8.useEffect)(() => {
       fetch("https://open.er-api.com/v6/latest/PEN").then((response) => response.json()).then((data) => {
         const nextRate = Number(data?.rates?.USD);
@@ -38010,7 +38014,22 @@
     }
     return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "mt-4", children: [
       /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mb-2 text-[11px] text-white/45", children: "Precio principal en soles \xB7 d\xF3lar referencial actualizado" }),
-      subscriptionQr && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "mb-3 flex items-center gap-3 rounded-xl bg-white p-3 text-left text-ink", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "mb-3 rounded-2xl border border-violet/20 bg-violet/10 p-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mb-2 text-xs font-bold text-violet-100", children: "Métodos de pago" }),
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "grid gap-2 sm:grid-cols-3", children: [
+          ["yape", "Yape", "Pago manual"], ["mercado", "Mercado Pago", "Checkout seguro"], ["paypal", "PayPal", "Pago online"].map(([value, label, hint]) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { type: "button", onClick: () => { setPaymentMethod(value); setProofMessage(""); }, className: `rounded-xl border p-2.5 text-left transition ${paymentMethod === value ? "border-violet-200 bg-violet-300/20 text-violet-100" : "border-white/10 bg-black/20 text-white/65 hover:border-violet-200/50"}`, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "block text-xs font-bold", children: label }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { className: "mt-1 block text-[10px] text-white/45", children: hint })
+          ] }, value))
+        ] }),
+        paymentMethod === "mercado" && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-2 rounded-xl border border-white/10 bg-black/20 p-2.5 text-[11px] leading-5 text-white/60", children: "Mercado Pago abrirá el checkout seguro cuando el enlace esté configurado por el desarrollador." }),
+        paymentMethod === "paypal" && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "mt-2 rounded-xl border border-sky-300/20 bg-sky-300/10 p-2.5 text-[11px] leading-5 text-white/70", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "font-bold text-sky-100", children: "Paga con PayPal" }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-1", children: paypalSettings.enabled && paypalSettings.email ? `Cuenta receptora: ${paypalSettings.email}` : "El desarrollador todavía debe configurar el enlace de PayPal." }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", disabled: !paypalSettings.enabled || !paypalSettings.link, onClick: () => { if (paypalSettings.link) window.location.href = paypalSettings.link; }, className: "mt-2 rounded-lg bg-[#0070ba] px-3 py-2 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-40", children: "Pagar con PayPal" })
+        ] })
+      ] }),
+      paymentMethod === "yape" && subscriptionQr && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "mb-3 flex items-center gap-3 rounded-xl bg-white p-3 text-left text-ink", children: [
         /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("img", { src: subscriptionQr, alt: "QR de Yape para suscripciones", className: "h-24 w-24 rounded-lg object-contain" }),
         /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { children: [
           /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("strong", { className: "block text-sm", children: "Paga con Yape" }),
@@ -38488,6 +38507,13 @@
     const [activationDraft, setActivationDraft] = (0, import_react9.useState)({ djId: "", email: "", displayName: "", accessCode: "", planType: "monthly", driveAccess: false, generatedCode: "" });
     const [activationBusy, setActivationBusy] = (0, import_react9.useState)(false);
     const [activationMessage, setActivationMessage] = (0, import_react9.useState)("");
+    const [paypalEnabled, setPaypalEnabled] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_paypal_settings_v1") || "null")?.enabled || false; } catch { return false; } });
+    const [paypalEmail, setPaypalEmail] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_paypal_settings_v1") || "null")?.email || ""; } catch { return ""; } });
+    const [paypalLink, setPaypalLink] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_paypal_settings_v1") || "null")?.link || ""; } catch { return ""; } });
+    function savePaypalSettings() {
+      localStorage.setItem("rc_paypal_settings_v1", JSON.stringify({ enabled: paypalEnabled, email: paypalEmail.trim(), link: paypalLink.trim() }));
+      setNotice("Configuración de PayPal guardada en este dispositivo.");
+    }
     async function load() {
       try {
         setDjs(await adminListDjs(session.token));
@@ -38884,6 +38910,19 @@
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "break-words", children: notice })
       ] }),
       error && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mb-3 rounded-xl border border-red-400/20 bg-red-400/10 px-3 py-2 text-xs text-red-200 sm:text-sm", children: error }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "mb-4 rounded-2xl border border-sky-300/20 bg-sky-300/[.06] p-3 sm:mb-5 sm:p-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-sky-100", children: "Métodos de pago" }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Configura PayPal para que aparezca como opción junto a Yape y Mercado Pago." }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 grid gap-3 sm:grid-cols-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 p-3 text-xs font-bold text-white/75", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: paypalEnabled, onChange: (e) => setPaypalEnabled(e.target.checked), className: "accent-sky-400" }),
+            "Activar PayPal"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-[11px] text-white/55", children: ["Correo de PayPal", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: paypalEmail, onChange: (e) => setPaypalEmail(e.target.value), placeholder: "pagos@ejemplo.com", className: "input-dark mt-1 w-full px-3 py-2 text-xs" })] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-[11px] text-white/55", children: ["Enlace de pago PayPal", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: paypalLink, onChange: (e) => setPaypalLink(e.target.value), placeholder: "https://paypal.me/...", className: "input-dark mt-1 w-full px-3 py-2 text-xs" })] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: savePaypalSettings, className: "btn-primary mt-3 px-4 py-2 text-xs", children: "Guardar PayPal" })
+      ] }),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mb-4 grid grid-cols-2 gap-2 sm:mb-5 sm:gap-3 xl:grid-cols-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: UsersRound, label: "Usuarios DJ", value: djUsers.length, active: summaryTarget === "all", onClick: () => {
           setSummaryTarget("all");
