@@ -39469,6 +39469,36 @@
       ] })
     ] }) });
   }
+  function RenewalPlanNotice({ access }) {
+    const [now, setNow] = (0, import_react10.useState)(Date.now());
+    const expiresAt2 = access?.planExpiresAt || access?.plan_expires_at;
+    (0, import_react10.useEffect)(() => {
+      if (!expiresAt2 || access?.role === "admin") return void 0;
+      const timer = setInterval(() => setNow(Date.now()), 6e4);
+      return () => clearInterval(timer);
+    }, [expiresAt2, access?.role]);
+    if (!expiresAt2 || access?.role === "admin") return null;
+    const expiresMs = new Date(expiresAt2).getTime();
+    if (!Number.isFinite(expiresMs)) return null;
+    const daysRemaining = Math.ceil((expiresMs - now) / 864e5);
+    if (daysRemaining > 5) return null;
+    const title = daysRemaining <= 0 ? "Tu plan ha vencido" : `Tu plan vence en ${daysRemaining} ${daysRemaining === 1 ? "día" : "días"}`;
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mb-5 flex flex-col gap-2 rounded-xl border border-turquoise/25 bg-turquoise/10 p-2.5 sm:flex-row sm:items-center sm:justify-between sm:p-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "flex items-center gap-2 text-sm font-bold text-turquoise", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Crown, { size: 15 }),
+          " ",
+          title
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mt-0.5 text-[11px] leading-4 text-white/55", children: "Adquiere o renueva tu plan y mantén habilitado tu acceso al catálogo privado." }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanOfferSummary, {})
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.dispatchEvent(new CustomEvent("rc-open-plans")), className: "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-turquoise px-3 py-2 text-xs font-extrabold text-ink transition hover:bg-turquoise/85", children: [
+        "Adquirir un plan ",
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 16 })
+      ] })
+    ] });
+  }
   function PlanOfferSummary() {
     const [plans, setPlans] = (0, import_react10.useState)(PLAN_OPTIONS);
     (0, import_react10.useEffect)(() => {
@@ -39725,6 +39755,11 @@
       const handleDjPopState = (event) => syncDjOverlay(event.state);
       window.addEventListener("popstate", handleDjPopState);
       return () => window.removeEventListener("popstate", handleDjPopState);
+    }, []);
+    (0, import_react10.useEffect)(() => {
+      const handleOpenPlans = () => openDjOverlay("plans");
+      window.addEventListener("rc-open-plans", handleOpenPlans);
+      return () => window.removeEventListener("rc-open-plans", handleOpenPlans);
     }, []);
     (0, import_react10.useEffect)(() => {
       const sync = async () => {
@@ -40120,20 +40155,7 @@
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mb-5 flex flex-col gap-2 rounded-xl border border-turquoise/25 bg-turquoise/10 p-2.5 sm:flex-row sm:items-center sm:justify-between sm:p-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "flex items-center gap-2 text-sm font-bold text-turquoise", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Crown, { size: 15 }),
-              " \xBFQuieres seguir usando el Panel de DJ?"
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mt-0.5 text-[11px] leading-4 text-white/55", children: "Adquiere o renueva tu plan y mant\xE9n habilitado tu acceso al cat\xE1logo privado." }),
-            /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanOfferSummary, {})
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => openDjOverlay("plans"), className: "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-turquoise px-3 py-2 text-xs font-extrabold text-ink transition hover:bg-turquoise/85", children: [
-            "Adquirir un plan ",
-            /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 16 })
-          ] })
-        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(RenewalPlanNotice, { access }),
         presenceNotice && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "fixed left-1/2 top-5 z-[90] flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-2 rounded-2xl border border-emerald-300/30 bg-[#071c1a]/95 px-4 py-3 text-xs font-bold text-emerald-200 shadow-2xl shadow-emerald-400/10 sm:text-sm", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(UserRound, { size: 17 }),
           " ",
