@@ -38344,7 +38344,7 @@
         if (err?.message === "DJ plan expired") {
           const access = err.access || null;
           const expiresAt = access?.plan_expires_at ? new Date(access.plan_expires_at).getTime() : NaN;
-          const hasExpiredPeriod = Number.isFinite(expiresAt) && expiresAt <= Date.now();
+          const hasExpiredPeriod = err?.message === "DJ plan expired" || (Number.isFinite(expiresAt) && expiresAt <= Date.now());
           setExpiredSession(access);
           if (hasExpiredPeriod) {
             setPlanExpired(true);
