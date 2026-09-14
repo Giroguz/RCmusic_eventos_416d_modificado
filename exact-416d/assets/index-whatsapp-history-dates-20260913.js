@@ -40468,8 +40468,16 @@
       return false;
     }
   }
+  function historyRestoredAnyRoute() {
+    try {
+      const hash = window.location.hash.slice(1);
+      return navigationType() === "back_forward" && Boolean(hash) && hash !== "home";
+    } catch {
+      return false;
+    }
+  }
   function shouldReturnHomeFromHistory() {
-    return pageWasRefreshed() || historyRestoredLogin() || historyRestoredPanel();
+    return pageWasRefreshed() || historyRestoredAnyRoute();
   }
   function initialScreen() {
     try {
