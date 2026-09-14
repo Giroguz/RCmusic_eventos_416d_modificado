@@ -37938,7 +37938,7 @@
     const [proofName, setProofName] = (0, import_react8.useState)("");
     const [proofBusy, setProofBusy] = (0, import_react8.useState)(false);
     const [proofMessage, setProofMessage] = (0, import_react8.useState)("");
-    const [paymentMethod, setPaymentMethod] = (0, import_react8.useState)("paypal");
+    const [paymentMethod, setPaymentMethod] = (0, import_react8.useState)("yape");
     const [paymentSettings, setPaymentSettings] = (0, import_react8.useState)(() => {
       try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || localStorage.getItem("rc_paypal_settings_v1") || "null") || { yapeEnabled: true, mercadoEnabled: false, paypalEnabled: true, paypalAutomatic: true, yapeHolder: "", mercadoLink: "", mercadoPublicKey: "", paypalEmail: "", paypalCurrency: "USD", paypalLink: "" }; } catch { return { yapeEnabled: true, mercadoEnabled: false, paypalEnabled: true, paypalAutomatic: true, yapeHolder: "", mercadoLink: "", mercadoPublicKey: "", paypalEmail: "", paypalCurrency: "USD", paypalLink: "" }; }
     });
@@ -37954,6 +37954,9 @@
       const timer = setInterval(refreshPaymentSettings, 1500);
       return () => clearInterval(timer);
     }, []);
+    (0, import_react8.useEffect)(() => {
+      if (!paymentSettings.yapeEnabled && paymentMethod === "yape") setPaymentMethod(paymentSettings.mercadoEnabled ? "mercado" : "paypal");
+    }, [paymentSettings, paymentMethod]);
     (0, import_react8.useEffect)(() => {
       fetch("https://open.er-api.com/v6/latest/PEN").then((response) => response.json()).then((data) => {
         const nextRate = Number(data?.rates?.USD);
