@@ -39025,26 +39025,6 @@
           "Cuando el plan vence, el Panel DJ y el cat\xE1logo privado quedan restringidos autom\xE1ticamente. Al guardar un nuevo plan, el desarrollador debe volver a autorizar al DJ y su estado pasar\xE1 a \u201CAutorizado \xB7 vigente\u201D."
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "mb-5 grid gap-3 rounded-2xl border border-neon/20 bg-neon/10 p-3 sm:mb-7 sm:p-4 md:grid-cols-[1fr_auto] md:items-center", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-neon", children: "QR de Yape para suscripciones" }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Sube manualmente una foto del QR. Se mostrar\xE1 a los DJs cuando elijan pagar por Yape." }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 flex flex-wrap items-center gap-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: yapeNumberDraft, onChange: (e) => setYapeNumberDraft(e.target.value), inputMode: "numeric", placeholder: "N\xFAmero de Yape", className: "w-40 rounded-xl border border-white/15 bg-black/25 px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/35 focus:border-neon/50" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: saveYapeNumber, disabled: qrBusy, className: "rounded-xl bg-neon px-3 py-2.5 text-xs font-bold text-ink hover:brightness-110", children: "Guardar n\xFAmero" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "mt-3 inline-flex cursor-pointer items-center justify-center rounded-xl border border-neon/30 bg-black/20 px-3 py-2.5 text-xs font-bold text-neon hover:bg-neon/10", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Plus, { size: 15, className: "mr-2" }),
-            qrBusy ? "Guardando\u2026" : "Subir foto del QR",
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "file", accept: "image/png,image/jpeg,image/webp", disabled: qrBusy, onChange: (e) => {
-              saveSubscriptionQr(e.target.files?.[0]);
-              e.target.value = "";
-            }, className: "sr-only" })
-          ] }),
-          subscriptionQr && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: removeSubscriptionQr, disabled: qrBusy, className: "ml-2 rounded-xl px-3 py-2.5 text-xs font-bold text-red-200 hover:bg-red-400/10", children: "Quitar QR" })
-        ] }),
-        subscriptionQr && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("img", { src: subscriptionQr, alt: "QR de Yape para suscripciones", className: "h-24 w-24 rounded-xl bg-white p-2 object-contain sm:h-32 sm:w-32" })
-      ] }),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-notification-settings", className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/10 p-3 sm:p-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
