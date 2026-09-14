@@ -40502,6 +40502,7 @@
   function App() {
     const [screen, setScreen] = (0, import_react11.useState)(initialScreen);
     const screenRef = (0, import_react11.useRef)(screen);
+    const routeIndexRef = (0, import_react11.useRef)(window.history.state?.routeIndex ?? 0);
     const [activeEvent, setActiveEvent] = (0, import_react11.useState)(() => {
       try {
         return window.location.hash.slice(1) === "attendee" ? window.history.state?.activeEvent || null : null;
@@ -40514,6 +40515,8 @@
     const [developerSession, setDeveloperSession] = (0, import_react11.useState)(null);
     (0, import_react11.useEffect)(() => {
       screenRef.current = screen;
+      const currentRouteIndex = window.history.state?.routeIndex;
+      if (Number.isFinite(currentRouteIndex)) routeIndexRef.current = currentRouteIndex;
     }, [screen]);
     (0, import_react11.useEffect)(() => {
       getEvents();
@@ -40546,15 +40549,18 @@
       const state = event?.state || window.history.state;
       if (state?.[HISTORY_KEY]) {
         const historyScreen = state.screen || screenRef.current || "home";
-        const cameFromAnotherAppRoute = historyScreen !== "home" && historyScreen !== screenRef.current;
+        const routeMoved = Number.isFinite(state.routeIndex) && state.routeIndex !== routeIndexRef.current;
+        const cameFromAnotherAppRoute = historyScreen !== "home" && (historyScreen !== screenRef.current || routeMoved);
         if (cameFromAnotherAppRoute) {
           const homeTrail = [{ screen: "home", activeEvent: null }];
           writeRouteStack(homeTrail);
           window.history.replaceState({ ...state, [HISTORY_KEY]: true, screen: "home", activeEvent: null, routeTrail: homeTrail, routeIndex: 0, appRoot: true }, "", routeHash("home"));
           setActiveEvent(null);
+          routeIndexRef.current = 0;
           setScreen("home");
           return;
         }
+        routeIndexRef.current = Number.isFinite(state.routeIndex) ? state.routeIndex : routeIndexRef.current;
         const trail = Array.isArray(state.routeTrail) && state.routeTrail.length ? state.routeTrail : readRouteStack();
         writeRouteStack(trail);
         setScreen(historyScreen);
@@ -40562,10 +40568,13 @@
         return;
       }
       const hashScreen = window.location.hash.slice(1);
-      if (hashScreen) {
-        setScreen(hashScreen);
+      if (hashScreen && hashScreen !== "home") {
+        const homeTrail = [{ screen: "home", activeEvent: null }];
+        writeRouteStack(homeTrail);
+        window.history.replaceState({ ...(window.history.state || {}), [HISTORY_KEY]: true, screen: "home", activeEvent: null, routeTrail: homeTrail, routeIndex: 0, appRoot: true }, "", routeHash("home"));
+        routeIndexRef.current = 0;
         setActiveEvent(null);
-        writeRouteStack([{ screen: hashScreen, activeEvent: null }]);
+        setScreen("home");
       }
     };
       window.addEventListener("popstate", restorePreviousRoute);
