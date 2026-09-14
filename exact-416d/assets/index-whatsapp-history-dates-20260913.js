@@ -38536,6 +38536,7 @@
   }
   function AdminPanel({ session, onClose }) {
     const { t } = useLanguage();
+    const [notice, setNotice] = (0, import_react9.useState)("");
     (0, import_react9.useEffect)(() => {
       const previousOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
@@ -38572,7 +38573,6 @@
     const [notificationEmail, setNotificationEmail] = (0, import_react9.useState)("");
     const [notificationWhatsapp, setNotificationWhatsapp] = (0, import_react9.useState)("");
     const [notificationBusy, setNotificationBusy] = (0, import_react9.useState)(false);
-    const [notice, setNotice] = (0, import_react9.useState)("");
     const [error, setError] = (0, import_react9.useState)("");
     const [busy, setBusy] = (0, import_react9.useState)(false);
     const [qrBusy, setQrBusy] = (0, import_react9.useState)(false);
