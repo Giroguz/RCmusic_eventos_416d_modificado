@@ -39683,6 +39683,7 @@
       setPaymentProof(overlay === "payment" ? state?.djOverlayData || "" : "");
       setDownloadOptions(overlay === "downloads" ? state?.djOverlayData || null : null);
       setChatOpen(overlay === "chat");
+      if (!overlay) document.body.style.overflow = "";
     }
     function openDjOverlay(name, data = null) {
       const current = window.history.state || {};
@@ -39698,7 +39699,15 @@
         delete next[DJ_OVERLAY_KEY];
         delete next.djOverlayData;
         window.history.replaceState(next, "", window.location.href);
-        syncDjOverlay(next);
+        setShowAdmin(false);
+        setShowPlans(false);
+        setShowCreate(false);
+        setShowSettings(false);
+        setShowFinalize(false);
+        setPreview(null);
+        setPaymentProof("");
+        setDownloadOptions(null);
+        setChatOpen(false);
         document.body.style.overflow = "";
         return;
       }
