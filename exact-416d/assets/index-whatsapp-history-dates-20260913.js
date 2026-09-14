@@ -39202,8 +39202,8 @@
               ] }, plan.id))
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "flex items-start gap-2 rounded-xl border border-white/10 bg-black/15 p-3 text-xs text-white/65 sm:col-span-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: activationDraft.driveAccess, onChange: (e) => setActivationDraft((current) => ({ ...current, driveAccess: e.target.checked })), className: "mt-0.5 h-4 w-4 accent-[#b8ff3d]" }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: `flex items-start gap-2 rounded-xl border p-3 text-xs transition sm:col-span-2 ${activationDraft.driveAccess ? "border-turquoise/60 bg-turquoise/10 text-turquoise" : "border-white/10 bg-black/15 text-white/65"}`, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: activationDraft.driveAccess, onChange: (e) => setActivationDraft((current) => ({ ...current, driveAccess: e.target.checked })), className: "mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded-md border border-turquoise/60 bg-black/30 accent-turquoise" }),
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { children: [
               "Otorgar acceso de solo lectura a ",
               /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("strong", { className: "text-white", children: "PACK TODOS LOS GENEROS" }),
