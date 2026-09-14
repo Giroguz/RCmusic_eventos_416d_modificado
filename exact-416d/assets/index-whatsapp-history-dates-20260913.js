@@ -32594,14 +32594,7 @@
       storeDjSession(null);
       return null;
     }
-    const session = { token, ...access };
-    if (access.role !== "admin" && (!access.plan_expires_at || new Date(access.plan_expires_at).getTime() <= Date.now())) {
-      storeDjSession(session);
-      const expired = new Error("DJ plan expired");
-      expired.access = session;
-      throw expired;
-    }
-    return session;
+    return { token, ...access };
   }
   async function signOutDj(token = getStoredDjSession()?.token) {
     if (supabase && token) await supabase.rpc("dj_logout", { p_token: token }).catch(() => {
@@ -37723,9 +37716,8 @@
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "mt-4 rounded-2xl border border-turquoise/25 bg-turquoise/10 p-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { type: "button", onClick: () => setManualOpen((open) => !open), className: "flex w-full items-center justify-between text-left text-sm font-bold text-turquoise", children: ["¿No encuentras tu canción o prefieres escribirla manualmente?", /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "text-xl", children: manualOpen ? "−" : "+" })] }),
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { type: "button", onClick: () => setManualOpen((open) => !open), className: "flex w-full items-center justify-between text-left text-sm font-bold text-turquoise", children: ["¿No encuentras tu canción?", /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "text-xl", children: manualOpen ? "−" : "+" })] }),
             manualOpen && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("form", { onSubmit: submitManualRequest, className: "mt-3 grid gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "text-xs text-white/60", children: "Escribe tu pedido manualmente" }),
               event.tipsRequired && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "rounded-2xl border border-neon/25 bg-neon/10 p-3", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "font-bold text-neon", children: "¡Haz que tu canción suene!" }),
                 /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/70", children: "Escanea el código QR, deja tu propina y adjunta el comprobante antes de enviar tu pedido." }),
@@ -37740,6 +37732,7 @@
                   ] })
                 ] })
               ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "text-xs text-white/60", children: "Escribe tu pedido manualmente" }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: manualSong, onChange: (e) => setManualSong(e.target.value), className: "input-dark", placeholder: "Canción" }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: manualArtist, onChange: (e) => setManualArtist(e.target.value), className: "input-dark", placeholder: "Artista" }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: form.requester, onChange: (e) => setForm((current) => ({ ...current, requester: e.target.value })), className: "input-dark", placeholder: "Quién solicita" }),
@@ -38163,6 +38156,8 @@
     const [error, setError] = (0, import_react8.useState)("");
     const [submitting, setSubmitting] = (0, import_react8.useState)(false);
     const [planExpired, setPlanExpired] = (0, import_react8.useState)(false);
+    const [noActivePlan, setNoActivePlan] = (0, import_react8.useState)(false);
+    const [showPlanWindow, setShowPlanWindow] = (0, import_react8.useState)(false);
     const [expiredSession, setExpiredSession] = (0, import_react8.useState)(null);
     const [showTrial, setShowTrial] = (0, import_react8.useState)(false);
     const [trialName, setTrialName] = (0, import_react8.useState)("");
@@ -38322,6 +38317,8 @@
       setSubmitting(true);
       setError("");
       setPlanExpired(false);
+      setNoActivePlan(false);
+      setShowPlanWindow(false);
       setExpiredSession(null);
       try {
         if (!supabaseEnabled) throw new Error("SUPABASE_REQUIRED");
@@ -38339,9 +38336,18 @@
         onLogin(access);
       } catch (err) {
         if (err?.message === "DJ plan expired") {
-          setPlanExpired(true);
-          setExpiredSession(err.access || null);
-          setError(t("planExpired"));
+          const access = err.access || null;
+          const expiresAt = access?.plan_expires_at ? new Date(access.plan_expires_at).getTime() : NaN;
+          const hasExpiredPeriod = Number.isFinite(expiresAt) && expiresAt <= Date.now();
+          setExpiredSession(access);
+          if (hasExpiredPeriod) {
+            setPlanExpired(true);
+            setShowPlanWindow(true);
+            setError("Tu plan ha vencido");
+          } else {
+            setNoActivePlan(true);
+            setError("Tu plan no está activo");
+          }
           return;
         }
         setError(err?.message === "SUPABASE_REQUIRED" ? t("supabaseRequired") : err?.message === "DEVELOPER_ACCESS_REQUIRED" ? "Este acceso es exclusivo para el desarrollador. Ingresa con el usuario y la clave de administrador." : err?.message === "LOGIN_TIMEOUT" ? "El servidor tard\xF3 demasiado en responder. Revisa la conexi\xF3n y vuelve a pulsar Ingresar." : t("loginError"));
@@ -38372,6 +38378,7 @@
               setEmail(e.target.value);
               setError("");
               setPlanExpired(false);
+              setNoActivePlan(false);
             }, className: "input-dark pl-11", placeholder: t("emailPlaceholder"), autoComplete: "username" })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("label", { className: "mb-2 mt-4 block text-sm font-semibold text-white/75", children: developerMode ? "Clave de desarrollador" : t("accessCode") }),
@@ -38381,14 +38388,15 @@
               setCode(e.target.value);
               setError("");
               setPlanExpired(false);
+              setNoActivePlan(false);
             }, className: "input-dark pl-11 pr-12", placeholder: developerMode ? "Clave de administrador" : "C\xF3digo personal", autoComplete: "one-time-code" }),
             /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: () => setShow(!show), className: "absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-white/35 hover:text-white", "aria-label": show ? "Ocultar c\xF3digo" : "Mostrar c\xF3digo", children: show ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(EyeOff, { size: 18 }) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Eye, { size: 18 }) })
           ] }),
           error && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "mt-3 rounded-xl border border-red-400/20 bg-red-400/10 px-3 py-2 text-sm text-red-200", children: [
             /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { children: error }),
-            planExpired && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-3 font-semibold text-turquoise", children: "Adquirir un plan:" }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(PlanCards, { token: expiredSession?.token, email, code })
+            (planExpired || noActivePlan) && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-3 font-semibold text-turquoise", children: planExpired ? "Adquiere un plan para volver a ingresar:" : "Solicita o adquiere un plan para activar tu acceso:" }),
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: () => setShowPlanWindow(true), className: "mt-3 inline-flex items-center gap-2 rounded-xl bg-turquoise px-4 py-2.5 text-xs font-bold text-ink", children: ["Adquirir un plan", /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ArrowRight, { size: 15 })] })
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { type: "submit", disabled: submitting, className: "btn-primary mt-5 w-full disabled:cursor-wait disabled:opacity-60", children: [
@@ -38411,7 +38419,7 @@
           setRecoveryVerified(false);
           setRecoveryStep("email");
           setRecoveryMessage("");
-        }, className: "mt-4 w-full text-xs text-white/45 underline underline-offset-4 hover:text-turquoise", children: "¿Olvidaste tu contraseña? Recuperarla por correo" }) : email.trim() ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: requestAdminCodeByEmail, className: "mt-4 w-full text-xs text-white/45 underline underline-offset-4 hover:text-turquoise", children: "¿Olvidaste tu código? Solicitar al administrador" }) : null,
+        }, className: "mt-4 w-full text-xs text-white/45 underline underline-offset-4 hover:text-turquoise", children: "¿Olvidaste tu contraseña? Recuperarla por correo" }) : email.trim() && !planExpired && !noActivePlan ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: requestAdminCodeByEmail, className: "mt-4 w-full text-xs text-white/45 underline underline-offset-4 hover:text-turquoise", children: "¿Olvidaste tu código? Solicitar al administrador" }) : null,
         /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: () => {
           setShowTrial(true);
           setTrialError("");
@@ -38419,6 +38427,16 @@
           setTrialCode("");
           setTrialStep("details");
         }, className: "mt-4 w-full rounded-xl border border-turquoise/30 bg-turquoise/10 px-4 py-3 text-sm font-bold text-turquoise hover:bg-turquoise/15", children: language === "en" ? `Try free demo \xB7 ${demoDays} ${demoDays === 1 ? "day" : "days"}` : `Probar demo gratis \xB7 ${demoDays} ${demoDays === 1 ? "d\xEDa" : "d\xEDas"}` })
+      ] }) }),
+      showPlanWindow && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/80 p-4 backdrop-blur-sm", onMouseDown: () => setShowPlanWindow(false), children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "glass my-6 w-full max-w-2xl rounded-[2rem] p-5 sm:p-7", onMouseDown: (e) => e.stopPropagation(), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "flex items-start justify-between gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("h2", { className: "font-display text-2xl font-bold text-white", children: planExpired ? "Tu plan ha vencido" : "Tu plan no está activo" }),
+            /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-2 text-sm leading-6 text-white/55", children: "Elige un plan y revisa las formas de pago disponibles para recuperar tu acceso al Panel de DJ." })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: () => setShowPlanWindow(false), className: "rounded-xl border border-white/10 px-3 py-2 text-xs font-bold text-white/60 hover:text-white", children: "Cerrar" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(PlanCards, { token: expiredSession?.token, email, code })
       ] }) }),
       showRecovery && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-black/75 p-4 backdrop-blur-sm", onMouseDown: () => setShowRecovery(false), children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "glass w-full max-w-md rounded-[2rem] p-6", onMouseDown: (e) => e.stopPropagation(), children: [
         /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("h2", { className: "font-display text-2xl font-bold", children: "Recuperar clave de desarrollador" }),
@@ -38549,7 +38567,6 @@
   }
   function AdminPanel({ session, onClose }) {
     const { t } = useLanguage();
-    const [notice, setNotice] = (0, import_react9.useState)("");
     (0, import_react9.useEffect)(() => {
       const previousOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
@@ -38586,6 +38603,7 @@
     const [notificationEmail, setNotificationEmail] = (0, import_react9.useState)("");
     const [notificationWhatsapp, setNotificationWhatsapp] = (0, import_react9.useState)("");
     const [notificationBusy, setNotificationBusy] = (0, import_react9.useState)(false);
+    const [notice, setNotice] = (0, import_react9.useState)("");
     const [error, setError] = (0, import_react9.useState)("");
     const [busy, setBusy] = (0, import_react9.useState)(false);
     const [qrBusy, setQrBusy] = (0, import_react9.useState)(false);
@@ -39482,36 +39500,6 @@
       ] })
     ] }) });
   }
-  function RenewalPlanNotice({ access }) {
-    const [now, setNow] = (0, import_react10.useState)(Date.now());
-    const expiresAt2 = access?.planExpiresAt || access?.plan_expires_at;
-    (0, import_react10.useEffect)(() => {
-      if (!expiresAt2 || access?.role === "admin") return void 0;
-      const timer = setInterval(() => setNow(Date.now()), 6e4);
-      return () => clearInterval(timer);
-    }, [expiresAt2, access?.role]);
-    if (!expiresAt2 || access?.role === "admin") return null;
-    const expiresMs = new Date(expiresAt2).getTime();
-    if (!Number.isFinite(expiresMs)) return null;
-    const daysRemaining = Math.ceil((expiresMs - now) / 864e5);
-    if (daysRemaining > 5) return null;
-    const title = daysRemaining <= 0 ? "Tu plan ha vencido" : `Tu plan vence en ${daysRemaining} ${daysRemaining === 1 ? "día" : "días"}`;
-    return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mb-5 flex flex-col gap-2 rounded-xl border border-turquoise/25 bg-turquoise/10 p-2.5 sm:flex-row sm:items-center sm:justify-between sm:p-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "flex items-center gap-2 text-sm font-bold text-turquoise", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Crown, { size: 15 }),
-          " ",
-          title
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mt-0.5 text-[11px] leading-4 text-white/55", children: "Adquiere o renueva tu plan y mantén habilitado tu acceso al catálogo privado." }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanOfferSummary, {})
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.dispatchEvent(new CustomEvent("rc-open-plans")), className: "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-turquoise px-3 py-2 text-xs font-extrabold text-ink transition hover:bg-turquoise/85", children: [
-        "Adquirir un plan ",
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 16 })
-      ] })
-    ] });
-  }
   function PlanOfferSummary() {
     const [plans, setPlans] = (0, import_react10.useState)(PLAN_OPTIONS);
     (0, import_react10.useEffect)(() => {
@@ -39715,13 +39703,6 @@
     const [qrLoading, setQrLoading] = (0, import_react10.useState)(false);
     const activeEvent = events.find((event) => event.id === activeId) || events[0];
     const DJ_OVERLAY_KEY = "rcMusicDjOverlay";
-    function restorePageScroll() {
-      document.body.style.overflow = "auto";
-      document.body.style.overscrollBehavior = "auto";
-      document.body.style.touchAction = "auto";
-      document.documentElement.style.overflow = "auto";
-      document.documentElement.style.overscrollBehavior = "auto";
-    }
     function syncDjOverlay(state = window.history.state) {
       const overlay = state?.[DJ_OVERLAY_KEY] || "";
       setShowAdmin(overlay === "admin");
@@ -39733,7 +39714,6 @@
       setPaymentProof(overlay === "payment" ? state?.djOverlayData || "" : "");
       setDownloadOptions(overlay === "downloads" ? state?.djOverlayData || null : null);
       setChatOpen(overlay === "chat");
-      if (!overlay) restorePageScroll();
     }
     function openDjOverlay(name, data = null) {
       const current = window.history.state || {};
@@ -39743,24 +39723,7 @@
       syncDjOverlay(next);
     }
     function closeDjOverlay(fallback) {
-      const current = window.history.state || {};
-      if (current[DJ_OVERLAY_KEY]) {
-        const next = { ...current };
-        delete next[DJ_OVERLAY_KEY];
-        delete next.djOverlayData;
-        window.history.replaceState(next, "", window.location.href);
-        setShowAdmin(false);
-        setShowPlans(false);
-        setShowCreate(false);
-        setShowSettings(false);
-        setShowFinalize(false);
-        setPreview(null);
-        setPaymentProof("");
-        setDownloadOptions(null);
-        setChatOpen(false);
-        restorePageScroll();
-        return;
-      }
+      if (window.history.state?.[DJ_OVERLAY_KEY]) { window.history.back(); return; }
       fallback?.();
     }
     (0, import_react10.useEffect)(() => {
@@ -39768,11 +39731,6 @@
       const handleDjPopState = (event) => syncDjOverlay(event.state);
       window.addEventListener("popstate", handleDjPopState);
       return () => window.removeEventListener("popstate", handleDjPopState);
-    }, []);
-    (0, import_react10.useEffect)(() => {
-      const handleOpenPlans = () => openDjOverlay("plans");
-      window.addEventListener("rc-open-plans", handleOpenPlans);
-      return () => window.removeEventListener("rc-open-plans", handleOpenPlans);
     }, []);
     (0, import_react10.useEffect)(() => {
       const sync = async () => {
@@ -39799,7 +39757,7 @@
             setActiveId((current) => freshEvents.some((event) => event.id === current) ? current : freshEvents[0]?.id);
           }
         } catch (error) {
-          setLoadError(error?.message === "DJ plan expired" ? "🔒 Tu plan no está activo. Renueva o solicita un plan para ingresar al Panel de DJ." : error?.message === "SESSION_EXPIRED" ? "La sesi\xF3n del DJ venci\xF3. Vuelve a ingresar con tu correo y c\xF3digo." : "No se pudo cargar el Panel de DJ. Revisa tu conexi\xF3n e int\xE9ntalo nuevamente.");
+          setLoadError(error?.message === "SESSION_EXPIRED" ? "La sesi\xF3n del DJ venci\xF3. Vuelve a ingresar con tu correo y c\xF3digo." : "No se pudo cargar el Panel de DJ. Revisa tu conexi\xF3n e int\xE9ntalo nuevamente.");
         } finally {
           setLoading(false);
         }
@@ -40168,7 +40126,20 @@
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(RenewalPlanNotice, { access }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mb-5 flex flex-col gap-2 rounded-xl border border-turquoise/25 bg-turquoise/10 p-2.5 sm:flex-row sm:items-center sm:justify-between sm:p-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "flex items-center gap-2 text-sm font-bold text-turquoise", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Crown, { size: 15 }),
+              " \xBFQuieres seguir usando el Panel de DJ?"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mt-0.5 text-[11px] leading-4 text-white/55", children: "Adquiere o renueva tu plan y mant\xE9n habilitado tu acceso al cat\xE1logo privado." }),
+            /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanOfferSummary, {})
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => openDjOverlay("plans"), className: "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-turquoise px-3 py-2 text-xs font-extrabold text-ink transition hover:bg-turquoise/85", children: [
+            "Adquirir un plan ",
+            /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 16 })
+          ] })
+        ] }),
         presenceNotice && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "fixed left-1/2 top-5 z-[90] flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-2 rounded-2xl border border-emerald-300/30 bg-[#071c1a]/95 px-4 py-3 text-xs font-bold text-emerald-200 shadow-2xl shadow-emerald-400/10 sm:text-sm", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(UserRound, { size: 17 }),
           " ",
@@ -40481,16 +40452,8 @@
       return false;
     }
   }
-  function historyRestoredAnyRoute() {
-    try {
-      const hash = window.location.hash.slice(1);
-      return navigationType() === "back_forward" && Boolean(hash) && hash !== "home";
-    } catch {
-      return false;
-    }
-  }
   function shouldReturnHomeFromHistory() {
-    return pageWasRefreshed() || historyRestoredAnyRoute();
+    return pageWasRefreshed() || historyRestoredLogin() || historyRestoredPanel();
   }
   function initialScreen() {
     try {
@@ -40502,7 +40465,6 @@
   function App() {
     const [screen, setScreen] = (0, import_react11.useState)(initialScreen);
     const screenRef = (0, import_react11.useRef)(screen);
-    const routeIndexRef = (0, import_react11.useRef)(window.history.state?.routeIndex ?? 0);
     const [activeEvent, setActiveEvent] = (0, import_react11.useState)(() => {
       try {
         return window.location.hash.slice(1) === "attendee" ? window.history.state?.activeEvent || null : null;
@@ -40515,8 +40477,6 @@
     const [developerSession, setDeveloperSession] = (0, import_react11.useState)(null);
     (0, import_react11.useEffect)(() => {
       screenRef.current = screen;
-      const currentRouteIndex = window.history.state?.routeIndex;
-      if (Number.isFinite(currentRouteIndex)) routeIndexRef.current = currentRouteIndex;
     }, [screen]);
     (0, import_react11.useEffect)(() => {
       getEvents();
@@ -40549,18 +40509,14 @@
       const state = event?.state || window.history.state;
       if (state?.[HISTORY_KEY]) {
         const historyScreen = state.screen || screenRef.current || "home";
-        const routeMoved = Number.isFinite(state.routeIndex) && state.routeIndex !== routeIndexRef.current;
-        const cameFromAnotherAppRoute = historyScreen !== "home" && (historyScreen !== screenRef.current || routeMoved);
-        if (cameFromAnotherAppRoute) {
+        if (historyScreen === "dj-login" || historyScreen === "attendee-join") {
           const homeTrail = [{ screen: "home", activeEvent: null }];
           writeRouteStack(homeTrail);
           window.history.replaceState({ ...state, [HISTORY_KEY]: true, screen: "home", activeEvent: null, routeTrail: homeTrail, routeIndex: 0, appRoot: true }, "", routeHash("home"));
           setActiveEvent(null);
-          routeIndexRef.current = 0;
           setScreen("home");
           return;
         }
-        routeIndexRef.current = Number.isFinite(state.routeIndex) ? state.routeIndex : routeIndexRef.current;
         const trail = Array.isArray(state.routeTrail) && state.routeTrail.length ? state.routeTrail : readRouteStack();
         writeRouteStack(trail);
         setScreen(historyScreen);
@@ -40568,13 +40524,10 @@
         return;
       }
       const hashScreen = window.location.hash.slice(1);
-      if (hashScreen && hashScreen !== "home") {
-        const homeTrail = [{ screen: "home", activeEvent: null }];
-        writeRouteStack(homeTrail);
-        window.history.replaceState({ ...(window.history.state || {}), [HISTORY_KEY]: true, screen: "home", activeEvent: null, routeTrail: homeTrail, routeIndex: 0, appRoot: true }, "", routeHash("home"));
-        routeIndexRef.current = 0;
+      if (hashScreen) {
+        setScreen(hashScreen);
         setActiveEvent(null);
-        setScreen("home");
+        writeRouteStack([{ screen: hashScreen, activeEvent: null }]);
       }
     };
       window.addEventListener("popstate", restorePreviousRoute);
