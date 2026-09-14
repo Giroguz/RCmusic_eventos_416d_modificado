@@ -38272,6 +38272,12 @@
       });
       window.location.href = `mailto:${ADMIN_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
+    function requestPlanByEmail() {
+      const requester = email.trim().toLowerCase();
+      const subject = "Solicitud de plan para Panel de DJ";
+      const body = `Hola,\n\nSolicito información y activación de un plan para ingresar al Panel de DJ.\n\nCorreo registrado: ${requester}\n\nGracias.`;
+      window.location.href = `mailto:${ADMIN_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
     async function requestRecovery(e) {
       e.preventDefault();
       setRecoveryMessage("");
@@ -38396,7 +38402,10 @@
             /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { children: error }),
             (planExpired || noActivePlan) && /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
               /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("p", { className: "mt-3 font-semibold text-turquoise", children: planExpired ? "Adquiere un plan para volver a ingresar:" : "Solicita o adquiere un plan para activar tu acceso:" }),
-              /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: () => setShowPlanWindow(true), className: "mt-3 inline-flex items-center gap-2 rounded-xl bg-turquoise px-4 py-2.5 text-xs font-bold text-ink", children: ["Adquirir un plan", /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ArrowRight, { size: 15 })] })
+              /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "mt-3 flex flex-wrap gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { type: "button", onClick: () => setShowPlanWindow(true), className: "inline-flex items-center gap-2 rounded-xl bg-turquoise px-4 py-2.5 text-xs font-bold text-ink", children: ["Adquirir un plan", /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ArrowRight, { size: 15 })] }),
+                noActivePlan && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: requestPlanByEmail, className: "inline-flex items-center gap-2 rounded-xl border border-turquoise/35 px-4 py-2.5 text-xs font-bold text-turquoise", children: "Solicitar un plan" })
+              ] })
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { type: "submit", disabled: submitting, className: "btn-primary mt-5 w-full disabled:cursor-wait disabled:opacity-60", children: [
