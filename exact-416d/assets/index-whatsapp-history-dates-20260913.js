@@ -37508,6 +37508,9 @@
     const [form, setForm] = (0, import_react7.useState)({ requester: "", dedication: "", paymentProof: "", proofName: "" });
     const [proofLoading, setProofLoading] = (0, import_react7.useState)(false);
     const [notice, setNotice] = (0, import_react7.useState)("");
+    const [manualOpen, setManualOpen] = (0, import_react7.useState)(false);
+    const [manualSong, setManualSong] = (0, import_react7.useState)("");
+    const [manualArtist, setManualArtist] = (0, import_react7.useState)("");
     const [likedIds, setLikedIds] = (0, import_react7.useState)(() => getLikedIds(event.id));
     const [driveOpen, setDriveOpen] = (0, import_react7.useState)(false);
     const [driveQuery, setDriveQuery] = (0, import_react7.useState)("");
@@ -37618,6 +37621,20 @@
         setNotice(event.tipsRequired ? t("paymentRequestFailed") : "No se pudo enviar el pedido. Int\xE9ntalo otra vez.");
       }
     }
+    async function submitManualRequest(e) {
+      e.preventDefault();
+      if (event.finalized || !manualSong.trim() || !manualArtist.trim() || !form.requester.trim() || event.tipsRequired && !form.paymentProof) return;
+      const manualTrack = { id: `manual-${Date.now()}`, title: manualSong.trim(), artist: manualArtist.trim(), source: "manual", thumbnail: "", previewUrl: "", externalUrl: "" };
+      try {
+        const request = supabaseEnabled && !event.localOnly ? await addSongRequest(event.id, manualTrack, form) : { id: manualTrack.id, title: manualTrack.title, artist: manualTrack.artist, videoId: manualTrack.id, source: "manual", thumbnail: "", previewUrl: "", externalUrl: "", requester: form.requester.trim(), dedication: form.dedication.trim(), paymentProof: form.paymentProof || "", likes: 0, status: event.tipsRequired ? "awaiting-payment" : "pending" };
+        onUpdate({ ...event, requests: [...event.requests || [], request] });
+        setManualOpen(false); setManualSong(""); setManualArtist(""); setForm({ requester: "", dedication: "", paymentProof: "", proofName: "" });
+        setNotice("Tu pedido fue enviado al DJ");
+        setTimeout(() => setNotice(""), 3e3);
+      } catch {
+        setNotice(event.tipsRequired ? t("paymentRequestFailed") : "No se pudo enviar el pedido. Inténtalo otra vez.");
+      }
+    }
     async function likeRequest(id) {
       if (event.finalized || likedIds.includes(id)) return;
       try {
@@ -37696,6 +37713,18 @@
               searching ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(LoaderCircle, { size: 18, className: "animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Search, { size: 18 }),
               " ",
               searching ? t("searching") : t("search")
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "mt-4 rounded-2xl border border-turquoise/25 bg-turquoise/10 p-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { type: "button", onClick: () => setManualOpen((open) => !open), className: "flex w-full items-center justify-between text-left text-sm font-bold text-turquoise", children: ["¿No encuentras tu canción?", /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "text-xl", children: manualOpen ? "−" : "+" })] }),
+            manualOpen && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("form", { onSubmit: submitManualRequest, className: "mt-3 grid gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "text-xs text-white/60", children: "Escribe tu pedido manualmente" }),
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: manualSong, onChange: (e) => setManualSong(e.target.value), className: "input-dark", placeholder: "Canción" }),
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: manualArtist, onChange: (e) => setManualArtist(e.target.value), className: "input-dark", placeholder: "Artista" }),
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: form.requester, onChange: (e) => setForm((current) => ({ ...current, requester: e.target.value })), className: "input-dark", placeholder: "Quién solicita" }),
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { value: form.dedication, onChange: (e) => setForm((current) => ({ ...current, dedication: e.target.value })), className: "input-dark", placeholder: "Dedicatoria (opcional)" }),
+              event.tipsRequired && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, type: "file", accept: "image/*", onChange: handleProofUpload, className: "input-dark text-xs" }),
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "btn-primary", disabled: proofLoading, children: "Pedir canción" })
             ] })
           ] }),
           results.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "mt-4 space-y-2", children: results.map((track) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(SearchResult, { track, t, onPreview: (track2) => {
@@ -38495,6 +38524,16 @@
   function AdminPanel({ session, onClose }) {
     const { t } = useLanguage();
     (0, import_react9.useEffect)(() => {
+      const previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = previousOverflow; };
+    }, []);
+    (0, import_react9.useEffect)(() => {
+      if (!notice) return void 0;
+      const timer = setTimeout(() => setNotice(""), 3e3);
+      return () => clearTimeout(timer);
+    }, [notice]);
+    (0, import_react9.useEffect)(() => {
       const appHeader = document.querySelector(".app-shell > header");
       if (!appHeader) return void 0;
       const previousVisibility = appHeader.style.visibility;
@@ -38996,7 +39035,7 @@
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { onClick: onClose, className: "rounded-xl p-2 text-white/50 hover:bg-white/10", "aria-label": t("close"), children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(X, { size: 20 }) })
         ] })
       ] }),
-      notice && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mb-3 flex items-center gap-2 rounded-xl border border-neon/20 bg-neon/10 px-3 py-2 text-xs text-neon sm:text-sm", children: [
+      notice && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "fixed left-1/2 top-1/2 z-[12000] flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-2xl border border-neon/40 bg-ink px-5 py-3 text-center text-xs font-bold text-neon shadow-[0_0_35px_rgba(45,255,214,0.28)] sm:text-sm", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Check, { size: 16 }),
         " ",
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "break-words", children: notice })
@@ -39599,6 +39638,12 @@
     const [showCreate, setShowCreate] = (0, import_react10.useState)(false);
     const [showSettings, setShowSettings] = (0, import_react10.useState)(false);
     const [showFinalize, setShowFinalize] = (0, import_react10.useState)(false);
+    (0, import_react10.useEffect)(() => {
+      const shouldLock = showPlans || showAdmin;
+      const previousOverflow = document.body.style.overflow;
+      if (shouldLock) document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = previousOverflow; };
+    }, [showPlans, showAdmin]);
     const [preview, setPreview] = (0, import_react10.useState)(null);
     const [paymentProof, setPaymentProof] = (0, import_react10.useState)("");
     const [notice, setNotice] = (0, import_react10.useState)("");
