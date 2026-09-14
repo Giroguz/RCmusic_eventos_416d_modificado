@@ -37718,12 +37718,18 @@
           /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "mt-4 rounded-2xl border border-turquoise/25 bg-turquoise/10 p-3", children: [
             /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { type: "button", onClick: () => setManualOpen((open) => !open), className: "flex w-full items-center justify-between text-left text-sm font-bold text-turquoise", children: ["¿No encuentras tu canción?", /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "text-xl", children: manualOpen ? "−" : "+" })] }),
             manualOpen && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("form", { onSubmit: submitManualRequest, className: "mt-3 grid gap-2", children: [
+              event.tipsRequired && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "rounded-2xl border border-neon/25 bg-neon/10 p-3", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "font-bold text-neon", children: "¡Haz que tu canción suene!" }),
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/70", children: "Escanea el código QR, deja tu propina y adjunta el comprobante antes de enviar tu pedido." }),
+                event.qrImage && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("img", { src: event.qrImage, alt: "QR de propina", className: "mx-auto mt-3 h-28 w-28 rounded-xl bg-white object-contain p-1" }),
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-2 text-center text-xs font-bold text-white", children: event.yapeNumber || "Yape" }),
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, type: "file", accept: "image/*", onChange: handleProofUpload, className: "input-dark mt-3 text-xs" })
+              ] }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "text-xs text-white/60", children: "Escribe tu pedido manualmente" }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: manualSong, onChange: (e) => setManualSong(e.target.value), className: "input-dark", placeholder: "Canción" }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: manualArtist, onChange: (e) => setManualArtist(e.target.value), className: "input-dark", placeholder: "Artista" }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: form.requester, onChange: (e) => setForm((current) => ({ ...current, requester: e.target.value })), className: "input-dark", placeholder: "Quién solicita" }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { value: form.dedication, onChange: (e) => setForm((current) => ({ ...current, dedication: e.target.value })), className: "input-dark", placeholder: "Dedicatoria (opcional)" }),
-              event.tipsRequired && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, type: "file", accept: "image/*", onChange: handleProofUpload, className: "input-dark text-xs" }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "btn-primary", disabled: proofLoading, children: "Pedir canción" })
             ] })
           ] }),
