@@ -38547,6 +38547,7 @@
     const [paypalCurrency, setPaypalCurrency] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.paypalCurrency || "USD"; } catch { return "USD"; } });
     const [paypalLink, setPaypalLink] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.paypalLink || JSON.parse(localStorage.getItem("rc_paypal_settings_v1") || "null")?.link || ""; } catch { return ""; } });
     const [paymentAccordion, setPaymentAccordion] = (0, import_react9.useState)("");
+    const [clientControlOpen, setClientControlOpen] = (0, import_react9.useState)(true);
     const [yapeHolder, setYapeHolder] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.yapeHolder || ""; } catch { return ""; } });
     const [mercadoLink, setMercadoLink] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.mercadoLink || ""; } catch { return ""; } });
     const [mercadoPublicKey, setMercadoPublicKey] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.mercadoPublicKey || ""; } catch { return ""; } });
@@ -39217,7 +39218,16 @@
         ] }),
         activationMessage && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-3 rounded-xl border border-white/10 bg-black/15 px-3 py-2 text-xs leading-5 text-turquoise", children: activationMessage })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-users", className: "scroll-mt-3", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-client-control", className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/10 p-3 sm:mb-7 sm:p-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => setClientControlOpen((open) => !open), className: "flex w-full items-center justify-between gap-3 text-left", "aria-expanded": clientControlOpen, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "flex items-center gap-2 font-bold text-turquoise", children: [/* @__PURE__ */ (0, import_jsx_runtime8.jsx)(UsersRound, { size: 17 }), "Control de clientes"] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mt-1 block text-xs leading-5 text-white/55", children: "Administra accesos, planes, códigos y estado de cada DJ." })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-turquoise/50 bg-black/20 text-xl font-black text-turquoise", children: clientControlOpen ? "−" : "+" })
+        ] }),
+        clientControlOpen && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-users", className: "scroll-mt-3", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mb-3 flex items-center gap-2", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Search, { size: 16, className: "text-white/35" }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: userSearch, onChange: (e) => setUserSearch(e.target.value), className: "input-dark py-2.5 text-sm", placeholder: "Buscar usuario por nombre o correo" })
@@ -39277,11 +39287,12 @@
           ] })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "mt-5 flex items-center gap-2 text-xs text-white/35", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Lock, { size: 13 }),
-        " El cat\xE1logo de Drive se entrega dentro de la aplicaci\xF3n y no se publica ning\xFAn enlace directo."
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "mt-5 flex items-center gap-2 text-xs text-white/35", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Lock, { size: 13 }),
+            " El cat\xE1logo de Drive se entrega dentro de la aplicaci\xF3n y no se publica ning\xFAn enlace directo."
+          ] })
+        ] })
       ] })
-    ] }) });
   }
 
   // src/components/DjApp.jsx
