@@ -39029,21 +39029,6 @@
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: UserCheck, label: "Por autorizar", value: pendingDjs, tone: "amber", active: summaryTarget === "pending", onClick: () => setSummaryTarget("pending") }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: WalletCards, label: "Solicitudes pendientes", value: pendingProofs, tone: "turquoise", active: summaryTarget === "proofs", onClick: () => setSummaryTarget("proofs") })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-notification-settings", className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/10 p-3 sm:p-4", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Destinos de notificaci\xF3n" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Configura el n\xF9mero de WhatsApp que recibir\xE1 avisos de solicitudes de planes y c\xF3digos." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: saveNotificationSettings, disabled: notificationBusy, className: "rounded-xl bg-turquoise px-3 py-2.5 text-xs font-bold text-ink hover:brightness-110", children: notificationBusy ? "Guardando\x2026" : "Guardar destinos" })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 max-w-md", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "block", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mb-1 block text-[11px] font-semibold text-white/60", children: "WhatsApp de notificaci\xF3n" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "tel", inputMode: "tel", value: notificationWhatsapp, onChange: (e) => setNotificationWhatsapp(e.target.value), className: "input-dark", placeholder: "519xxxxxxxx" })
-          ] })
-        ] })
-      ] }),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "mb-5 rounded-2xl border border-violet-300/20 bg-violet-300/[.06] p-3 sm:mb-7 sm:p-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "flex items-center gap-2 font-bold text-violet-100", children: [
@@ -39098,6 +39083,21 @@
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "rounded-full bg-violet-300/15 px-2.5 py-1 text-xs font-bold text-violet-100", children: `${filteredNotificationHistory.length} visibles` }),
           notificationHistory.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: clearNotificationHistory, disabled: notificationBusy, className: "inline-flex items-center gap-1.5 rounded-xl border border-red-300/25 bg-red-400/10 px-3 py-2 text-xs font-bold text-red-100 hover:bg-red-400/20", children: [/* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Trash2, { size: 14 }), "Borrar todo"] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 rounded-2xl border border-turquoise/20 bg-turquoise/10 p-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Destinos de notificación" }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Configura el número de WhatsApp que recibirá avisos de solicitudes de planes y códigos." })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: saveNotificationSettings, disabled: notificationBusy, className: "rounded-xl bg-turquoise px-3 py-2.5 text-xs font-bold text-ink hover:brightness-110", children: notificationBusy ? "Guardando…" : "Guardar destinos" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 max-w-md", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "block", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mb-1 block text-[11px] font-semibold text-white/60", children: "WhatsApp de notificación" }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "tel", inputMode: "tel", value: notificationWhatsapp, onChange: (e) => setNotificationWhatsapp(e.target.value), className: "input-dark", placeholder: "519xxxxxxxx" })
+            ] })
+          ] })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 flex flex-wrap gap-2", children: [
           [["all", "Todos"], ["code_request", "Códigos"], ["plan_request", "Planes/comprobantes"]].map(([value, label]) => /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: () => setNotificationHistoryFilter(value), className: `rounded-lg px-2.5 py-1.5 text-[11px] font-bold ${notificationHistoryFilter === value ? "bg-violet-300/20 text-violet-100" : "bg-black/20 text-white/50 hover:text-white"}`, children: label }, value))
