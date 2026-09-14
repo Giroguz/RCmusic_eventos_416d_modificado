@@ -38554,10 +38554,24 @@
     }
     function adminAccordionHeader(title, key) {
       const open = Boolean(adminAccordionOpen[key]);
+      const Icon = key === "summary" ? UsersRound : key === "pricing" ? WalletCards : key === "payment" ? CreditCard : key === "history" ? MessageCircle : key === "proofs" ? FileCheck2 : KeyRound;
       return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => toggleAdminAccordion(key), className: "flex w-full items-center justify-between gap-3 text-left", "aria-expanded": open, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "font-bold text-turquoise", children: title }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { className: "flex items-center gap-2 font-bold text-turquoise", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Icon, { size: 17, className: "shrink-0" }),
+          title
+        ] }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-turquoise/50 bg-black/20 text-xl font-black text-turquoise", children: open ? "−" : "+" })
       ] });
+    }
+    async function copyDjCode(code) {
+      if (!code) return;
+      try {
+        await navigator.clipboard.writeText(code);
+        setNotice("Código copiado.");
+        setError("");
+      } catch {
+        setError("No se pudo copiar el código automáticamente.");
+      }
     }
     const [yapeHolder, setYapeHolder] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.yapeHolder || ""; } catch { return ""; } });
     const [mercadoLink, setMercadoLink] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.mercadoLink || ""; } catch { return ""; } });
@@ -39310,7 +39324,8 @@
               /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-[11px] text-white/55", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "text-white/35", children: "C\xF3digo actual:" }),
                 " ",
-                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("strong", { className: "ml-1 font-mono tracking-wider text-neon", children: dj.generatedCode || "No disponible" })
+                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("strong", { className: "ml-1 font-mono tracking-wider text-neon", children: dj.generatedCode || "No disponible" }),
+                dj.generatedCode && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: () => copyDjCode(dj.generatedCode), className: "ml-2 inline-grid h-7 w-7 place-items-center rounded-lg border border-turquoise/40 bg-turquoise/10 text-turquoise hover:bg-turquoise/20", title: "Copiar código", "aria-label": "Copiar código", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Copy, { size: 14 }) })
               ] })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-start gap-2 lg:justify-end", children: [
