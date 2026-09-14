@@ -37865,16 +37865,20 @@
 
   // src/lib/plans.js
   var PLAN_OPTIONS = [
-    { id: "fifteen", days: 15, pricePen: 16, label: "15 d\xEDas" },
-    { id: "monthly", days: 30, pricePen: 30, label: "Mensual" },
-    { id: "annual", days: 365, pricePen: 330, label: "Anual" }
+    { id: "fifteen", days: 15, pricePen: 25, label: "15 d\xEDas" },
+    { id: "monthly", days: 30, pricePen: 35, label: "Mensual" },
+    { id: "annual", days: 365, pricePen: 340, label: "Anual" }
   ];
   function getPlanOption(planType, plans = PLAN_OPTIONS) {
     return plans.find((plan) => plan.id === planType) || null;
   }
   function mergePlanOptions(rows = []) {
     const byType = Object.fromEntries(rows.map((row) => [row.plan_type || row.planType || row.id, row]));
-    return PLAN_OPTIONS.map((plan) => ({ ...plan, days: Number(byType[plan.id]?.days) || plan.days, pricePen: Number(byType[plan.id]?.price_pen ?? byType[plan.id]?.pricePen) || plan.pricePen }));
+    return PLAN_OPTIONS.map((plan) => {
+      const rawPrice = Number(byType[plan.id]?.price_pen ?? byType[plan.id]?.pricePen);
+      const legacyDefault = plan.id === "fifteen" && rawPrice === 16 || plan.id === "monthly" && rawPrice === 30 || plan.id === "annual" && rawPrice === 330;
+      return { ...plan, days: Number(byType[plan.id]?.days) || plan.days, pricePen: rawPrice > 0 && !legacyDefault ? rawPrice : plan.pricePen };
+    });
   }
   function formatCountdown(expiresAt2, now = Date.now()) {
     const remaining = Math.max(0, new Date(expiresAt2 || 0).getTime() - now);
@@ -38896,6 +38900,7 @@
       try {
         if (contactChanged) await adminUpdateDj(dj.id, { email: nextEmail, displayName: nextDisplayName }, session.token);
         if (planChanged || needsActivation) await adminSetDjPlan(dj.id, selectedPlan, session.token);
+        if (planChanged && !selectedBlocked) await adminSetDjState(dj.id, { approved: true, blocked: false }, session.token);
         if (extraDays > 0) await adminExtendDjPlan(dj.id, extraDays, session.token);
         if (blockChanged) await adminSetDjState(dj.id, selectedBlocked ? { approved: false, blocked: true } : { approved: true, blocked: false }, session.token);
         setNotice(`Cambios guardados para ${nextDisplayName}.`);
@@ -39024,23 +39029,6 @@
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: UserCheck, label: "Por autorizar", value: pendingDjs, tone: "amber", active: summaryTarget === "pending", onClick: () => setSummaryTarget("pending") }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SummaryCard, { icon: WalletCards, label: "Solicitudes pendientes", value: pendingProofs, tone: "turquoise", active: summaryTarget === "proofs", onClick: () => setSummaryTarget("proofs") })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mb-4 grid gap-3 rounded-2xl border border-violet/20 bg-violet/10 p-3 sm:mb-5 sm:p-4 md:grid-cols-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "text-[10px] uppercase tracking-widest text-white/45 sm:text-xs", children: "Planes disponibles" }),
-          planOptions.map((plan) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "mt-1 text-xs font-bold text-violet-100 sm:mt-2 sm:text-sm", children: [
-            plan.label,
-            " \xB7 S/ ",
-            Number(plan.pricePen).toFixed(2),
-            " \xB7 ",
-            plan.days,
-            " d\xEDas"
-          ] }, plan.id))
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "md:col-span-2 flex items-center text-xs leading-5 text-white/65 sm:text-sm sm:leading-6", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(ShieldCheck, { size: 18, className: "mr-2 shrink-0 text-neon" }),
-          "Cuando el plan vence, el Panel DJ y el cat\xE1logo privado quedan restringidos autom\xE1ticamente. Al guardar un nuevo plan, el desarrollador debe volver a autorizar al DJ y su estado pasar\xE1 a \u201CAutorizado \xB7 vigente\u201D."
-        ] })
-      ] }),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-notification-settings", className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/10 p-3 sm:p-4", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
@@ -39064,6 +39052,16 @@
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Configura cu\xE1nto cuesta cada plan y cu\xE1ntos d\xEDas agrega al acceso." })
         ] }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 grid gap-3 rounded-2xl border border-violet/20 bg-violet/10 p-3 sm:p-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Planes disponibles" }),
+            planOptions.map((plan) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "mt-1 text-xs font-bold text-violet-100 sm:text-sm", children: [plan.label, " · S/ ", Number(plan.pricePen).toFixed(2), " · ", plan.days, " días"] }, plan.id))
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "grid gap-2 text-xs leading-5 text-white/65 sm:text-sm", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "rounded-xl border border-turquoise/20 bg-turquoise/10 px-3 py-2", children: ["✓ ", "Cuando el plan vence, el Panel DJ y el catálogo privado quedan restringidos automáticamente."] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "rounded-xl border border-magenta/20 bg-magenta/10 px-3 py-2", children: ["↻ ", "Al guardar un nuevo plan, el desarrollador debe volver a autorizar al DJ y su estado pasará a “Autorizado · vigente”."] })
+          ] })
+        ] }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-turquoise/25 bg-turquoise/10 p-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Duraci\xF3n de la demo gratuita" }),
