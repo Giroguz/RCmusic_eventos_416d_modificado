@@ -39707,9 +39707,32 @@
     const [showFinalize, setShowFinalize] = (0, import_react10.useState)(false);
     (0, import_react10.useEffect)(() => {
       const shouldLock = showPlans || showAdmin;
-      const previousOverflow = document.body.style.overflow;
-      if (shouldLock) document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = previousOverflow; };
+      const body = document.body;
+      const html = document.documentElement;
+      const previous = {
+        bodyOverflow: body.style.overflow,
+        bodyTouchAction: body.style.touchAction,
+        bodyOverscroll: body.style.overscrollBehavior,
+        htmlOverflow: html.style.overflow,
+        htmlTouchAction: html.style.touchAction,
+        htmlOverscroll: html.style.overscrollBehavior
+      };
+      if (shouldLock) {
+        body.style.overflow = "hidden";
+        body.style.touchAction = "none";
+        body.style.overscrollBehavior = "none";
+        html.style.overflow = "hidden";
+        html.style.touchAction = "none";
+        html.style.overscrollBehavior = "none";
+      }
+      return () => {
+        body.style.overflow = previous.bodyOverflow;
+        body.style.touchAction = previous.bodyTouchAction;
+        body.style.overscrollBehavior = previous.bodyOverscroll;
+        html.style.overflow = previous.htmlOverflow;
+        html.style.touchAction = previous.htmlTouchAction;
+        html.style.overscrollBehavior = previous.htmlOverscroll;
+      };
     }, [showPlans, showAdmin]);
     const [preview, setPreview] = (0, import_react10.useState)(null);
     const [paymentProof, setPaymentProof] = (0, import_react10.useState)("");
@@ -39728,6 +39751,21 @@
     const DJ_OVERLAY_KEY = "rcMusicDjOverlay";
     function syncDjOverlay(state = window.history.state) {
       const overlay = state?.[DJ_OVERLAY_KEY] || "";
+      if (overlay !== "admin") {
+        const body = document.body;
+        const html = document.documentElement;
+        body.style.removeProperty("overflow");
+        body.style.removeProperty("touch-action");
+        body.style.removeProperty("overscroll-behavior");
+        html.style.removeProperty("overflow");
+        html.style.removeProperty("touch-action");
+        html.style.removeProperty("overscroll-behavior");
+        const appHeader = document.querySelector(".app-shell > header");
+        if (appHeader) {
+          appHeader.style.removeProperty("visibility");
+          appHeader.style.removeProperty("pointer-events");
+        }
+      }
       setShowAdmin(overlay === "admin");
       setShowPlans(overlay === "plans");
       setShowCreate(overlay === "create");
