@@ -38582,11 +38582,6 @@
       return () => { document.body.style.overflow = previousOverflow; };
     }, []);
     (0, import_react9.useEffect)(() => {
-      if (!notice) return void 0;
-      const timer = setTimeout(() => setNotice(""), 3e3);
-      return () => clearTimeout(timer);
-    }, [notice]);
-    (0, import_react9.useEffect)(() => {
       const appHeader = document.querySelector(".app-shell > header");
       if (!appHeader) return void 0;
       const previousVisibility = appHeader.style.visibility;
@@ -40069,7 +40064,7 @@
         " Desarrollador"
       ] })
     ] }), children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(PageContainer, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanCountdownCard, { access }),
+      access?.role !== "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanCountdownCard, { access }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mx-auto max-w-lg glass rounded-2xl p-6", children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Headphones, { size: 28, className: "mx-auto mb-3 text-violet-200" }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mb-5 text-center text-white/60", children: t("noEvents") }),
@@ -40099,7 +40094,7 @@
       ] })
     ] }), children: [
       /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(PageContainer, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanCountdownCard, { access }),
+        access?.role !== "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanCountdownCard, { access }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mb-7 flex flex-col justify-between gap-5 lg:flex-row lg:items-end", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "eyebrow text-violet-200", children: t("panelTitle") }),
@@ -40135,7 +40130,7 @@
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mb-5 flex flex-col gap-2 rounded-xl border border-turquoise/25 bg-turquoise/10 p-2.5 sm:flex-row sm:items-center sm:justify-between sm:p-3", children: [
+        access?.role !== "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mb-5 flex flex-col gap-2 rounded-xl border border-turquoise/25 bg-turquoise/10 p-2.5 sm:flex-row sm:items-center sm:justify-between sm:p-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "flex items-center gap-2 text-sm font-bold text-turquoise", children: [
               /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Crown, { size: 15 }),
