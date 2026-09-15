@@ -38577,28 +38577,19 @@
   function AdminPanel({ session, onClose }) {
     const { t } = useLanguage();
     (0, import_react9.useEffect)(() => {
-      const body = document.body;
-      const html = document.documentElement;
-      const previousOverflow = body.style.overflow;
-      const previousTouchAction = body.style.touchAction;
-      const previousOverscroll = body.style.overscrollBehavior;
-      const previousHtmlOverflow = html.style.overflow;
-      const previousHtmlTouchAction = html.style.touchAction;
-      const previousHtmlOverscroll = html.style.overscrollBehavior;
-      body.style.overflow = "hidden";
-      body.style.touchAction = "none";
-      body.style.overscrollBehavior = "none";
-      html.style.overflow = "hidden";
-      html.style.touchAction = "none";
-      html.style.overscrollBehavior = "none";
-      return () => {
-        body.style.overflow = previousOverflow;
-        body.style.touchAction = previousTouchAction;
-        body.style.overscrollBehavior = previousOverscroll;
-        html.style.overflow = previousHtmlOverflow;
-        html.style.touchAction = previousHtmlTouchAction;
-        html.style.overscrollBehavior = previousHtmlOverscroll;
+      // El Centro de gestión tiene su propio desplazamiento. No bloquear el
+      // documento evita dejar congelado el Panel DJ al volver con historial.
+      const restore = () => {
+        const body = document.body;
+        const html = document.documentElement;
+        body.style.removeProperty("overflow");
+        body.style.removeProperty("touch-action");
+        body.style.removeProperty("overscroll-behavior");
+        html.style.removeProperty("overflow");
+        html.style.removeProperty("touch-action");
+        html.style.removeProperty("overscroll-behavior");
       };
+      return restore;
     }, []);
     (0, import_react9.useEffect)(() => {
       const appHeader = document.querySelector(".app-shell > header");
@@ -39706,33 +39697,16 @@
     const [showSettings, setShowSettings] = (0, import_react10.useState)(false);
     const [showFinalize, setShowFinalize] = (0, import_react10.useState)(false);
     (0, import_react10.useEffect)(() => {
-      const shouldLock = showPlans || showAdmin;
+      // No aplicar bloqueo global: los overlays y el Panel DJ deben conservar
+      // el desplazamiento incluso después de volver mediante popstate.
       const body = document.body;
       const html = document.documentElement;
-      const previous = {
-        bodyOverflow: body.style.overflow,
-        bodyTouchAction: body.style.touchAction,
-        bodyOverscroll: body.style.overscrollBehavior,
-        htmlOverflow: html.style.overflow,
-        htmlTouchAction: html.style.touchAction,
-        htmlOverscroll: html.style.overscrollBehavior
-      };
-      if (shouldLock) {
-        body.style.overflow = "hidden";
-        body.style.touchAction = "none";
-        body.style.overscrollBehavior = "none";
-        html.style.overflow = "hidden";
-        html.style.touchAction = "none";
-        html.style.overscrollBehavior = "none";
-      }
-      return () => {
-        body.style.overflow = previous.bodyOverflow;
-        body.style.touchAction = previous.bodyTouchAction;
-        body.style.overscrollBehavior = previous.bodyOverscroll;
-        html.style.overflow = previous.htmlOverflow;
-        html.style.touchAction = previous.htmlTouchAction;
-        html.style.overscrollBehavior = previous.htmlOverscroll;
-      };
+      body.style.removeProperty("overflow");
+      body.style.removeProperty("touch-action");
+      body.style.removeProperty("overscroll-behavior");
+      html.style.removeProperty("overflow");
+      html.style.removeProperty("touch-action");
+      html.style.removeProperty("overscroll-behavior");
     }, [showPlans, showAdmin]);
     const [preview, setPreview] = (0, import_react10.useState)(null);
     const [paymentProof, setPaymentProof] = (0, import_react10.useState)("");
