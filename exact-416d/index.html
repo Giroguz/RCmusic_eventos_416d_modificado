@@ -19,7 +19,8 @@
   let lastText = '';
   let timer = null;
   let overlay = null;
-  const findDeveloperNotice = () => Array.from(document.querySelectorAll('div')).find((node) => node.classList.contains('fixed') && node.classList.contains('z-[12000]') && node.textContent.trim());
+  const successText = /(copiad|guardad|actualizad|eliminad|activad|aceptad|rechazad|configurad|demo .*d[ií]a|n[uú]mero de yape|qr de yape|registros .*historial)/i;
+  const findDeveloperNotice = () => Array.from(document.querySelectorAll('div')).find((node) => { const text = node.textContent.trim(); return node.classList.contains('border') && node.classList.contains('rounded-2xl') && text && text.length <= 220 && successText.test(text); });
   const ensureOverlay = () => {
     if (overlay) return overlay;
     overlay = document.createElement('div');
