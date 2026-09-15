@@ -38606,7 +38606,7 @@
     const [djs, setDjs] = (0, import_react9.useState)([]);
     const [proofs, setProofs] = (0, import_react9.useState)([]);
     const [notificationHistory, setNotificationHistory] = (0, import_react9.useState)([]);
-    const [selectedNotificationIds, setSelectedNotificationIds] = (0, import_react9.useState)([]);
+    const [notificationHistorySelected, setNotificationHistorySelected] = (0, import_react9.useState)([]);
     const [notificationHistoryFilter, setNotificationHistoryFilter] = (0, import_react9.useState)("all");
     const [notificationHistoryFrom, setNotificationHistoryFrom] = (0, import_react9.useState)("");
     const [notificationHistoryTo, setNotificationHistoryTo] = (0, import_react9.useState)("");
@@ -38838,20 +38838,27 @@
         setNotificationBusy(false);
       }
     }
-    async function deleteSelectedNotificationHistory() {
-      const ids = selectedNotificationIds.filter((id) => notificationHistory.some((item) => item.id === id));
-      if (!ids.length || !window.confirm(`¿Borrar los ${ids.length} registros seleccionados del historial?`)) return;
+    function toggleNotificationHistoryItem(id) {
+      setNotificationHistorySelected((current) => current.includes(id) ? current.filter((itemId) => itemId !== id) : [...current, id]);
+    }
+    function toggleAllNotificationHistory() {
+      const visibleIds = filteredNotificationHistory.slice(0, 100).map((item) => item.id);
+      const allSelected = visibleIds.length > 0 && visibleIds.every((id) => notificationHistorySelected.includes(id));
+      setNotificationHistorySelected(allSelected ? [] : visibleIds);
+    }
+    async function clearSelectedNotificationHistory() {
+      const selectedIds = notificationHistorySelected.filter((id) => notificationHistory.some((item) => item.id === id));
+      if (!selectedIds.length || !window.confirm(`¿Borrar los ${selectedIds.length} registros seleccionados del historial?`)) return;
       setNotificationBusy(true);
       setError("");
       try {
-        const removedIds = [];
-        for (const id of ids) {
+        for (const id of selectedIds) {
           const removed = await adminDeleteWhatsappNotificationHistory(id, session.token);
-          if (removed) removedIds.push(id);
+          if (!removed) throw new Error("Selected history item not deleted");
         }
-        setNotificationHistory((current) => current.filter((item) => !removedIds.includes(item.id)));
-        setSelectedNotificationIds([]);
-        setNotice(`${removedIds.length} registros seleccionados eliminados del historial.`);
+        setNotificationHistory((current) => current.filter((item) => !selectedIds.includes(item.id)));
+        setNotificationHistorySelected([]);
+        setNotice(`${selectedIds.length} registros seleccionados eliminados del historial.`);
       } catch {
         setError("No se pudieron borrar todos los registros seleccionados.");
       } finally {
@@ -39089,15 +39096,8 @@
       const toMatch = !notificationHistoryTo || day <= notificationHistoryTo;
       return typeMatch && fromMatch && toMatch;
     });
-    const visibleNotificationItems = filteredNotificationHistory.slice(0, 100);
-    const visibleNotificationIds = visibleNotificationItems.map((item) => item.id);
-    const allVisibleNotificationsSelected = visibleNotificationIds.length > 0 && visibleNotificationIds.every((id) => selectedNotificationIds.includes(id));
-    const toggleAllVisibleNotifications = () => {
-      setSelectedNotificationIds((current) => allVisibleNotificationsSelected ? current.filter((id) => !visibleNotificationIds.includes(id)) : [...new Set([...current, ...visibleNotificationIds])]);
-    };
-    const toggleNotificationSelection = (id) => {
-      setSelectedNotificationIds((current) => current.includes(id) ? current.filter((itemId) => itemId !== id) : [...current, id]);
-    };
+    const visibleNotificationHistory = filteredNotificationHistory.slice(0, 100);
+    const allNotificationHistorySelected = visibleNotificationHistory.length > 0 && visibleNotificationHistory.every((item) => notificationHistorySelected.includes(item.id));
     const djUsers = djs.filter((dj) => dj.role !== "admin");
     const pendingProofs = proofs.filter((proof) => proof.status === "pending").length;
     const activeDjs = djUsers.filter((dj) => dj.isActive).length;
@@ -39259,9 +39259,8 @@
             /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Consulta los avisos enviados y elimina los registros que ya no necesites." })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "rounded-full bg-violet-300/15 px-2.5 py-1 text-xs font-bold text-violet-100", children: `${filteredNotificationHistory.length} visibles` }),
-          notificationHistory.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs font-bold text-white/80", children: [/* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: allVisibleNotificationsSelected, onChange: toggleAllVisibleNotifications, className: "h-4 w-4 accent-[#2dffd6]" }), "Seleccionar todos"] }),
-          selectedNotificationIds.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: deleteSelectedNotificationHistory, disabled: notificationBusy, className: "inline-flex items-center gap-1.5 rounded-xl border border-red-300/25 bg-red-400/10 px-3 py-2 text-xs font-bold text-red-100 hover:bg-red-400/20 disabled:opacity-50", children: [/* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Trash2, { size: 14 }), `Borrar seleccionados (${selectedNotificationIds.length})`] }),
-          notificationHistory.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: clearNotificationHistory, disabled: notificationBusy, className: "inline-flex items-center gap-1.5 rounded-xl border border-red-300/25 bg-red-400/10 px-3 py-2 text-xs font-bold text-red-100 hover:bg-red-400/20", children: [/* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Trash2, { size: 14 }), "Borrar todo"] })
+          visibleNotificationHistory.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs font-bold text-white/80", children: [/* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: allNotificationHistorySelected, onChange: toggleAllNotificationHistory, disabled: notificationBusy, className: "h-4 w-4 accent-violet-300" }), "Seleccionar todos"] }),
+          notificationHistorySelected.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: clearSelectedNotificationHistory, disabled: notificationBusy, className: "inline-flex items-center gap-1.5 rounded-xl border border-red-300/25 bg-red-400/10 px-3 py-2 text-xs font-bold text-red-100 hover:bg-red-400/20", children: [/* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Trash2, { size: 14 }), `Borrar seleccionados (${notificationHistorySelected.length})`] })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 rounded-2xl border border-turquoise/20 bg-turquoise/10 p-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
@@ -39287,8 +39286,8 @@
           (notificationHistoryFrom || notificationHistoryTo) && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: () => { setNotificationHistoryFrom(""); setNotificationHistoryTo(""); }, className: "rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-white/60 hover:bg-white/10 hover:text-white", children: "Limpiar fechas" })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 space-y-2", children: [
-          filteredNotificationHistory.slice(0, 100).map((item) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("article", { className: "flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 p-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: selectedNotificationIds.includes(item.id), onChange: () => toggleNotificationSelection(item.id), className: "h-4 w-4 shrink-0 accent-[#2dffd6]", "aria-label": "Seleccionar aviso" }),
+          visibleNotificationHistory.map((item) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("article", { className: "flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 p-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: notificationHistorySelected.includes(item.id), onChange: () => toggleNotificationHistoryItem(item.id), disabled: notificationBusy, className: "h-4 w-4 shrink-0 accent-violet-300", "aria-label": "Seleccionar aviso" }),
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "min-w-0 flex-1", children: [
               /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "text-sm font-bold text-white", children: item.event_type === "code_request" ? "Solicitud de código DJ" : "Solicitud de plan/comprobante" }),
               /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "break-all text-xs text-white/55", children: item.requester_email || "Sin correo" }),
