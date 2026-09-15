@@ -11,7 +11,40 @@
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
   }
 })();
-</script><div id="root"></div><script>try{const k="rc_admin_subscription_settings_v1";const v=JSON.parse(localStorage.getItem(k)||"null");if(v&&Array.isArray(v.plans)){v.plans=v.plans.map(p=>({...p,planType:p.planType||p.plan_type||p.id}));localStorage.setItem(k,JSON.stringify(v))}}catch(e){}</script><script type="module" src="/assets/index-dj-drive-plan-gate-20260914.js?v=20260915-0001"></script><script>
+</script><script>
+(() => {
+  const SUPABASE_URL = 'https://fzqpmpgbubpmongodcat.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6cXBtcGdidWJwbW9uZ29kY2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5NzI5MzIsImV4cCI6MjEwMzU0ODkzMn0.pLJfo5jpfMNRQCAbKC1dEW_INuBJan_eoyB_hWpChdw';
+  const headers = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' };
+  const readSettings = () => { try { return JSON.parse(localStorage.getItem('rc_payment_settings_v1') || '{}'); } catch { return {}; } };
+  const writePublicPayPal = (row) => {
+    if (!row) return;
+    const current = readSettings();
+    localStorage.setItem('rc_payment_settings_v1', JSON.stringify({ ...current, paypalEnabled: Boolean(row.paypal_enabled), paypalEmail: row.paypal_email || '', paypalCurrency: row.paypal_currency || 'USD', paypalLink: row.paypal_link || '' }));
+  };
+  const syncPublic = async () => {
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_paypal_settings`, { method: 'POST', headers, body: '{}' });
+      if (response.ok) { const rows = await response.json(); writePublicPayPal(Array.isArray(rows) ? rows[0] : rows); }
+    } catch {}
+  };
+  const syncAdmin = async () => {
+    try {
+      const session = JSON.parse(sessionStorage.getItem('rc_music_dj_session_v1') || localStorage.getItem('rc_music_dj_session_v1') || 'null');
+      const settings = readSettings();
+      if (!session?.token || !settings.paypalEmail && !settings.paypalLink) return;
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/admin_set_paypal_settings`, { method: 'POST', headers, body: JSON.stringify({ p_token: session.token, p_paypal_enabled: Boolean(settings.paypalEnabled), p_paypal_email: settings.paypalEmail || '', p_paypal_currency: settings.paypalCurrency || 'USD', p_paypal_link: settings.paypalLink || '' }) });
+      if (response.ok) { const rows = await response.json(); writePublicPayPal(Array.isArray(rows) ? rows[0] : rows); }
+    } catch {}
+  };
+  syncPublic();
+  setInterval(syncPublic, 5000);
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('button');
+    if (button && button.textContent.trim() === 'Guardar PayPal') setTimeout(syncAdmin, 250);
+  }, true);
+})();
+</script><div id="root"></div><script>try{const k="rc_admin_subscription_settings_v1";const v=JSON.parse(localStorage.getItem(k)||"null");if(v&&Array.isArray(v.plans)){v.plans=v.plans.map(p=>({...p,planType:p.planType||p.plan_type||p.id}));localStorage.setItem(k,JSON.stringify(v))}}catch(e){}</script><script type="module" src="/assets/index-dj-drive-plan-gate-20260914.js?v=20260915-0025"></script><script>
 (() => {
   const oldText = "¿No encuentras tu canción?";
   const newText = "¿No encuentras tu canción o prefieres escribirla?";
