@@ -38577,9 +38577,28 @@
   function AdminPanel({ session, onClose }) {
     const { t } = useLanguage();
     (0, import_react9.useEffect)(() => {
-      const previousOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = previousOverflow; };
+      const body = document.body;
+      const html = document.documentElement;
+      const previousOverflow = body.style.overflow;
+      const previousTouchAction = body.style.touchAction;
+      const previousOverscroll = body.style.overscrollBehavior;
+      const previousHtmlOverflow = html.style.overflow;
+      const previousHtmlTouchAction = html.style.touchAction;
+      const previousHtmlOverscroll = html.style.overscrollBehavior;
+      body.style.overflow = "hidden";
+      body.style.touchAction = "none";
+      body.style.overscrollBehavior = "none";
+      html.style.overflow = "hidden";
+      html.style.touchAction = "none";
+      html.style.overscrollBehavior = "none";
+      return () => {
+        body.style.overflow = previousOverflow;
+        body.style.touchAction = previousTouchAction;
+        body.style.overscrollBehavior = previousOverscroll;
+        html.style.overflow = previousHtmlOverflow;
+        html.style.touchAction = previousHtmlTouchAction;
+        html.style.overscrollBehavior = previousHtmlOverscroll;
+      };
     }, []);
     (0, import_react9.useEffect)(() => {
       const appHeader = document.querySelector(".app-shell > header");
