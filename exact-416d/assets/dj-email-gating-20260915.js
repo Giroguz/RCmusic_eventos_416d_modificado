@@ -1,17 +1,17 @@
 (() => {
   const URL = "https://fzqpmpgbubpmongodcat.supabase.co";
-  const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6cXBtcGdidWJwbW9uZ29kY2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5NzI5MzIsImV4cCI6MjEwMzU0ODkzMn0.pLJfo5jpfMNRQCAbKC1dEW_INuBJan_eoyB_hWpChdw";
+  const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZXIsInJlZiI6ImZ6cXBtcGdidWJwbW9uZ29kY2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5NzI5MzIsImV4cCI6MjEwMzU0ODkzMn0.pLJfo5jpfMNRQCAbKC1dEW_INuBJan_eoyB_hWpChdw";
   const ADMIN_REQUEST = "rcmusiceventos@gmail.com";
   const style = "margin-top:1rem;text-align:center;color:#67e8f9;font-size:.875rem;font-weight:700;line-height:1.5;";
   let timer = null;
   let sequence = 0;
   let lastEmail = "";
+  let appliedStatus = "idle";
 
   const visible = (node) => node && node.getBoundingClientRect().width > 0 && getComputedStyle(node).display !== "none";
   const emailField = () => [...document.querySelectorAll('input[type="email"]')].find(visible);
   const findDemo = () => [...document.querySelectorAll("button")].find((b) => /^(Probar demo gratis|Try free demo)/.test(b.textContent.trim()));
   const findForgot = () => [...document.querySelectorAll("button")].find((b) => b.textContent.trim().includes("¿Olvidaste tu código? Solicitar al administrador"));
-  const findPlan = () => [...document.querySelectorAll("button")].find((b) => b.textContent.trim() === "Solicitar un plan");
   const mailPlan = () => {
     const email = emailField()?.value.trim().toLowerCase() || "";
     const subject = encodeURIComponent("Solicitud de plan para Panel de DJ");
@@ -35,6 +35,7 @@
   };
   const clear = (id) => { const node = document.getElementById(id); if (node) node.remove(); };
   const render = (status, email) => {
+    appliedStatus = status;
     const demo = findDemo();
     if (demo) demo.style.display = status === "new" ? "" : "none";
     clear("rc-email-plans");
@@ -47,11 +48,13 @@
     }
     if (status === "expired") {
       clear("rc-email-forgot");
+      findForgot()?.remove();
       ensure("rc-email-status", "🔒 Tu demo o plan ya venció. Adquiere o renueva un plan para continuar.", () => {});
       ensure("rc-email-plans", "Adquirir un plan", mailPlan);
       return;
     }
     clear("rc-email-forgot");
+    findForgot()?.remove();
     ensure("rc-email-status", "🔒 Correo nuevo. Confírmalo para activar la demo.", () => {});
     ensure("rc-email-plans", "Ver planes disponibles", mailPlan);
   };
@@ -66,7 +69,15 @@
   const sync = () => {
     const field = emailField();
     const email = field?.value.trim().toLowerCase() || "";
-    if (email === lastEmail) return;
+    if (email === lastEmail) {
+      const demo = findDemo();
+      if (demo) demo.style.display = appliedStatus === "new" ? "" : "none";
+      if (appliedStatus === "expired" || appliedStatus === "new") {
+        findForgot()?.remove();
+        clear("rc-email-forgot");
+      }
+      return;
+    }
     lastEmail = email;
     sequence += 1;
     clearTimeout(timer);
