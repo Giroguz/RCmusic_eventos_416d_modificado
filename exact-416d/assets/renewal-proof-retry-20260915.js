@@ -29,16 +29,17 @@
     } catch {}
     return originalFetch(input, init);
   };
-  const prices = [['15 días', 'S/. 25.00', 'S/. 16.00'], ['Mensual', 'S/. 35.00', 'S/. 30.00'], ['Anual', 'S/. 340.00', 'S/. 330.00']];
+  const prices = [['15 días', 'S/. 25.00', 'S/. 16.00', '$/. 7.43', '$/. 4.75'], ['Mensual', 'S/. 35.00', 'S/. 30.00', '$/. 10.40', '$/. 8.91'], ['Anual', 'S/. 340.00', 'S/. 330.00', '$/. 101.04', '$/. 98.06']];
   const syncPrices = () => {
     document.querySelectorAll('button').forEach((button) => {
-      if (!prices.some(([label]) => button.textContent.includes(label))) return;
+      const plan = prices.find(([label]) => button.textContent.includes(label));
+      if (!plan) return;
       const walker = document.createTreeWalker(button, NodeFilter.SHOW_TEXT);
       const nodes = [];
       while (walker.nextNode()) nodes.push(walker.currentNode);
-      nodes.forEach((node) => prices.forEach(([, oldPrice, newPrice]) => {
-        if (node.nodeValue.includes(oldPrice)) node.nodeValue = node.nodeValue.replaceAll(oldPrice, newPrice);
-      }));
+      nodes.forEach((node) => {
+        node.nodeValue = node.nodeValue.replaceAll(plan[1], plan[2]).replaceAll(plan[3], plan[4]);
+      });
     });
   };
   new MutationObserver(syncPrices).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
