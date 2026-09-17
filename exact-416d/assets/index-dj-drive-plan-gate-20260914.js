@@ -39489,7 +39489,7 @@
 
   // src/components/DjApp.jsx
   var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
-  const BACKUP_DRIVE_URL = "https://drive.google.com/drive/folders/1UTIQESYvJcNdKXNsDdDs0dRCrDzs5JvF";
+  const BACKUP_DRIVE_URL = "https://drive.google.com/drive/folders/1iwuKlMfb8JSLV86ZlbPNQg1ri2Q0CeNl";
   function GoogleDriveIcon({ size = 18 }) {
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("svg", { width: size, height: size, viewBox: "0 0 87.3 78", preserveAspectRatio: "xMidYMid meet", "aria-hidden": "true", className: "shrink-0", children: [
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("path", { d: "m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z", fill: "#0066da" }),
@@ -40012,7 +40012,7 @@
         window.location.href = BACKUP_DRIVE_URL;
         return;
       }
-      setNotice("El acceso al Backup actualizado en Drive está disponible únicamente con un plan activo.");
+      setNotice("El acceso al Actualización y Utilidades Dj. está disponible únicamente con un plan activo.");
       setTimeout(() => setNotice(""), 4500);
       window.location.href = "/assets/planes.html#dj-plans";
     }
@@ -40140,7 +40140,7 @@
       access?.role !== "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanCountdownCard, { access }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5 sm:px-4", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(GoogleDriveIcon, { size: 18 }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Backup actualizado en Drive" }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Actualización y Utilidades Dj." }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
       ] }) }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mx-auto max-w-lg glass rounded-2xl p-6", children: [
@@ -40264,7 +40264,7 @@
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5 sm:px-4", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(GoogleDriveIcon, { size: 18 }),
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Backup actualizado en Drive" }),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Actualización y Utilidades Dj." }),
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
         ] }) }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3", children: [
