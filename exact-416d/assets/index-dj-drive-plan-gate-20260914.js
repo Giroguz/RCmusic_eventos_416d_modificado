@@ -40014,7 +40014,7 @@
       }
       setNotice("El acceso al Backup actualizado en Drive está disponible únicamente con un plan activo.");
       setTimeout(() => setNotice(""), 4500);
-      openDjOverlay("plans");
+      window.location.href = "/assets/planes.html#dj-plans";
     }
     const pending = activeEvent?.requests?.filter((request) => request.status === "pending").length || 0;
     const played = activeEvent?.requests?.filter((request) => request.status === "played").length || 0;
