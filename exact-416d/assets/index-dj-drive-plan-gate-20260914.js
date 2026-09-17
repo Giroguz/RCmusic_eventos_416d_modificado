@@ -40143,6 +40143,7 @@
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Backup actualizado en Drive" }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
       ] }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mx-auto max-w-lg glass rounded-2xl p-6", children: [
       
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Headphones, { size: 28, className: "mx-auto mb-3 text-violet-200" }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mb-5 text-center text-white/60", children: t("noEvents") }),
@@ -40155,7 +40156,6 @@
           ] })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mx-auto max-w-lg glass rounded-2xl p-6", children: [
       showPlans && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(Modal2, { title: "Adquirir un plan", onClose: () => closeDjOverlay(() => setShowPlans(false)), children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mb-3 text-sm leading-6 text-white/55", children: "Elige un plan, realiza el pago y env\xEDa tu comprobante para activar o renovar tu acceso." }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanCards, { token: access?.token, email: access?.email })
