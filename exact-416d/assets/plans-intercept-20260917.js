@@ -1,0 +1,1 @@
+(()=>{const go=e=>{const el=e.target?.closest?.('button,a,[role="button"]');if(!el||!/adquirir\s+un\s+plan/i.test(el.textContent||''))return;e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();if(location.hash!=='#dj-plans')location.hash='#dj-plans'};['pointerdown','mousedown','touchstart','click'].forEach(n=>document.addEventListener(n,go,true))})();
