@@ -18,6 +18,9 @@
     if (label.includes("¿Olvidaste tu código? Solicitar al administrador")) {
       event.preventDefault(); event.stopImmediatePropagation();
       requestEmail("Solicitud de reenvío de código de acceso DJ", "Hola,\\n\\nSolicito que me envíen nuevamente mi código de acceso al Panel de DJ.\\n\\nCorreo registrado: {{email}}\\n\\nGracias.", true);
+    } else if (event.target.closest("#rc-email-status")?.textContent.includes("Correo reconocido")) {
+      event.preventDefault(); event.stopImmediatePropagation();
+      requestEmail("Solicitud de reenvío de código de acceso DJ", "Hola,\n\nSolicito que me envíen nuevamente mi código de acceso al Panel de DJ.\n\nCorreo registrado: {{email}}\n\nGracias.", true);
     } else if (label === "Solicitar un plan") {
       event.preventDefault(); event.stopImmediatePropagation();
       requestEmail("Solicitud de plan para Panel de DJ", "Hola,\\n\\nSolicito información y activación de un plan para ingresar al Panel de DJ.\\n\\nCorreo registrado: {{email}}\\n\\nGracias.", false);
