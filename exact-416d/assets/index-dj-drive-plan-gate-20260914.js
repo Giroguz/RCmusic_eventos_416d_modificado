@@ -40139,6 +40139,12 @@
     ] }), children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(PageContainer, { children: [
       access?.role !== "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanCountdownCard, { access }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mx-auto max-w-lg glass rounded-2xl p-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5 sm:px-4", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(GoogleDriveIcon, { size: 18 }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Backup actualizado en Drive" }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
+      ] }) }),
+      
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Headphones, { size: 28, className: "mx-auto mb-3 text-violet-200" }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mb-5 text-center text-white/60", children: t("noEvents") }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("form", { onSubmit: createEvent, className: "space-y-3", children: [
@@ -40150,11 +40156,6 @@
           ] })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5 sm:px-4", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(GoogleDriveIcon, { size: 18 }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Backup actualizado en Drive" }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
-      ] }) }),
       showPlans && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(Modal2, { title: "Adquirir un plan", onClose: () => closeDjOverlay(() => setShowPlans(false)), children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mb-3 text-sm leading-6 text-white/55", children: "Elige un plan, realiza el pago y env\xEDa tu comprobante para activar o renovar tu acceso." }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanCards, { token: access?.token, email: access?.email })
