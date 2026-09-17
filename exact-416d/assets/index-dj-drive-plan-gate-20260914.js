@@ -40008,13 +40008,11 @@
     }
     const hasDriveAccess = access?.role === "admin" || ["fifteen", "monthly", "annual"].includes(String(access?.planType || access?.plan_type || "").toLowerCase());
     function openBackupDrive() {
-      if (hasDriveAccess) {
-        window.location.href = BACKUP_DRIVE_URL;
+      if (!hasDriveAccess) {
+        window.location.assign("/assets/planes.html#dj-plans");
         return;
       }
-      setNotice("El acceso al Actualización y Utilidades Dj. está disponible únicamente con un plan activo.");
-      setTimeout(() => setNotice(""), 4500);
-      window.location.href = "/assets/planes.html#dj-plans";
+      window.location.assign(BACKUP_DRIVE_URL);
     }
     const pending = activeEvent?.requests?.filter((request) => request.status === "pending").length || 0;
     const played = activeEvent?.requests?.filter((request) => request.status === "played").length || 0;
