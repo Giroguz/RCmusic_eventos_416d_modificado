@@ -40009,7 +40009,8 @@
     const hasDriveAccess = access?.role === "admin" || ["fifteen", "monthly", "annual"].includes(String(access?.planType || access?.plan_type || "").toLowerCase());
     function openBackupDrive() {
       if (hasDriveAccess) {
-        window.open(BACKUP_DRIVE_URL, "_blank", "noopener,noreferrer");
+        const opened = window.open(BACKUP_DRIVE_URL, "_blank", "noopener,noreferrer");
+        if (!opened) window.location.href = BACKUP_DRIVE_URL;
         return;
       }
       setNotice("El acceso al Backup actualizado en Drive está disponible únicamente con un plan activo.");
