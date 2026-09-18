@@ -32603,8 +32603,8 @@
   }
   function mapRequest(row) {
     const rawVideoId = String(row.video_id || "");
-    const source = rawVideoId.match(/^(spotify|deezer|soundcloud):/)?.[1] || "youtube";
-    const videoId = rawVideoId.replace(/^(spotify|deezer|soundcloud):/, "");
+    const source = rawVideoId.match(/^(spotify|deezer|soundcloud|manual):/)?.[1] || "youtube";
+    const videoId = rawVideoId.replace(/^(spotify|deezer|soundcloud|manual):/, "");
     const externalUrl = source === "deezer" ? `https://www.deezer.com/track/${videoId}` : source === "soundcloud" ? `https://soundcloud.com/search/sounds?q=${encodeURIComponent(`${row.title} ${row.artist}`)}` : "";
     return { id: row.id, title: row.title, artist: row.artist, videoId, source, spotifyId: videoId, externalUrl, thumbnail: row.thumbnail, requester: row.requester, dedication: row.dedication || "", paymentProof: row.payment_proof || "", likes: row.likes || 0, status: row.status, createdAt: row.created_at };
   }
