@@ -37733,6 +37733,14 @@
                   ] })
                 ] })
               ] }),
+              !event.tipsRequired && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "rounded-2xl border border-white/10 bg-white/[.04] p-3", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mb-2 text-sm font-bold text-white/85", children: "Comprobante de pago (opcional)" }),
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-dashed border-turquoise/50 bg-turquoise/5 px-4 py-3 text-sm font-bold text-turquoise transition hover:bg-turquoise/10", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ImagePlus, { size: 19, "aria-hidden": "true" }),
+                  form.proofName ? form.proofName : "Subir comprobante",
+                  /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { type: "file", accept: "image/*", onChange: handleProofUpload, className: "hidden" })
+                ] })
+              ] }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "text-xs text-white/60", children: "Escribe tu pedido manualmente" }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: manualSong, onChange: (e) => setManualSong(e.target.value), className: "input-dark", placeholder: "Canción" }),
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, value: manualArtist, onChange: (e) => setManualArtist(e.target.value), className: "input-dark", placeholder: "Artista" }),
