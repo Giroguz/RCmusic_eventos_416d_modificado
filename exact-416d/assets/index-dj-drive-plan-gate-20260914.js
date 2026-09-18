@@ -38634,7 +38634,22 @@
     const [notificationWhatsapp, setNotificationWhatsapp] = (0, import_react9.useState)("");
     const [notificationBusy, setNotificationBusy] = (0, import_react9.useState)(false);
     const [notice, setNotice] = (0, import_react9.useState)("");
+    const noticeAnchor = (0, import_react9.useRef)(null);
     const [error, setError] = (0, import_react9.useState)("");
+    (0, import_react9.useEffect)(() => {
+      const rememberNoticePosition = (event) => {
+        if (event.target?.closest?.("button")) noticeAnchor.current = { x: event.clientX, y: event.clientY };
+      };
+      document.addEventListener("click", rememberNoticePosition, true);
+      return () => document.removeEventListener("click", rememberNoticePosition, true);
+    }, []);
+    function noticeStyle() {
+      const point = noticeAnchor.current;
+      const x = point ? Math.max(150, Math.min(window.innerWidth - 150, point.x)) : window.innerWidth / 2;
+      const below = point && point.y < 140;
+      const y = point ? Math.max(16, Math.min(window.innerHeight - 16, below ? point.y + 30 : point.y - 18)) : window.innerHeight / 2;
+      return { position: "fixed", left: `${x}px`, top: `${y}px`, transform: below ? "translate(-50%, 0)" : "translate(-50%, -100%)" };
+    }
     const [busy, setBusy] = (0, import_react9.useState)(false);
     const [qrBusy, setQrBusy] = (0, import_react9.useState)(false);
     const [proofBusy, setProofBusy] = (0, import_react9.useState)(false);
@@ -39150,7 +39165,7 @@
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { onClick: onClose, className: "rounded-xl p-2 text-white/50 hover:bg-white/10", "aria-label": t("close"), children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(X, { size: 20 }) })
         ] })
       ] }),
-      notice && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "fixed left-1/2 top-1/2 z-[12000] flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-2xl border border-neon/40 bg-ink px-5 py-3 text-center text-xs font-bold text-neon shadow-[0_0_35px_rgba(45,255,214,0.28)] sm:text-sm", children: [
+      notice && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "z-[12000] flex items-center gap-2 rounded-2xl border border-neon/40 bg-ink px-5 py-3 text-center text-xs font-bold text-neon shadow-[0_0_35px_rgba(45,255,214,0.28)] sm:text-sm", style: noticeStyle(), children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Check, { size: 16 }),
         " ",
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "break-words", children: notice })
