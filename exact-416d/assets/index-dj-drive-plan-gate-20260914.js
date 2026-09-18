@@ -39819,6 +39819,7 @@
       setChatOpen(overlay === "chat");
     }
     function openDjOverlay(name, data = null) {
+      if (name === "plans" && !shouldShowAcquirePlan(access)) return;
       const current = window.history.state || {};
       if (current[DJ_OVERLAY_KEY] === name) return;
       const next = { ...current, [DJ_OVERLAY_KEY]: name, djOverlayData: data };
