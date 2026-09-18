@@ -40260,7 +40260,7 @@
             ] })
           ] })
         ] }),
-        access?.role !== "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mb-5 flex flex-col gap-2 rounded-xl border border-turquoise/25 bg-turquoise/10 p-2.5 sm:flex-row sm:items-center sm:justify-between sm:p-3", children: [
+        shouldShowAcquirePlan(access) && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mb-5 flex flex-col gap-2 rounded-xl border border-turquoise/25 bg-turquoise/10 p-2.5 sm:flex-row sm:items-center sm:justify-between sm:p-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "flex items-center gap-2 text-sm font-bold text-turquoise", children: [
               /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Crown, { size: 15 }),
