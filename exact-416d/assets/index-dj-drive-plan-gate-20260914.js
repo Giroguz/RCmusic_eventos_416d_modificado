@@ -40599,10 +40599,18 @@
   function pageWasRefreshed() {
     return navigationType() === "reload";
   }
+  function paymentReturnPending() {
+    try {
+      const value = JSON.parse(sessionStorage.getItem("rc_payment_return_pending") || "null");
+      return Boolean(value && Date.now() - Number(value.at || 0) < 15 * 60 * 1e3);
+    } catch {
+      return false;
+    }
+  }
   function historyRestoredPanel() {
     try {
       const hash = window.location.hash.slice(1);
-      return navigationType() === "back_forward" && (hash === "attendee" || hash === "dj" || hash === "developer");
+      return navigationType() === "back_forward" && !paymentReturnPending() && (hash === "attendee" || hash === "dj" || hash === "developer");
     } catch {
       return false;
     }
@@ -40647,6 +40655,7 @@
       });
       try {
         if (sessionStorage.getItem("rc_pending_recovery_v1")) setScreen("dj-login");
+        sessionStorage.removeItem("rc_payment_return_pending");
       } catch {
       }
     }, []);
