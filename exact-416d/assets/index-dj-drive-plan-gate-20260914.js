@@ -38634,21 +38634,18 @@
     const [notificationWhatsapp, setNotificationWhatsapp] = (0, import_react9.useState)("");
     const [notificationBusy, setNotificationBusy] = (0, import_react9.useState)(false);
     const [notice, setNotice] = (0, import_react9.useState)("");
-    const noticeAnchor = (0, import_react9.useRef)(null);
+    const adminNoticeTimer = (0, import_react9.useRef)(null);
     const [error, setError] = (0, import_react9.useState)("");
     (0, import_react9.useEffect)(() => {
-      const rememberNoticePosition = (event) => {
-        if (event.target?.closest?.("button")) noticeAnchor.current = { x: event.clientX, y: event.clientY };
+      if (!notice) return void 0;
+      if (adminNoticeTimer.current) clearTimeout(adminNoticeTimer.current);
+      adminNoticeTimer.current = setTimeout(() => setNotice(""), 3e3);
+      return () => {
+        if (adminNoticeTimer.current) clearTimeout(adminNoticeTimer.current);
       };
-      document.addEventListener("click", rememberNoticePosition, true);
-      return () => document.removeEventListener("click", rememberNoticePosition, true);
-    }, []);
+    }, [notice]);
     function noticeStyle() {
-      const point = noticeAnchor.current;
-      const x = point ? Math.max(150, Math.min(window.innerWidth - 150, point.x)) : window.innerWidth / 2;
-      const below = point && point.y < 140;
-      const y = point ? Math.max(16, Math.min(window.innerHeight - 16, below ? point.y + 30 : point.y - 18)) : window.innerHeight / 2;
-      return { position: "fixed", left: `${x}px`, top: `${y}px`, transform: below ? "translate(-50%, 0)" : "translate(-50%, -100%)", zIndex: 12000, maxWidth: "calc(100vw - 24px)" };
+      return { position: "fixed", left: "50%", top: "50%", transform: "translate(-50%, -50%)", zIndex: 12000, maxWidth: "calc(100vw - 24px)" };
     }
     const [busy, setBusy] = (0, import_react9.useState)(false);
     const [qrBusy, setQrBusy] = (0, import_react9.useState)(false);
