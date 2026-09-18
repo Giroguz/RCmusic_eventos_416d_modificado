@@ -40707,29 +40707,12 @@
         window.history.replaceState({ ...current, [HISTORY_KEY]: true, screen: currentScreen, activeEvent: currentEvent, routeTrail, routeIndex: 0, appRoot: true }, "", routeHash(currentScreen));
       }
       const restorePreviousRoute = (event) => {
-      const state = event?.state || window.history.state;
-      if (state?.[HISTORY_KEY]) {
-        const historyScreen = state.screen || screenRef.current || "home";
-        if (historyScreen === "dj-login" || historyScreen === "attendee-join") {
-          const homeTrail = [{ screen: "home", activeEvent: null }];
-          writeRouteStack(homeTrail);
-          window.history.replaceState({ ...state, [HISTORY_KEY]: true, screen: "home", activeEvent: null, routeTrail: homeTrail, routeIndex: 0, appRoot: true }, "", routeHash("home"));
-          setActiveEvent(null);
-          setScreen("home");
-          return;
-        }
-        const trail = Array.isArray(state.routeTrail) && state.routeTrail.length ? state.routeTrail : readRouteStack();
-        writeRouteStack(trail);
-        setScreen(historyScreen);
-        setActiveEvent(state.activeEvent || null);
-        return;
-      }
-      const hashScreen = window.location.hash.slice(1);
-      if (hashScreen) {
-        setScreen(hashScreen);
-        setActiveEvent(null);
-        writeRouteStack([{ screen: hashScreen, activeEvent: null }]);
-      }
+      const state = event?.state || window.history.state || {};
+      const homeTrail = [{ screen: "home", activeEvent: null }];
+      writeRouteStack(homeTrail);
+      window.history.replaceState({ ...state, [HISTORY_KEY]: true, screen: "home", activeEvent: null, routeTrail: homeTrail, routeIndex: 0, appRoot: true }, "", routeHash("home"));
+      setActiveEvent(null);
+      setScreen("home");
     };
       window.addEventListener("popstate", restorePreviousRoute);
       window.addEventListener("__disabled_hashchange", () => {});
