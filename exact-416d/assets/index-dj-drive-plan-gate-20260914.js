@@ -38185,7 +38185,8 @@
         try {
           const { data, error: statusError } = await supabase.rpc("dj_email_status", { p_email: email.trim().toLowerCase() });
           if (!active) return;
-          setLoginEmailStatus(statusError ? "unknown" : data?.[0]?.status || "unknown");
+          const statusRow = Array.isArray(data) ? data[0] : data;
+          setLoginEmailStatus(statusError ? "unknown" : statusRow?.status || "unknown");
         } catch {
           if (active) setLoginEmailStatus("unknown");
         }
