@@ -39535,6 +39535,7 @@
 
   // src/components/DjApp.jsx
   var import_jsx_runtime9 = __toESM(require_jsx_runtime(), 1);
+  var import_react_dom = __toESM(require_react_dom(), 1);
   const BACKUP_DRIVE_URL = "https://drive.google.com/drive/folders/1iwuKlMfb8JSLV86ZlbPNQg1ri2Q0CeNl";
   function GoogleDriveIcon({ size = 18 }) {
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("svg", { width: size, height: size, viewBox: "0 0 87.3 78", preserveAspectRatio: "xMidYMid meet", "aria-hidden": "true", className: "shrink-0", children: [
@@ -40244,7 +40245,7 @@
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mb-3 text-sm leading-6 text-white/55", children: "Elige un plan, realiza el pago y env\xEDa tu comprobante para activar o renovar tu acceso." }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanCards, { token: access?.token, email: access?.email })
       ] }),
-      showAdmin && access?.role === "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(AdminPanel, { session: access, onClose: () => closeDjOverlay(() => setShowAdmin(false)) })
+      showAdmin && access?.role === "admin" && /* @__PURE__ */ (0, import_react_dom.createPortal)(/* @__PURE__ */ (0, import_jsx_runtime9.jsx)(AdminPanel, { session: access, onClose: () => closeDjOverlay(() => setShowAdmin(false)) }), document.body)
     ] }) });
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(AppShell, { onHome: onExit, right: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "flex items-center gap-2", children: [
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(EmailVerificationBadge, { access }),
@@ -40568,7 +40569,7 @@
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mb-3 text-sm leading-6 text-white/55", children: "Elige un plan, realiza el pago y env\xEDa tu comprobante para activar o renovar tu acceso." }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanCards, { token: access?.token, email: access?.email })
       ] }),
-      showAdmin && access?.role === "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(AdminPanel, { session: access, onClose: () => closeDjOverlay(() => setShowAdmin(false)) })
+      showAdmin && access?.role === "admin" && /* @__PURE__ */ (0, import_react_dom.createPortal)(/* @__PURE__ */ (0, import_jsx_runtime9.jsx)(AdminPanel, { session: access, onClose: () => closeDjOverlay(() => setShowAdmin(false)) }), document.body)
     ] });
   }
 
