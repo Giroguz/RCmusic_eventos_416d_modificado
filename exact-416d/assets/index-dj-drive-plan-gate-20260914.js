@@ -37713,7 +37713,7 @@
           /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("form", { onSubmit: handleSearch, className: "flex flex-col gap-3 sm:flex-row", children: [
             /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "relative flex-1", children: [
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Search, { size: 19, className: "absolute left-4 top-1/2 -translate-y-1/2 text-white/35" }),
-              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { value: query, onChange: (e) => setQuery(e.target.value), className: "input-dark pl-11", placeholder: t("searchPlaceholder") })
+              /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { value: query, onChange: (e) => { const value = e.target.value; setQuery(value); if (!value.trim()) setResults([]); }, className: "input-dark pl-11", placeholder: t("searchPlaceholder") })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { className: "btn-primary sm:min-w-36", disabled: searching || !query.trim(), children: [
               searching ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(LoaderCircle, { size: 18, className: "animate-spin" }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Search, { size: 18 }),
