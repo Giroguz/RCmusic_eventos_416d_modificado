@@ -32813,7 +32813,7 @@
     if (!supabase || !token) return 1;
     const { data, error } = await supabase.rpc("admin_get_demo_days", { p_token: token });
     if (error) throw error;
-    return Number(data || 1);
+    return Number(data ?? 1);
   }
   async function adminSetDemoDays(days, token) {
     if (!supabase || !token) throw new Error("Admin session required");
@@ -32825,7 +32825,7 @@
     if (!supabase) return 1;
     const { data, error } = await supabase.rpc("get_demo_days");
     if (error) return 1;
-    return Number(data || 1);
+    return Number(data ?? 1);
   }
   async function adminExtendDjPlan(id, days, token) {
     const { data, error } = await supabase.rpc("admin_extend_dj_plan", { p_token: token, p_dj_id: id, p_days: Number(days) });
@@ -38471,7 +38471,7 @@
           setRecoveryStep("email");
           setRecoveryMessage("");
         }, className: "mt-4 w-full text-xs text-white/45 underline underline-offset-4 hover:text-turquoise", children: "¿Olvidaste tu contraseña? Recuperarla por correo" }) : email.trim() && !planExpired && !noActivePlan ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: requestAdminCodeByEmail, className: "mt-4 w-full text-xs text-white/45 underline underline-offset-4 hover:text-turquoise", children: "¿Olvidaste tu código? Solicitar al administrador" }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: () => {
+        demoDays > 0 && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("button", { type: "button", onClick: () => {
           setShowTrial(true);
           setTrialError("");
           setTrialVerificationCode("");
@@ -38683,8 +38683,8 @@
     const [proofBusy, setProofBusy] = (0, import_react9.useState)(false);
     const [planOptions, setPlanOptions] = (0, import_react9.useState)(() => { const saved = readAdminSettings(); return saved?.plans?.length ? mergePlanOptions(saved.plans) : PLAN_OPTIONS; });
     const [priceDraft, setPriceDraft] = (0, import_react9.useState)(() => { const saved = readAdminSettings(); const plans = saved?.plans?.length ? mergePlanOptions(saved.plans) : PLAN_OPTIONS; return draftFromPlans(plans); });
-    const [demoDays, setDemoDays] = (0, import_react9.useState)(() => Number(readAdminSettings()?.demoDays) || 1);
-    const [demoDaysDraft, setDemoDaysDraft] = (0, import_react9.useState)(() => Number(readAdminSettings()?.demoDays) || 1);
+    const [demoDays, setDemoDays] = (0, import_react9.useState)(() => Number(readAdminSettings()?.demoDays ?? 1));
+    const [demoDaysDraft, setDemoDaysDraft] = (0, import_react9.useState)(() => Number(readAdminSettings()?.demoDays ?? 1));
     const [pricesBusy, setPricesBusy] = (0, import_react9.useState)(false);
     const [userSearch, setUserSearch] = (0, import_react9.useState)("");
     const [userDrafts, setUserDrafts] = (0, import_react9.useState)({});
@@ -38803,11 +38803,11 @@
       }
       try {
         const days = await adminGetDemoDays(session.token);
-        const nextDays = Number(savedSettings?.demoDays) || days;
+        const nextDays = savedSettings?.demoDays !== undefined && savedSettings?.demoDays !== null ? Number(savedSettings.demoDays) : days;
         setDemoDays(nextDays);
         setDemoDaysDraft(nextDays);
       } catch {
-        if (savedSettings?.demoDays) { setDemoDays(Number(savedSettings.demoDays)); setDemoDaysDraft(Number(savedSettings.demoDays)); }
+        if (savedSettings?.demoDays !== undefined && savedSettings?.demoDays !== null) { setDemoDays(Number(savedSettings.demoDays)); setDemoDaysDraft(Number(savedSettings.demoDays)); }
       }
     }
     (0, import_react9.useEffect)(() => {
@@ -38838,15 +38838,16 @@
     async function saveDemoDays() {
       setPricesBusy(true);
       setError("");
-      const savedDays = Math.max(1, Number(demoDaysDraft) || 1);
+      const parsedDays = Number(demoDaysDraft);
+      const savedDays = Number.isFinite(parsedDays) ? Math.max(0, Math.min(3650, parsedDays)) : 0;
       writeAdminSettings({ plans: planOptions, demoDays: savedDays });
       setDemoDays(savedDays);
       setDemoDaysDraft(savedDays);
       try {
         await adminSetDemoDays(savedDays, session.token);
-        setNotice(`Demo configurada por ${savedDays} ${savedDays === 1 ? "d\xEDa" : "d\xEDas"}.`);
+        setNotice(savedDays === 0 ? "Demo desactivada." : `Demo configurada por ${savedDays} ${savedDays === 1 ? "d\xEDa" : "d\xEDas"}.`);
       } catch {
-        setNotice(`Demo guardada localmente por ${savedDays} ${savedDays === 1 ? "d\xEDa" : "d\xEDas"}.`);
+        setNotice(savedDays === 0 ? "Demo desactivada localmente." : `Demo guardada localmente por ${savedDays} ${savedDays === 1 ? "d\xEDa" : "d\xEDas"}.`);
         setError("La duraci\xF3n qued\xF3 conservada localmente; vuelve a intentarlo para sincronizarla con el servidor.");
       } finally {
         setPricesBusy(false);
@@ -39237,7 +39238,7 @@
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex items-end gap-2", children: [
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-[11px] text-white/50", children: [
               "D\xEDas",
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "1", max: "3650", value: demoDaysDraft, onChange: (e) => { const value = e.target.value; setDemoDaysDraft(value); writeAdminSettings({ plans: planOptions, demoDays: Number(value) || 1 }); }, className: "input-dark mt-1 w-24 px-3 py-2 text-sm" })
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "0", max: "3650", value: demoDaysDraft, onChange: (e) => { const value = e.target.value; setDemoDaysDraft(value); writeAdminSettings({ plans: planOptions, demoDays: Number(value) || 0 }); }, className: "input-dark mt-1 w-24 px-3 py-2 text-sm" })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: saveDemoDays, disabled: pricesBusy, className: "btn-primary px-3 py-2 text-xs", children: pricesBusy ? "Guardando\u2026" : "Guardar demo" })
           ] })
