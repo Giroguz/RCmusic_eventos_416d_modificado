@@ -2659,3 +2659,12 @@ button:disabled { cursor: not-allowed; opacity: .55; }
     grid-template-columns: minmax(0,1fr) 340px;
   }
 }
+
+/* Keep one password visibility control: the app's own eye button. */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
