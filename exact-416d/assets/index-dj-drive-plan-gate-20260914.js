@@ -39839,7 +39839,13 @@
             setActiveId((current) => freshEvents.some((event) => event.id === current) ? current : freshEvents[0]?.id);
           }
         } catch (error) {
-          setLoadError(error?.message === "SESSION_EXPIRED" ? "La sesi\xF3n del DJ venci\xF3. Vuelve a ingresar con tu correo y c\xF3digo." : "No se pudo cargar el Panel de DJ. Revisa tu conexi\xF3n e int\xE9ntalo nuevamente.");
+          if (error?.message === "SESSION_EXPIRED") {
+            await signOutDj(session?.token).catch(() => {});
+            setLoadError("Tu cuenta está bloqueada o ya no tiene acceso activo. Vuelve a ingresar cuando el desarrollador la desbloquee.");
+            onExit();
+            return;
+          }
+          setLoadError("No se pudo cargar el Panel de DJ. Revisa tu conexión e inténtalo nuevamente.");
         } finally {
           setLoading(false);
         }
@@ -39849,7 +39855,7 @@
         window.addEventListener("storage", sync);
         window.addEventListener("rc-events-updated", sync);
       }
-      const interval = setInterval(sync, 25e3);
+      const interval = setInterval(sync, 5e3);
       return () => {
         window.removeEventListener("storage", sync);
         window.removeEventListener("rc-events-updated", sync);
@@ -40022,8 +40028,15 @@
       }
     }
     const hasDriveAccess = access?.role === "admin" || ["fifteen", "monthly", "annual"].includes(String(access?.planType || access?.plan_type || "").toLowerCase());
-    function openBackupDrive() {
-      if (!hasDriveAccess) {
+    async function openBackupDrive() {
+      const currentAccess = supabaseEnabled ? await getDjAccess(access?.token).catch(() => null) : access;
+      if (!currentAccess) {
+        onExit();
+        return;
+      }
+      const currentPlan = String(currentAccess.planType || currentAccess.plan_type || "").toLowerCase();
+      const currentHasDriveAccess = currentAccess.role === "admin" || ["fifteen", "monthly", "annual"].includes(currentPlan);
+      if (!currentHasDriveAccess) {
         window.location.assign("/assets/planes.html#dj-plans");
         return;
       }
