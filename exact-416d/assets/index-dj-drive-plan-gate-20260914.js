@@ -37431,7 +37431,7 @@
   }
   function MediaThumbnail({ src, alt = "", className = "" }) {
     const [failed, setFailed] = (0, import_react7.useState)(!src);
-    if (failed) return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("img", { src: "/music-placeholder.svg", alt: alt || "M\xFAsica", className });
+    if (failed) return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("img", { src: "/assets/music-placeholder.svg", alt: alt || "M\xFAsica", className });
     return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("img", { src, alt, className, onError: () => setFailed(true) });
   }
   function DeezerPreview({ track }) {
@@ -39583,7 +39583,7 @@
   }
   function MediaThumbnail2({ src, alt = "", className = "" }) {
     const [failed, setFailed] = (0, import_react10.useState)(!src);
-    if (failed) return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("img", { src: "/music-placeholder.svg", alt: alt || "M\xFAsica", className });
+    if (failed) return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("img", { src: "/assets/music-placeholder.svg", alt: alt || "M\xFAsica", className });
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("img", { src, alt, className, onError: () => setFailed(true) });
   }
   function DeezerPreview2({ track }) {
