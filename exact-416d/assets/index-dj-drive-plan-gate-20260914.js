@@ -38929,6 +38929,15 @@
         const proof = proofs.find((item) => item.id === id);
         const result = await adminReviewSubscriptionProof(id, status, status === "approved" ? "Pago aceptado. Acceso activado y c\xF3digo enviado por correo." : "Comprobante rechazado por el desarrollador.", session.token);
         let emailSent = false;
+        let driveGranted = false;
+        if (status === "approved" && proof) {
+          try {
+            await grantDriveFolderAccess(String(proof.email || "").trim().toLowerCase());
+            driveGranted = true;
+          } catch {
+            setError("Pago aprobado, pero el permiso de lectura de Drive quedó pendiente de autorización.");
+          }
+        }
         if (status === "approved" && proof && result?.generated_code) {
           try {
             await sendSubscriptionEmail({ adminToken: session.token, to: proof.email, displayName: proof.display_name, code: result.generated_code, planLabel: planLabel(proof.plan_type, t, planOptions) });
@@ -38937,7 +38946,7 @@
             setError("Pago aceptado y acceso activado, pero no se pudo enviar el correo. Configura la funci\xF3n de correo y vuelve a intentarlo.");
           }
         }
-        if (status === "approved" && emailSent) setNotice("Pago aceptado. El acceso fue activado y el c\xF3digo \xFAnico se envi\xF3 al correo del DJ.");
+        if (status === "approved" && emailSent) setNotice(driveGranted ? "Pago aceptado. Acceso activado, código enviado y permiso de lectura de Drive otorgado." : "Pago aceptado. Acceso activado y código enviado; el permiso de Drive quedó pendiente.");
         if (status === "rejected") setNotice("Comprobante rechazado.");
         await load();
       } catch {
@@ -38993,7 +39002,7 @@
       try {
         const result = await adminActivateDj(draft.djId, { email: draft.email.trim().toLowerCase(), displayName: draft.displayName.trim(), accessCode: draft.accessCode.trim(), planType: draft.planType }, session.token);
         let message = `Acceso activado para ${draft.displayName}. C\xF3digo generado: ${result.generatedCode}`;
-        if (draft.driveAccess) {
+        if (draft.planType) {
           try {
             await grantDriveFolderAccess(draft.email.trim().toLowerCase());
             message += " Permiso de lectura de Drive otorgado.";
@@ -39072,7 +39081,10 @@
       try {
         if (contactChanged) await adminUpdateDj(dj.id, { email: nextEmail, displayName: nextDisplayName }, session.token);
         if (planChanged || needsActivation) await adminSetDjPlan(dj.id, selectedPlan, session.token);
-        if (planChanged && !selectedBlocked) await adminSetDjState(dj.id, { approved: true, blocked: false }, session.token);
+        if (planChanged && !selectedBlocked) {
+          await adminSetDjState(dj.id, { approved: true, blocked: false }, session.token);
+          try { await grantDriveFolderAccess(nextEmail); } catch { setError("Plan aprobado, pero el permiso de lectura de Drive quedó pendiente de autorización."); }
+        }
         if (extraDays > 0) await adminExtendDjPlan(dj.id, extraDays, session.token);
         if (blockChanged) await adminSetDjState(dj.id, selectedBlocked ? { approved: false, blocked: true } : { approved: true, blocked: false }, session.token);
         setNotice(`Cambios guardados para ${nextDisplayName}.`);
