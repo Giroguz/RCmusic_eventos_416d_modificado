@@ -37526,6 +37526,13 @@
     const [chatOpen, setChatOpen] = (0, import_react7.useState)(false);
     (0, import_react7.useEffect)(() => subscribeToEventPresence(event.id, "attendee", () => {
     }, "event"), [event.id]);
+    (0, import_react7.useEffect)(() => {
+      if (!supabase || event.localOnly) return void 0;
+      const channel = supabase.channel(`event-settings-${event.id}`).on("postgres_changes", { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${event.id}` }, ({ new: row }) => {
+        onUpdate({ ...event, name: row.name || event.name, djName: row.dj_name || event.djName, yapeNumber: row.yape_number || "", contact: row.contact || "", thankYou: row.thank_you || "", qrImage: row.qr_image_url || "", tipsRequired: Boolean(row.tips_required), tipCurrency: String(row.tip_currency || "PEN").toUpperCase(), tipAmount: Number(row.tip_amount || 0), finalized: Boolean(row.finalized_at || row.finalized), finalizedAt: row.finalized_at || null });
+      }).subscribe();
+      return () => { supabase.removeChannel(channel); };
+    }, [event.id, event.localOnly, onUpdate]);
     function pushOverlay(overlay) {
       const current = window.history.state || {};
       const base = current[APP_HISTORY_KEY] ? current : { ...current, [APP_HISTORY_KEY]: true, screen: "attendee", activeEvent: event, appRoot: false };
@@ -37567,7 +37574,7 @@
         } catch {
         }
       };
-      const interval = setInterval(refresh, 1e4);
+      const interval = setInterval(refresh, 3e3);
       return () => clearInterval(interval);
     }, [event.code, event.localOnly, onUpdate]);
     const sortedRequests = (0, import_react7.useMemo)(() => [...event.requests || []].filter((request) => !["awaiting-payment", "payment-rejected"].includes(request.status)).sort((a, b) => b.likes - a.likes), [event.requests]);
