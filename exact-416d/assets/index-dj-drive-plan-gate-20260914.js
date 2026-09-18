@@ -39113,7 +39113,7 @@
       }
     }
     async function deleteDj(dj) {
-      if (!window.confirm(`\xBFEliminar definitivamente a ${dj.displayName || dj.email}?`)) return;
+      if (!window.confirm(`\xBFEliminar definitivamente a ${dj.displayName || dj.email}? Se eliminarán sus eventos, pedidos, configuraciones, comprobantes, sesiones y registros asociados. Esta acción no se puede deshacer.`)) return;
       setBusy(true);
       setError("");
       try {
