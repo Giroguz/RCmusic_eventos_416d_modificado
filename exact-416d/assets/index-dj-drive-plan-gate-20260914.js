@@ -40189,6 +40189,20 @@
       ] })
     ] }), children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(PageContainer, { children: [
       access?.role !== "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanCountdownCard, { access }),
+      shouldShowAcquirePlan(access) && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("section", { className: "mb-5 flex flex-col gap-2 rounded-xl border border-turquoise/25 bg-turquoise/10 p-2.5 sm:flex-row sm:items-center sm:justify-between sm:p-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("p", { className: "flex items-center gap-2 text-sm font-bold text-turquoise", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Crown, { size: 15 }),
+            " ¿Quieres seguir usando el Panel de DJ?"
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mt-0.5 text-[11px] leading-4 text-white/55", children: "Adquiere o renueva tu plan y mantén habilitado tu acceso al catálogo privado." }),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PlanOfferSummary, {})
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => openDjOverlay("plans"), className: "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-turquoise px-3 py-2 text-xs font-extrabold text-ink transition hover:bg-turquoise/85", children: [
+          "Adquirir un plan ",
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 16 })
+        ] })
+      ] }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5 sm:px-4", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(GoogleDriveIcon, { size: 18 }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Actualización y Utilidades Dj." }),
