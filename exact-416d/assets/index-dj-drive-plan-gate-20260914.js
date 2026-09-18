@@ -32530,6 +32530,10 @@
       } else {
         sessionStorage.removeItem(SESSION_KEY);
         localStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem("rcMusicSearchCache:v5");
+        localStorage.removeItem(EVENTS_KEY);
+        localStorage.removeItem(LIKES_KEY);
+        Object.keys(localStorage).filter((key) => key.startsWith("rc_music_chat_history_v1_") || key.startsWith("rc_music_chat_name_v1_")).forEach((key) => localStorage.removeItem(key));
       }
     } catch {
     }
