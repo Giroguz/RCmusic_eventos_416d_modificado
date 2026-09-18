@@ -37483,20 +37483,25 @@
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
-    const image = await new Promise((resolve, reject) => {
-      const value = new Image();
-      value.onload = () => resolve(value);
-      value.onerror = reject;
-      value.src = source;
-    });
-    const maxSide = 1100;
-    const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
-    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
-    canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
-    const result = canvas.toDataURL("image/jpeg", 0.78);
-    if (result.length > 88e4) throw new Error("image-too-large");
+    let result = source;
+    try {
+      const image = await new Promise((resolve, reject) => {
+        const value = new Image();
+        value.onload = () => resolve(value);
+        value.onerror = reject;
+        value.src = source;
+      });
+      const maxSide = 1100;
+      const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+      result = canvas.toDataURL("image/jpeg", 0.78);
+    } catch {
+      result = source;
+    }
+    if (result.length > 12e5) throw new Error("image-too-large");
     return result;
   }
   function AttendeeApp({ event, onUpdate, onExit }) {
@@ -37729,8 +37734,9 @@
                   /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "flex min-h-16 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-dashed border-fuchsia-400/70 bg-fuchsia-950/20 px-4 py-4 text-sm font-bold text-fuchsia-400 transition hover:bg-fuchsia-950/35", children: [
                     /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ImagePlus, { size: 20, "aria-hidden": "true" }),
                     "Subir comprobante",
-                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, type: "file", accept: "image/*", onChange: handleProofUpload, className: "hidden" })
-                  ] })
+                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, type: "file", accept: "image/*,.heic,.heif", onChange: handleProofUpload, className: "mt-2 block w-full text-xs text-white/70" })
+                  ] }),
+                  form.proofName && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-2 truncate text-xs text-emerald-200", children: `Listo: ${form.proofName}` })
                 ] })
               ] }),
               !event.tipsRequired && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "rounded-2xl border border-white/10 bg-white/[.04] p-3", children: [
