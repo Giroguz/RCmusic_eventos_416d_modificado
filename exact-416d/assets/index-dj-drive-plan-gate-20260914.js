@@ -38634,6 +38634,7 @@
     const [notificationWhatsapp, setNotificationWhatsapp] = (0, import_react9.useState)("");
     const [notificationBusy, setNotificationBusy] = (0, import_react9.useState)(false);
     const [notice, setNotice] = (0, import_react9.useState)("");
+    const adminScrollerRef = (0, import_react9.useRef)(null);
     const adminNoticeTimer = (0, import_react9.useRef)(null);
     const [error, setError] = (0, import_react9.useState)("");
     (0, import_react9.useEffect)(() => {
@@ -38645,7 +38646,10 @@
       };
     }, [notice]);
     function noticeStyle() {
-      return { position: "fixed", left: "50%", top: "50%", transform: "translate(-50%, -50%)", zIndex: 12000, maxWidth: "calc(100vw - 24px)" };
+      const scroller = adminScrollerRef.current;
+      const height = scroller?.clientHeight || window.innerHeight;
+      const scrollTop = scroller?.scrollTop || 0;
+      return { position: "absolute", left: "50%", top: `${scrollTop + height / 2}px`, transform: "translate(-50%, -50%)", zIndex: 12000, maxWidth: "calc(100vw - 24px)" };
     }
     const [busy, setBusy] = (0, import_react9.useState)(false);
     const [qrBusy, setQrBusy] = (0, import_react9.useState)(false);
@@ -39147,7 +39151,7 @@
       return searchMatch && focusMatch;
     });
     const proofList = proofs.slice(0, 20);
-    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "fixed inset-0 z-[11000] h-[100dvh] overflow-y-auto overscroll-contain bg-black/95 p-1.5 backdrop-blur-sm sm:p-3", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mx-auto my-1 max-w-6xl rounded-2xl border border-white/10 bg-ink p-2 sm:my-3 sm:rounded-[2rem] sm:p-4 lg:p-6", children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { ref: adminScrollerRef, className: "fixed inset-0 z-[11000] h-[100dvh] overflow-y-auto overscroll-contain bg-black/95 p-1.5 backdrop-blur-sm sm:p-3", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mx-auto my-1 max-w-6xl rounded-2xl border border-white/10 bg-ink p-2 sm:my-3 sm:rounded-[2rem] sm:p-4 lg:p-6", children: [
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "sticky top-0 z-30 -mx-0.5 mb-3 flex items-center justify-between gap-2 rounded-xl border border-violet-300/30 bg-[#100b1b] p-2 shadow-2xl shadow-black/50 backdrop-blur-xl sm:-mx-1 sm:mb-4 sm:gap-3 sm:p-3", children: [
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex min-w-0 items-start gap-2 sm:gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-violet-300/25 bg-violet-300/10 text-violet-100 sm:h-10 sm:w-10 sm:rounded-xl", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(Crown, { size: 19, className: "sm:h-6 sm:w-6" }) }),
