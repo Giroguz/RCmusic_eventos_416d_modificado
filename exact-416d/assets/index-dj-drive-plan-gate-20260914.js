@@ -37731,17 +37731,17 @@
                 /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-2 text-center text-xs font-bold text-white", children: event.yapeNumber || "Yape" }),
                 /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "mt-3", children: [
                   /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("p", { className: "mb-2 text-sm font-bold text-white/85", children: ["Comprobante o captura del pago ", /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "text-fuchsia-400", children: "*" })] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "flex min-h-16 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-dashed border-fuchsia-400/70 bg-fuchsia-950/20 px-4 py-4 text-sm font-bold text-fuchsia-400 transition hover:bg-fuchsia-950/35", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "flex min-h-14 w-full cursor-pointer items-center justify-center gap-1 rounded-2xl border border-dashed border-fuchsia-400/70 bg-fuchsia-950/20 px-2 py-2 text-xs font-bold leading-tight text-fuchsia-400 transition hover:bg-fuchsia-950/35", style: { fontSize: "12px", lineHeight: 1.15 }, children: [
                     /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ImagePlus, { size: 20, "aria-hidden": "true" }),
                     "Subir comprobante",
-                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, type: "file", accept: "image/*,.heic,.heif", onChange: handleProofUpload, className: "mt-2 block w-full text-xs text-white/70" })
+                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { required: true, type: "file", accept: "image/*,.heic,.heif", onChange: handleProofUpload, className: "mt-1 block w-full max-w-full text-[10px] leading-3 text-white/70", style: { fontSize: "10px", lineHeight: 1.15 } })
                   ] }),
                   form.proofName && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-2 truncate text-xs text-emerald-200", children: `Listo: ${form.proofName}` })
                 ] })
               ] }),
               !event.tipsRequired && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "rounded-2xl border border-white/10 bg-white/[.04] p-3", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mb-2 text-sm font-bold text-white/85", children: "Comprobante de pago (opcional)" }),
-                /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-dashed border-turquoise/50 bg-turquoise/5 px-4 py-3 text-sm font-bold text-turquoise transition hover:bg-turquoise/10", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("label", { className: "flex min-h-12 w-full cursor-pointer items-center justify-center gap-1 rounded-2xl border border-dashed border-turquoise/50 bg-turquoise/5 px-2 py-2 text-xs font-bold leading-tight text-turquoise transition hover:bg-turquoise/10", style: { fontSize: "12px", lineHeight: 1.15 }, children: [
                   /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(ImagePlus, { size: 19, "aria-hidden": "true" }),
                   form.proofName ? form.proofName : "Subir comprobante",
                   /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("input", { type: "file", accept: "image/*", onChange: handleProofUpload, className: "hidden" })
