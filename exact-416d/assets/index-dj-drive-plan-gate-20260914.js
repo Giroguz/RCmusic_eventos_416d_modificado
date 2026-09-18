@@ -40040,6 +40040,9 @@
         window.location.assign("/assets/planes.html#dj-plans");
         return;
       }
+      try {
+        sessionStorage.setItem("rc_drive_return_pending", JSON.stringify({ hash: location.hash, at: Date.now() }));
+      } catch {}
       window.location.assign(BACKUP_DRIVE_URL);
     }
     const pending = activeEvent?.requests?.filter((request) => request.status === "pending").length || 0;
