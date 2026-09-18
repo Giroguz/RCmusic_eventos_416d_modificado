@@ -38174,6 +38174,28 @@
     const [show, setShow] = (0, import_react8.useState)(false);
     const [error, setError] = (0, import_react8.useState)("");
     const [submitting, setSubmitting] = (0, import_react8.useState)(false);
+    const [loginEmailStatus, setLoginEmailStatus] = (0, import_react8.useState)("idle");
+    (0, import_react8.useEffect)(() => {
+      if (developerMode || !supabase || !email.trim() || !email.includes("@")) {
+        setLoginEmailStatus("idle");
+        return void 0;
+      }
+      let active = true;
+      const timer = setTimeout(async () => {
+        try {
+          const { data, error: statusError } = await supabase.rpc("dj_email_status", { p_email: email.trim().toLowerCase() });
+          if (!active) return;
+          setLoginEmailStatus(statusError ? "unknown" : data?.[0]?.status || "unknown");
+        } catch {
+          if (active) setLoginEmailStatus("unknown");
+        }
+      }, 250);
+      return () => {
+        active = false;
+        clearTimeout(timer);
+      };
+    }, [email, developerMode]);
+    const loginBlockedByExpiredPlan = !developerMode && loginEmailStatus === "expired";
     const [planExpired, setPlanExpired] = (0, import_react8.useState)(false);
     const [noActivePlan, setNoActivePlan] = (0, import_react8.useState)(false);
     const [showPlanWindow, setShowPlanWindow] = (0, import_react8.useState)(false);
@@ -38338,7 +38360,7 @@
     }
     async function submit(e) {
       e.preventDefault();
-      if (submitting) return;
+      if (submitting || loginBlockedByExpiredPlan) return;
       setSubmitting(true);
       setError("");
       setPlanExpired(false);
@@ -38427,7 +38449,7 @@
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { type: "submit", disabled: submitting, className: "btn-primary mt-5 w-full disabled:cursor-wait disabled:opacity-60", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("button", { type: "submit", disabled: submitting || loginBlockedByExpiredPlan, title: loginBlockedByExpiredPlan ? "Tu plan o demo venció. Renueva tu plan para volver a ingresar." : void 0, className: "btn-primary mt-5 w-full disabled:cursor-not-allowed disabled:opacity-40", children: [
             submitting ? "Ingresando\u2026" : t("enter"),
             " ",
             /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(ArrowRight, { size: 18 })
