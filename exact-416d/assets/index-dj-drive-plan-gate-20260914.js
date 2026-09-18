@@ -39527,6 +39527,15 @@
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("path", { d: "m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z", fill: "#ffba00" })
     ] });
   }
+  function shouldShowAcquirePlan(access) {
+    if (!access || access.role === "admin") return false;
+    const planType = String(access.planType || access.plan_type || "").toLowerCase();
+    if (["trial", "demo", "demo-day"].includes(planType)) return true;
+    const expiresAt = access.planExpiresAt || access.plan_expires_at;
+    if (!expiresAt) return true;
+    const remainingDays = (new Date(expiresAt).getTime() - Date.now()) / 864e5;
+    return remainingDays <= 5;
+  }
   function EmailVerificationBadge({ access }) {
     const verified = Boolean(access?.email_verified || access?.emailVerified);
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: `hidden rounded-full border px-3 py-1.5 text-[11px] font-bold sm:inline ${verified ? "border-emerald-300/30 bg-emerald-400/10 text-emerald-200" : "border-amber-300/30 bg-amber-400/10 text-amber-100"}`, children: verified ? "\u2713 Correo verificado" : "Correo pendiente" });
@@ -40172,7 +40181,7 @@
     if (!activeEvent) return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(AppShell, { onHome: onExit, right: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "flex items-center gap-2", children: [
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(EmailVerificationBadge, { access }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(AccessCountdown, { access }),
-      access?.role !== "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { onClick: () => openDjOverlay("plans"), className: "inline-flex rounded-full border border-turquoise/30 bg-turquoise/10 px-3 py-1.5 text-[11px] font-bold text-turquoise transition hover:bg-turquoise/20", children: "Adquirir un plan" }),
+      shouldShowAcquirePlan(access) && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { onClick: () => openDjOverlay("plans"), className: "inline-flex rounded-full border border-turquoise/30 bg-turquoise/10 px-3 py-1.5 text-[11px] font-bold text-turquoise transition hover:bg-turquoise/20", children: "Adquirir un plan" }),
       access?.role === "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { onClick: () => openDjOverlay("admin"), className: "btn-secondary px-3 py-2 text-sm", children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Crown, { size: 16 }),
         " Desarrollador"
@@ -40206,7 +40215,7 @@
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(AppShell, { onHome: onExit, right: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "flex items-center gap-2", children: [
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(EmailVerificationBadge, { access }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(AccessCountdown, { access }),
-      access?.role !== "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { onClick: () => openDjOverlay("plans"), className: "inline-flex rounded-full border border-turquoise/30 bg-turquoise/10 px-3 py-1.5 text-[11px] font-bold text-turquoise transition hover:bg-turquoise/20", children: "Adquirir un plan" }),
+      shouldShowAcquirePlan(access) && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { onClick: () => openDjOverlay("plans"), className: "inline-flex rounded-full border border-turquoise/30 bg-turquoise/10 px-3 py-1.5 text-[11px] font-bold text-turquoise transition hover:bg-turquoise/20", children: "Adquirir un plan" }),
       access?.role === "admin" && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { onClick: () => openDjOverlay("admin"), className: "btn-secondary px-3 py-2 text-sm", children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ShieldCheck, { size: 16 }),
         " ",
