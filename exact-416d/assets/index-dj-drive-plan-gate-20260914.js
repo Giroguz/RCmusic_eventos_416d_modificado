@@ -38648,9 +38648,7 @@
       const x = point ? Math.max(150, Math.min(window.innerWidth - 150, point.x)) : window.innerWidth / 2;
       const below = point && point.y < 140;
       const y = point ? Math.max(16, Math.min(window.innerHeight - 16, below ? point.y + 30 : point.y - 18)) : window.innerHeight / 2;
-      const scroller = document.querySelector('div[class*="overflow-y-auto"]');
-      const scrollTop = scroller?.scrollTop || 0;
-      return { position: "absolute", left: `${x}px`, top: `${scrollTop + y}px`, transform: below ? "translate(-50%, 0)" : "translate(-50%, -100%)" };
+      return { position: "fixed", left: `${x}px`, top: `${y}px`, transform: below ? "translate(-50%, 0)" : "translate(-50%, -100%)", zIndex: 12000, maxWidth: "calc(100vw - 24px)" };
     }
     const [busy, setBusy] = (0, import_react9.useState)(false);
     const [qrBusy, setQrBusy] = (0, import_react9.useState)(false);
