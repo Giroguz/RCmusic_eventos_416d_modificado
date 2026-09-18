@@ -37717,7 +37717,7 @@
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "mt-4 rounded-2xl border border-turquoise/25 bg-turquoise/10 p-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { type: "button", onClick: () => setManualOpen((open) => !open), className: "flex w-full items-center justify-between text-left text-sm font-bold text-turquoise", children: ["¿No encuentras tu canción?", /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "text-xl", children: manualOpen ? "−" : "+" })] }),
+            /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { type: "button", onClick: () => setManualOpen((open) => !open), className: "flex w-full items-center justify-between text-left text-sm font-bold text-turquoise", children: ["¿Prefieres pedir tu canción por escrito?", /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "text-xl", children: manualOpen ? "−" : "+" })] }),
             manualOpen && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("form", { onSubmit: submitManualRequest, className: "mt-3 grid gap-2", children: [
               event.tipsRequired && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "rounded-2xl border border-neon/25 bg-neon/10 p-3", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "font-bold text-neon", children: "¡Haz que tu canción suene!" }),
