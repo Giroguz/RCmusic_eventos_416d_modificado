@@ -37385,11 +37385,12 @@
     const handled = request.status !== "pending";
     const statusTone = request.status === "played" ? "border-emerald-400/30 bg-emerald-400/[.06]" : request.status === "not-found" ? "border-[#ff2b6d]/40 bg-[#ff2b6d]/[.06]" : "border-amber-300/30 bg-amber-300/[.05]";
     const statusText = request.status === "played" ? "text-emerald-300" : request.status === "not-found" ? "text-[#ff4f86]" : "text-amber-300";
+    const playable = request.source === "deezer" || request.source === "youtube";
     return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("article", { className: `live-request-card flex min-w-0 items-center gap-2 rounded-2xl border px-2.5 py-2.5 transition ${statusTone}`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { onClick: () => onPreview({ id: request.videoId, source: request.source, spotifyId: request.spotifyId, title: request.title, artist: request.artist, thumbnail: request.thumbnail, previewUrl: request.previewUrl, externalUrl: request.externalUrl }), className: "relative h-14 w-[76px] shrink-0 overflow-hidden rounded-xl bg-white/10", "aria-label": `${t("preview")}: ${request.title}`, children: [
+      playable ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { onClick: () => onPreview({ id: request.videoId, source: request.source, spotifyId: request.spotifyId, title: request.title, artist: request.artist, thumbnail: request.thumbnail, previewUrl: request.previewUrl, externalUrl: request.externalUrl }), className: "relative h-14 w-[76px] shrink-0 overflow-hidden rounded-xl bg-white/10", "aria-label": `${t("preview")}: ${request.title}`, children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(MediaThumbnail, { src: request.thumbnail, alt: request.title, className: "h-full w-full object-cover" }),
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "absolute inset-0 grid place-items-center bg-black/30 text-white", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "grid h-6 w-6 place-items-center rounded-full bg-black/35", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Play, { size: 12, fill: "currentColor" }) }) })
-      ] }),
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "relative h-14 w-[76px] shrink-0 overflow-hidden rounded-xl bg-white/10", "aria-label": "Miniatura estándar sin reproducción", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(MediaThumbnail, { src: request.thumbnail, alt: request.title, className: "h-full w-full object-cover" }) }),
       /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "min-w-0 flex-1", children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex min-w-0 items-start gap-2", children: [
           /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "min-w-0 flex-1", children: [
