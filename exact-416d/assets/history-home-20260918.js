@@ -1,8 +1,11 @@
 (()=>{
-const driveReturn=()=>{try{const raw=sessionStorage.getItem('rc_drive_return_pending');if(!raw)return false;const p=JSON.parse(raw);const sameHash=!p?.hash||p.hash===location.hash; if(sameHash)sessionStorage.removeItem('rc_drive_return_pending');return sameHash;}catch{return false;}};
-const goHome=()=>{try{if(location.pathname==='/'&&!location.hash&&!location.search)return;location.replace(location.origin+'/');}catch{location.href=location.origin+'/';}};
-let nav='navigate';try{nav=performance.getEntriesByType('navigation')[0]?.type||'navigate';}catch{}
-const returningFromDrive=driveReturn();
-if(nav==='back_forward'&&!returningFromDrive)goHome();
-window.addEventListener('pageshow',e=>{if(e.persisted&&!driveReturn())goHome();});
+  // Preserve the browser history: Back/Forward must move one navigation at a time.
+  // Only consume the Drive return marker; do not redirect restored pages to Home.
+  try {
+    const raw=sessionStorage.getItem('rc_drive_return_pending');
+    if(raw){
+      const p=JSON.parse(raw);
+      if(!p?.hash||p.hash===location.hash)sessionStorage.removeItem('rc_drive_return_pending');
+    }
+  }catch{}
 })();
