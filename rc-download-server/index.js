@@ -13,7 +13,9 @@ const app = express()
 const port = Number(process.env.PORT || 8787)
 const frontendOrigin = process.env.FRONTEND_ORIGIN || 'https://r-cmusic-eventos.vercel.app'
 const corsOrigin = process.env.CORS_ORIGIN || frontendOrigin
-const driveFolderId = process.env.DRIVE_FOLDER_ID || '1UTIQESYvJcNdKXNsDdDs0dRCrDzs5JvF'
+const driveFolderId = process.env.DRIVE_FOLDER_ID || '1iwuKlMfb8JSLV86ZlbPNQg1ri2Q0CeNl'
+const supabaseUrl = process.env.SUPABASE_URL || 'https://fzqpmpgbubpmongodcat.supabase.co'
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmctbW9uZ29kY2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5NzI5MzIsImV4cCI6MjEwMzU0ODkzMn0.pLJfo5jpfMNRQCAbKC1dEW_INuBJan_eoyB_hWpChdw'
 const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI || 'https://rcmusic-eventos.onrender.com/api/drive/callback'
 const driveTokenCache = new Map()
 let spotifyTokenCache = { value: '', expiresAt: 0 }
@@ -79,7 +81,7 @@ app.get('/api/drive/auth', (req, res) => {
   const state = crypto.randomBytes(24).toString('hex')
   oauthStates.set(state, safeReturnTo(req.query.returnTo))
   setTimeout(() => oauthStates.delete(state), 10 * 60 * 1000)
-  const params = new URLSearchParams({ client_id: clientId, redirect_uri: googleRedirectUri, response_type: 'code', access_type: 'offline', prompt: 'consent', scope: 'https://www.googleapis.com/auth/drive.readonly', state })
+  const params = new URLSearchParams({ client_id: clientId, redirect_uri: googleRedirectUri, response_type: 'code', access_type: 'offline', prompt: 'consent', scope: 'https://www.googleapis.com/auth/drive', state })
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`)
 })
 
@@ -218,6 +220,57 @@ async function findDriveFile(accessToken, query, cacheKey) {
     return { file, score: exact + matches * 10 }
   }).filter((item) => item.score > 0).sort((a, b) => b.score - a.score || a.file.name.localeCompare(b.file.name))[0]?.file || null
 }
+
+async function requireAdminDriveAction(req) {
+  const token = String(req.headers['x-rc-session-token'] || '').trim()
+  if (!token) { const error = new Error('ADMIN_REQUIRED'); error.status = 403; throw error }
+  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/dj_check_access`, { method: 'POST', headers: { apikey: supabaseAnonKey, Authorization: `Bearer ${supabaseAnonKey}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_token: token }) })
+  const data = await response.json().catch(() => null)
+  const access = Array.isArray(data) ? data[0] : data
+  if (!response.ok || access?.role !== 'admin' || access?.is_active === false) { const error = new Error('ADMIN_REQUIRED'); error.status = 403; throw error }
+  return access
+}
+async function drivePermissions(accessToken) {
+  const params = new URLSearchParams({ fields: 'permissions(id,type,role,emailAddress,displayName)', pageSize: '100', supportsAllDrives: 'true' })
+  const response = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(driveFolderId)}/permissions?${params}`, { headers: { Authorization: `Bearer ${accessToken}` } })
+  if (!response.ok) throw new Error('DRIVE_PERMISSION_READ_FAILED')
+  return (await response.json()).permissions || []
+}
+async function grantDriveFolderPermission(accessToken, email) {
+  const normalized = String(email || '').trim().toLowerCase()
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(normalized)) { const error = new Error('INVALID_EMAIL'); error.status = 400; throw error }
+  const permissions = await drivePermissions(accessToken)
+  const existing = permissions.find((permission) => permission.type === 'user' && String(permission.emailAddress || '').toLowerCase() === normalized)
+  if (existing) {
+    if (existing.role !== 'reader') {
+      const response = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(driveFolderId)}/permissions/${encodeURIComponent(existing.id)}?supportsAllDrives=true`, { method: 'PATCH', headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ role: 'reader' }) })
+      if (!response.ok) throw new Error('DRIVE_PERMISSION_UPDATE_FAILED')
+    }
+    return { ok: true, email: normalized, role: 'reader', updated: existing.role !== 'reader' }
+  }
+  const response = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(driveFolderId)}/permissions?sendNotificationEmail=false&supportsAllDrives=true`, { method: 'POST', headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'user', role: 'reader', emailAddress: normalized }) })
+  if (!response.ok) throw new Error('DRIVE_PERMISSION_CREATE_FAILED')
+  return { ok: true, email: normalized, role: 'reader', created: true }
+}
+async function revokeDriveFolderPermission(accessToken, email) {
+  const normalized = String(email || '').trim().toLowerCase()
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(normalized)) { const error = new Error('INVALID_EMAIL'); error.status = 400; throw error }
+  const permissions = await drivePermissions(accessToken)
+  const matches = permissions.filter((permission) => permission.type === 'user' && String(permission.emailAddress || '').toLowerCase() === normalized)
+  for (const permission of matches) {
+    const response = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(driveFolderId)}/permissions/${encodeURIComponent(permission.id)}?supportsAllDrives=true`, { method: 'DELETE', headers: { Authorization: `Bearer ${accessToken}` } })
+    if (!response.ok && response.status !== 404) throw new Error('DRIVE_PERMISSION_DELETE_FAILED')
+  }
+  return { ok: true, email: normalized, revoked: matches.length }
+}
+app.post('/api/drive/grant-folder-access', async (req, res) => {
+  try { await requireAdminDriveAction(req); const { accessToken } = await getDriveAccessToken(req); return res.json(await grantDriveFolderPermission(accessToken, req.body?.email)) }
+  catch (error) { if (error.code === 'DRIVE_AUTH_REQUIRED') return res.status(401).json({ error: 'DRIVE_AUTH_REQUIRED' }); return res.status(error.status || 503).json({ error: error.message || 'DRIVE_PERMISSION_FAILED' }) }
+})
+app.post('/api/drive/revoke-folder-access', async (req, res) => {
+  try { await requireAdminDriveAction(req); const { accessToken } = await getDriveAccessToken(req); return res.json(await revokeDriveFolderPermission(accessToken, req.body?.email)) }
+  catch (error) { if (error.code === 'DRIVE_AUTH_REQUIRED') return res.status(401).json({ error: 'DRIVE_AUTH_REQUIRED' }); return res.status(error.status || 503).json({ error: error.message || 'DRIVE_PERMISSION_FAILED' }) }
+})
 
 app.get('/api/drive/status', (req, res) => {
   const sessionId = String(req.headers['x-drive-session'] || '')
@@ -387,3 +440,4 @@ app.post('/api/youtube-download', async (req, res) => {
 })
 
 app.listen(port, () => console.log(`RC music_eventos API escuchando en el puerto ${port}`))
+
