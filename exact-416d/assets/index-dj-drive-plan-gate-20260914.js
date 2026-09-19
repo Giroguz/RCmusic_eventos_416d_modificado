@@ -39532,7 +39532,7 @@
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => setPanelLinkOpen((open) => !open), className: "flex w-full items-center justify-between gap-3 text-left", "aria-expanded": panelLinkOpen, children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "flex items-center gap-2 font-bold text-violet-100", children: "Botón adicional del Panel de DJ" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mt-1 block text-xs leading-5 text-white/55", children: "Configura el botón que aparecerá junto a Actualización y Utilidades Dj." })
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mt-1 block text-xs leading-5 text-white/55", children: "Configura el botón que aparecerá junto a Maleta Dj." })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-violet-300/50 bg-black/20 text-xl font-black text-violet-100", children: panelLinkOpen ? "−" : "+" })
         ] }),
@@ -40325,7 +40325,7 @@
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: panelLink.enabled ? "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5" : "mb-5 w-full rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5", style: panelLink.enabled ? { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top", marginRight: "8px" } : { display: "block", width: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(GoogleDriveIcon, { size: 18 }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Actualización y Utilidades Dj." }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Maleta Dj." }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
       ] }) }),
       panelLink.enabled && panelLink.url && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 rounded-2xl border border-violet-300/25 bg-violet-300/[.06] px-3 py-2.5", style: { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.open(panelLink.url, "_blank", "noopener,noreferrer"), className: "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold transition hover:brightness-110", style: { background: "linear-gradient(90deg, #21d4d0 0%, #c58cff 52%, #b8ff3d 100%)", color: "#07111a", minHeight: "48px" }, children: [
@@ -40453,7 +40453,7 @@
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: panelLink.enabled ? "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5" : "mb-5 w-full rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5", style: panelLink.enabled ? { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top", marginRight: "8px" } : { display: "block", width: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(GoogleDriveIcon, { size: 18 }),
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Actualización y Utilidades Dj." }),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Maleta Dj." }),
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
         ] }) }),
         panelLink.enabled && panelLink.url && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 rounded-2xl border border-violet-300/25 bg-violet-300/[.06] px-3 py-2.5", style: { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.open(panelLink.url, "_blank", "noopener,noreferrer"), className: "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold transition hover:brightness-110", style: { background: "linear-gradient(90deg, #21d4d0 0%, #c58cff 52%, #b8ff3d 100%)", color: "#07111a", minHeight: "48px" }, children: [
