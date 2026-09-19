@@ -39036,7 +39036,7 @@
         setDrivePermissionMessage("Escribe un correo v\xE1lido del DJ.");
         return;
       }
-      if (!window.confirm(`\xBFDar acceso de lectura a PACK TODOS LOS GENEROS y sus subcarpetas a ${email}?`)) return;
+      if (!window.confirm(`\xBFDar acceso de lectura a ACTUALIZACIÓN Y UTILIDADES DJ. y sus subcarpetas a ${email}?`)) return;
       setDrivePermissionBusy(true);
       setDrivePermissionMessage("");
       try {
@@ -39481,7 +39481,7 @@
             /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: activationDraft.driveAccess, onChange: (e) => setActivationDraft((current) => ({ ...current, driveAccess: e.target.checked })), className: "mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded-md border border-turquoise/60 bg-black/30 accent-turquoise" }),
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { children: [
               "Otorgar acceso de solo lectura a ",
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("strong", { className: "text-white", children: "PACK TODOS LOS GENEROS" }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("strong", { className: "text-white", children: "ACTUALIZACIÓN Y UTILIDADES DJ." }),
               " y sus subcarpetas."
             ] })
           ] }),
