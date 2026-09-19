@@ -40674,7 +40674,9 @@
     }
   }
   function shouldReturnHomeFromHistory() {
-    return pageWasRefreshed() || historyRestoredLogin() || historyRestoredPanel();
+    // Back/Forward must restore the immediately previous panel, not Home.
+    // Only a refresh or restored login route needs the safe Home fallback.
+    return pageWasRefreshed() || historyRestoredLogin();
   }
   function initialScreen() {
     try {
