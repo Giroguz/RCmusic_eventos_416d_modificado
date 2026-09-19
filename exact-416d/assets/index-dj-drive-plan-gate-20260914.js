@@ -40319,7 +40319,7 @@
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 16 })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 inline-block w-full align-top rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5 sm:mr-2 sm:w-[calc(50%-0.5rem)]", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: panelLink.enabled ? "mb-5 inline-block w-full align-top rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5 sm:mr-2 sm:w-[calc(50%-0.5rem)]" : "mb-5 w-full rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(GoogleDriveIcon, { size: 18 }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Actualización y Utilidades Dj." }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
@@ -40447,7 +40447,7 @@
             /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { onClick: removeActiveEvent, className: "rounded-xl border border-red-300/20 bg-red-400/10 p-2.5 text-red-200 transition hover:border-red-300/40 hover:bg-red-400/20", title: "Eliminar evento", "aria-label": "Eliminar evento", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Trash2, { size: 17 }) })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 inline-block w-full align-top rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5 sm:mr-2 sm:w-[calc(50%-0.5rem)]", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: panelLink.enabled ? "mb-5 inline-block w-full align-top rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5 sm:mr-2 sm:w-[calc(50%-0.5rem)]" : "mb-5 w-full rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(GoogleDriveIcon, { size: 18 }),
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Actualización y Utilidades Dj." }),
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
