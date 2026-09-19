@@ -233,7 +233,7 @@ async function requireAdminDriveAction(req) {
 async function drivePermissions(accessToken) {
   const params = new URLSearchParams({ fields: 'permissions(id,type,role,emailAddress,displayName)', pageSize: '100', supportsAllDrives: 'true' })
   const response = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(driveFolderId)}/permissions?${params}`, { headers: { Authorization: `Bearer ${accessToken}` } })
-  if (!response.ok) throw new Error('DRIVE_PERMISSION_READ_FAILED')
+  if (!response.ok) { const error = new Error(response.status === 403 ? 'DRIVE_SCOPE_REQUIRED' : 'DRIVE_PERMISSION_READ_FAILED'); error.status = response.status === 403 ? 403 : 503; throw error }
   return (await response.json()).permissions || []
 }
 async function grantDriveFolderPermission(accessToken, email) {
