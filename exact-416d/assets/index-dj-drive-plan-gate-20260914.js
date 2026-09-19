@@ -38428,7 +38428,7 @@
               setError("");
               setPlanExpired(false);
               setNoActivePlan(false);
-            }, className: "input-dark pl-11", placeholder: t("emailPlaceholder"), autoComplete: "username" })
+            }, className: "input-dark pl-11", placeholder: t("emailPlaceholder"), autoComplete: "email" })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("label", { className: "mb-2 mt-4 block text-sm font-semibold text-white/75", children: developerMode ? "Clave de desarrollador" : t("accessCode") }),
           /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "relative", children: [
