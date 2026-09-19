@@ -33103,7 +33103,8 @@
   captureDriveSession();
   function driveRequestHeaders() {
     const driveSession = getDriveSession();
-    return { "Content-Type": "application/json", ...driveSession ? { "X-Drive-Session": driveSession } : {} };
+    const djToken = getStoredDjSession()?.token || "";
+    return { "Content-Type": "application/json", ...driveSession ? { "X-Drive-Session": driveSession } : {}, ...djToken ? { "X-RC-Session-Token": djToken } : {} };
   }
   async function driveFetch(url2, options = {}, timeoutMs) {
     const controller = new AbortController();
@@ -33134,9 +33135,14 @@
     }
     throw new Error(error || "DOWNLOAD_FAILED");
   }
-  async function grantDriveFolderAccess(email) {
+  async function grantDriveFolderAccess(email, token = getStoredDjSession()?.token) {
     captureDriveSession();
-    const response = await driveFetch(`${apiBase}/drive/grant-folder-access`, { method: "POST", headers: driveRequestHeaders(), credentials: "include", body: JSON.stringify({ email }) }, 12e4);
+    const response = await driveFetch(`${apiBase}/drive/grant-folder-access`, { method: "POST", headers: { ...driveRequestHeaders(), ...(token ? { "X-RC-Session-Token": token } : {}) }, credentials: "include", body: JSON.stringify({ email }) }, 12e4);
+    return handleDriveResponse(response).then((value) => value.json());
+  }
+  async function revokeDriveFolderAccess(email, token = getStoredDjSession()?.token) {
+    captureDriveSession();
+    const response = await driveFetch(`${apiBase}/drive/revoke-folder-access`, { method: "POST", headers: { ...driveRequestHeaders(), ...(token ? { "X-RC-Session-Token": token } : {}) }, credentials: "include", body: JSON.stringify({ email }) }, 12e4);
     return handleDriveResponse(response).then((value) => value.json());
   }
   async function searchDriveAudio(query, signal) {
@@ -38764,7 +38770,15 @@
     }
     async function load() {
       try {
-        setDjs(await adminListDjs(session.token));
+        const nextDjs = await adminListDjs(session.token);
+        setDjs(nextDjs);
+        const paidPlans = new Set(["fifteen", "monthly", "annual"]);
+        await Promise.all(nextDjs.filter((dj) => {
+          if (dj.role === "admin") return false;
+          const type = String(dj.planType || dj.plan_type || "").toLowerCase();
+          const expires = dj.planExpiresAt || dj.plan_expires_at;
+          return dj.blocked || !dj.approved || !paidPlans.has(type) || !expires || new Date(expires).getTime() <= Date.now();
+        }).map((dj) => revokeDriveFolderAccess(String(dj.email || "").trim().toLowerCase(), session.token).catch(() => null)));
         setError("");
       } catch {
         setError(t("adminLoadError"));
@@ -38977,7 +38991,7 @@
         let driveGranted = false;
         if (status === "approved" && proof) {
           try {
-            await grantDriveFolderAccess(String(proof.email || "").trim().toLowerCase());
+            await grantDriveFolderAccess(String(proof.email || "").trim().toLowerCase(), session.token);
             driveGranted = true;
           } catch {
             setError("Pago aprobado, pero el permiso de lectura de Drive quedó pendiente de autorización.");
@@ -39026,7 +39040,7 @@
       setDrivePermissionBusy(true);
       setDrivePermissionMessage("");
       try {
-        const result = await grantDriveFolderAccess(email);
+        const result = await grantDriveFolderAccess(email, session.token);
         setDrivePermissionMessage(result?.message || "Permiso otorgado correctamente.");
         setDrivePermissionEmail("");
       } catch (error2) {
@@ -39049,7 +39063,7 @@
         let message = `Acceso activado para ${draft.displayName}. C\xF3digo generado: ${result.generatedCode}`;
         if (draft.planType) {
           try {
-            await grantDriveFolderAccess(draft.email.trim().toLowerCase());
+            await grantDriveFolderAccess(draft.email.trim().toLowerCase(), session.token);
             message += " Permiso de lectura de Drive otorgado.";
           } catch {
             message += " El acceso a Drive qued\xF3 pendiente de autorizaci\xF3n.";
@@ -39128,10 +39142,15 @@
         if (planChanged || needsActivation) await adminSetDjPlan(dj.id, selectedPlan, session.token);
         if (planChanged && !selectedBlocked) {
           await adminSetDjState(dj.id, { approved: true, blocked: false }, session.token);
-          try { await grantDriveFolderAccess(nextEmail); } catch { setError("Plan aprobado, pero el permiso de lectura de Drive quedó pendiente de autorización."); }
+          try { await grantDriveFolderAccess(nextEmail, session.token); } catch { setError("Plan aprobado, pero el permiso de lectura de Drive quedó pendiente de autorización."); }
         }
         if (extraDays > 0) await adminExtendDjPlan(dj.id, extraDays, session.token);
-        if (blockChanged) await adminSetDjState(dj.id, selectedBlocked ? { approved: false, blocked: true } : { approved: true, blocked: false }, session.token);
+        if (blockChanged) {
+          await adminSetDjState(dj.id, selectedBlocked ? { approved: false, blocked: true } : { approved: true, blocked: false }, session.token);
+          if (selectedBlocked) {
+            try { await revokeDriveFolderAccess(nextEmail, session.token); } catch { setError("Usuario bloqueado, pero el permiso de Drive quedó pendiente de revocación."); }
+          }
+        }
         setNotice(`Cambios guardados para ${nextDisplayName}.`);
         setUserDrafts((current) => ({ ...current, [dj.id]: { planType: "none", extraDays: "", email: nextEmail, displayName: nextDisplayName, blocked: selectedBlocked } }));
         await load();
@@ -39146,6 +39165,7 @@
       setBusy(true);
       setError("");
       try {
+        try { await revokeDriveFolderAccess(String(dj.email || "").trim().toLowerCase(), session.token); } catch { setError("El permiso de Drive quedó pendiente de revocación."); }
         const removed = await adminDeleteDj(dj.id, session.token);
         if (!removed) throw new Error("DJ not deleted");
         setDjs((current) => current.filter((item) => item.id !== dj.id));
