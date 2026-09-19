@@ -26766,6 +26766,7 @@
   }
   function AppShell({ children, onHome, right }) {
     const { t } = useLanguage();
+    const [privacyOpen, setPrivacyOpen] = (0, import_react11.useState)(false);
     return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "app-shell min-h-screen overflow-x-hidden bg-ink bg-grid", children: [
       /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("header", { className: "sticky top-0 isolate border-b border-neon/10 bg-[#08050d]/75 backdrop-blur-xl", style: { zIndex: 1e4 }, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex w-full flex-wrap items-center gap-2 px-2 py-3 sm:flex-nowrap sm:gap-3 sm:px-4 sm:py-4 lg:px-6", children: [
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "flex w-full min-w-0 items-center sm:w-auto", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { onClick: onHome, "aria-label": t("home"), className: "shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Brand, { compact: true }) }) }),
@@ -26776,7 +26777,30 @@
         ] })
       ] }) }),
       /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("main", { children }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("footer", { className: "mx-auto max-w-6xl px-4 py-8 text-center text-xs text-white/30 sm:px-6 lg:px-8", children: "RCmusic_eventos" })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("footer", { className: "mx-auto flex max-w-6xl flex-col items-center justify-center gap-2 px-4 py-8 text-center text-xs text-white/30 sm:px-6 lg:px-8", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { children: "RCmusic_eventos" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", onClick: () => setPrivacyOpen(true), className: "text-turquoise underline decoration-turquoise/40 underline-offset-4 transition hover:text-white", children: "Privacidad" })
+      ] }),
+      privacyOpen && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "fixed inset-0 z-[12000] grid place-items-center bg-black/80 px-4 py-6 backdrop-blur-sm", role: "dialog", "aria-modal": "true", "aria-label": "Privacidad", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] border border-turquoise/25 bg-[#0b0813] p-5 shadow-2xl shadow-black/60 sm:p-7", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-start justify-between gap-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "eyebrow text-turquoise", children: "RCmusic_eventos" }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "mt-2 font-display text-3xl font-bold text-white", children: "Privacidad" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { type: "button", onClick: () => setPrivacyOpen(false), className: "btn-secondary shrink-0 px-3 py-2 text-sm", "aria-label": "Cerrar privacidad", children: "Cerrar" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "mt-5 text-sm leading-7 text-white/75", children: "RCmusic_eventos está diseñada para ayudar a DJs y asistentes a organizar pedidos musicales en eventos, cuidando la información que se utiliza para que el servicio funcione." }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "mt-5 font-bold text-turquoise", children: "¿Qué hacemos con la información?" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("ul", { className: "mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-white/70", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("li", { children: "Usamos el código del evento y los datos escritos por el asistente para enviar y ordenar su pedido en la cola del DJ." }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("li", { children: "Usamos el correo, código de acceso y estado del plan del DJ para proteger el ingreso al Panel de DJ." }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("li", { children: "Mostramos únicamente la información que el DJ decide compartir en su evento, como su nombre, mensaje, QR de propina o datos de contacto." }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("li", { children: "No vendemos la información personal ni la usamos para publicidad ajena a la aplicación." })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "mt-5 font-bold text-turquoise", children: "¿Cómo la protegemos?" }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "mt-2 text-sm leading-6 text-white/70", children: "Limitamos el acceso a las funciones según el rol y los permisos de cada cuenta. Las credenciales y códigos de acceso no se muestran públicamente, y las funciones administrativas están reservadas para el desarrollador autorizado." }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "mt-5 text-xs leading-5 text-white/45", children: "Al usar la aplicación, comparte solo los datos necesarios para tu evento. Si necesitas corregir o retirar información, solicita la gestión al administrador de RCmusic_eventos." })
+      ] }) })
     ] });
   }
   function PageContainer({ children, className = "" }) {
