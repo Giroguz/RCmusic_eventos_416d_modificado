@@ -37546,6 +37546,7 @@
     }
     function closeOverlay(setter) {
       if (window.history.state?.[OVERLAY_KEY]) {
+        window.__rcSkipHistoryHomeOnce = true;
         window.history.back();
         return;
       }
@@ -39871,7 +39872,7 @@
       syncDjOverlay(next);
     }
     function closeDjOverlay(fallback) {
-      if (window.history.state?.[DJ_OVERLAY_KEY]) { window.history.back(); return; }
+      if (window.history.state?.[DJ_OVERLAY_KEY]) { window.__rcSkipHistoryHomeOnce = true; window.history.back(); return; }
       fallback?.();
     }
     (0, import_react10.useEffect)(() => {
@@ -40708,6 +40709,16 @@
       }
       const restorePreviousRoute = (event) => {
       const state = event?.state || window.history.state || {};
+      if (window.__rcSkipHistoryHomeOnce) {
+        window.__rcSkipHistoryHomeOnce = false;
+        if (state?.[HISTORY_KEY]) {
+          const trail = Array.isArray(state.routeTrail) && state.routeTrail.length ? state.routeTrail : [{ screen: state.screen || "home", activeEvent: state.activeEvent || null }];
+          writeRouteStack(trail);
+          setActiveEvent(state.activeEvent || null);
+          setScreen(state.screen || "home");
+          return;
+        }
+      }
       const homeTrail = [{ screen: "home", activeEvent: null }];
       writeRouteStack(homeTrail);
       window.history.replaceState({ ...state, [HISTORY_KEY]: true, screen: "home", activeEvent: null, routeTrail: homeTrail, routeIndex: 0, appRoot: true }, "", routeHash("home"));
