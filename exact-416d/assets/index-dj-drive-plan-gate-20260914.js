@@ -40324,9 +40324,9 @@
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Actualización y Utilidades Dj." }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
       ] }) }),
-      panelLink.enabled && panelLink.url && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 inline-block w-full align-top rounded-2xl border border-violet-300/25 bg-violet-300/[.06] px-3 py-2.5 sm:w-[calc(50%-0.5rem)]", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.open(panelLink.url, "_blank", "noopener,noreferrer"), className: "flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-turquoise via-violet-300 to-neon px-4 py-3 text-sm font-extrabold text-ink shadow-lg shadow-turquoise/10 transition hover:brightness-110", children: [
+      panelLink.enabled && panelLink.url && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 inline-block w-full align-top rounded-2xl border border-violet-300/25 bg-violet-300/[.06] px-3 py-2.5 sm:w-[calc(50%-0.5rem)]", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.open(panelLink.url, "_blank", "noopener,noreferrer"), className: "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold transition hover:brightness-110", style: { background: "linear-gradient(90deg, #21d4d0 0%, #c58cff 52%, #b8ff3d 100%)", color: "#07111a", minHeight: "48px" }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 18 }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "whitespace-normal break-words text-center", children: panelLink.label || "Enlace adicional" })
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "whitespace-normal break-words text-center", children: String(panelLink.label || "Enlace adicional") })
       ] }) }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mx-auto max-w-lg glass rounded-2xl p-6", children: [
       
@@ -40452,9 +40452,9 @@
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Actualización y Utilidades Dj." }),
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
         ] }) }),
-        panelLink.enabled && panelLink.url && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 inline-block w-full align-top rounded-2xl border border-violet-300/25 bg-violet-300/[.06] px-3 py-2.5 sm:w-[calc(50%-0.5rem)]", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.open(panelLink.url, "_blank", "noopener,noreferrer"), className: "flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-turquoise via-violet-300 to-neon px-4 py-3 text-sm font-extrabold text-ink shadow-lg shadow-turquoise/10 transition hover:brightness-110", children: [
+        panelLink.enabled && panelLink.url && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 inline-block w-full align-top rounded-2xl border border-violet-300/25 bg-violet-300/[.06] px-3 py-2.5 sm:w-[calc(50%-0.5rem)]", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.open(panelLink.url, "_blank", "noopener,noreferrer"), className: "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold transition hover:brightness-110", style: { background: "linear-gradient(90deg, #21d4d0 0%, #c58cff 52%, #b8ff3d 100%)", color: "#07111a", minHeight: "48px" }, children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 18 }),
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "whitespace-normal break-words text-center", children: panelLink.label || "Enlace adicional" })
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "whitespace-normal break-words text-center", children: String(panelLink.label || "Enlace adicional") })
         ] }) }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Stat, { icon: ListMusic, label: t("totalRequests"), value: activeEvent.requests?.length || 0, onClick: () => focusQueue("all") }),
