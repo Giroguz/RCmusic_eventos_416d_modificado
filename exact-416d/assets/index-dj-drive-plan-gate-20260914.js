@@ -26835,6 +26835,7 @@
   }
   function HomeScreen({ onAttendee, onDj }) {
     const { t } = useLanguage();
+    const [privacyOpen, setPrivacyOpen] = (0, import_react11.useState)(false);
     return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "party-page min-h-screen bg-ink bg-grid", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(PageContainer, { className: "flex min-h-screen flex-col", children: [
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between", children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Brand, {}),
@@ -26887,14 +26888,37 @@
         ] })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col gap-3 border-t border-white/10 pt-5 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "font-semibold tracking-wide", children: "RCmusic_eventos" }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "font-semibold tracking-wide", children: "RCmusic_eventos" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { type: "button", onClick: () => setPrivacyOpen(true), className: "text-turquoise underline decoration-turquoise/40 underline-offset-4 transition hover:text-white", children: "Privacidad" })
+        ] }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", "aria-label": "Redes sociales", children: [
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { title: "Facebook", className: "grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[.04] text-white/60", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SocialIcon, { type: "facebook" }) }),
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { title: "TikTok", className: "grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[.04] text-white/60", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SocialIcon, { type: "tiktok" }) }),
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { title: "Instagram", className: "grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[.04] text-white/60", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SocialIcon, { type: "instagram" }) }),
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { title: "YouTube", className: "grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[.04] text-white/60", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SocialIcon, { type: "youtube" }) })
         ] })
-      ] })
+      ] }),
+      privacyOpen && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "fixed inset-0 z-[12000] grid place-items-center bg-black/80 px-4 py-6 backdrop-blur-sm", role: "dialog", "aria-modal": "true", "aria-label": "Privacidad", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] border border-turquoise/25 bg-[#0b0813] p-5 text-left shadow-2xl shadow-black/60 sm:p-7", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-start justify-between gap-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "eyebrow text-turquoise", children: "RCmusic_eventos" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h2", { className: "mt-2 font-display text-3xl font-bold text-white", children: "Privacidad" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { type: "button", onClick: () => setPrivacyOpen(false), className: "btn-secondary shrink-0 px-3 py-2 text-sm", children: "Cerrar" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "mt-5 text-sm leading-7 text-white/75", children: "RCmusic_eventos está diseñada para ayudar a DJs y asistentes a organizar pedidos musicales en eventos, cuidando la información que se utiliza para que el servicio funcione." }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { className: "mt-5 font-bold text-turquoise", children: "¿Qué hacemos con la información?" }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("ul", { className: "mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-white/70", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("li", { children: "Usamos el código del evento y los datos escritos por el asistente para enviar y ordenar su pedido en la cola del DJ." }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("li", { children: "Usamos el correo, código de acceso y estado del plan del DJ para proteger el ingreso al Panel de DJ." }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("li", { children: "Mostramos únicamente la información que el DJ decide compartir en su evento." }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("li", { children: "No vendemos la información personal ni la usamos para publicidad ajena a la aplicación." })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { className: "mt-5 font-bold text-turquoise", children: "¿Cómo la protegemos?" }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "mt-2 text-sm leading-6 text-white/70", children: "Limitamos el acceso según el rol y los permisos de cada cuenta. Las credenciales y códigos de acceso no se muestran públicamente, y las funciones administrativas están reservadas para el desarrollador autorizado." }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "mt-5 text-xs leading-5 text-white/45", children: "Comparte solo los datos necesarios para tu evento. Si necesitas corregir o retirar información, solicita la gestión al administrador de RCmusic_eventos." })
+      ] }) })
     ] }) });
   }
 
