@@ -38849,7 +38849,8 @@
       try {
         const saved = await adminSetDjPanelLink(panelLinkDraft, session.token);
         setPanelLinkDraft(saved);
-        setNotice(saved.enabled ? "Botón adicional activado en el Panel de DJ." : "Botón adicional oculto del Panel de DJ.");
+        window.dispatchEvent(new Event("rc-dj-panel-links-updated"));
+        setNotice("Configuración de botones guardada en el Panel de DJ.");
       } catch {
         setError("No se pudo guardar el botón adicional. Revisa el nombre y la URL.");
       } finally { setPanelLinkBusy(false); }
@@ -39980,7 +39981,12 @@
     const [qrLoading, setQrLoading] = (0, import_react10.useState)(false);
     const activeEvent = events.find((event) => event.id === activeId) || events[0];
     const [panelLinks, setPanelLinks] = (0, import_react10.useState)(DEFAULT_DJ_PANEL_LINKS);
-    (0, import_react10.useEffect)(() => { getDjPanelLink().then((value) => setPanelLinks(value)).catch(() => {}); }, []);
+    (0, import_react10.useEffect)(() => {
+      const refreshPanelLinks = () => { getDjPanelLink().then((value) => setPanelLinks(value)).catch(() => {}); };
+      refreshPanelLinks();
+      window.addEventListener("rc-dj-panel-links-updated", refreshPanelLinks);
+      return () => window.removeEventListener("rc-dj-panel-links-updated", refreshPanelLinks);
+    }, []);
     const DJ_OVERLAY_KEY = "rcMusicDjOverlay";
     function syncDjOverlay(state = window.history.state) {
       const overlay = state?.[DJ_OVERLAY_KEY] || "";
