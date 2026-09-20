@@ -32935,23 +32935,29 @@
     if (error) throw error;
     return data;
   }
+  const DEFAULT_DJ_PANEL_BUTTONS = [
+    { id: "custom1", enabled: false, label: "Botón adicional 1", url: "https://" },
+    { id: "custom2", enabled: false, label: "Botón adicional 2", url: "https://" },
+    { id: "custom3", enabled: false, label: "Botón adicional 3", url: "https://" }
+  ];
+  const DEFAULT_DJ_PANEL_LINKS = { drive: { enabled: true, label: "Maleta Dj." }, buttons: DEFAULT_DJ_PANEL_BUTTONS };
   async function getDjPanelLink() {
-    if (!supabase) return { enabled: false, label: "Enlace adicional", url: "https://" };
-    const { data, error } = await supabase.rpc("get_dj_panel_link");
+    if (!supabase) return DEFAULT_DJ_PANEL_LINKS;
+    const { data, error } = await supabase.rpc("get_dj_panel_links");
     if (error) throw error;
-    return data || { enabled: false, label: "Enlace adicional", url: "https://" };
+    return data?.drive && Array.isArray(data?.buttons) ? data : DEFAULT_DJ_PANEL_LINKS;
   }
   async function adminGetDjPanelLink(token) {
-    if (!supabase || !token) return { enabled: false, label: "Enlace adicional", url: "https://" };
-    const { data, error } = await supabase.rpc("admin_get_dj_panel_link", { p_token: token });
+    if (!supabase || !token) return DEFAULT_DJ_PANEL_LINKS;
+    const { data, error } = await supabase.rpc("admin_get_dj_panel_links", { p_token: token });
     if (error) throw error;
-    return data || { enabled: false, label: "Enlace adicional", url: "https://" };
+    return data?.drive && Array.isArray(data?.buttons) ? data : DEFAULT_DJ_PANEL_LINKS;
   }
   async function adminSetDjPanelLink(input, token) {
     if (!supabase || !token) throw new Error("Admin session required");
-    const { data, error } = await supabase.rpc("admin_set_dj_panel_link", { p_token: token, p_enabled: Boolean(input.enabled), p_label: input.label, p_url: input.url });
+    const { data, error } = await supabase.rpc("admin_set_dj_panel_links", { p_token: token, p_drive_enabled: Boolean(input.drive?.enabled), p_drive_label: input.drive?.label || "Maleta Dj.", p_buttons: input.buttons || DEFAULT_DJ_PANEL_BUTTONS });
     if (error) throw error;
-    return data;
+    return data?.drive && Array.isArray(data?.buttons) ? data : input;
   }
   function subscribeToEventPresence(eventId, role = "attendee", callback = () => {
   }, scope = "event", countAll = false) {
@@ -38763,7 +38769,7 @@
     const [userDrafts, setUserDrafts] = (0, import_react9.useState)({});
     const [summaryTarget, setSummaryTarget] = (0, import_react9.useState)("all");
     const [drivePermissionEmail, setDrivePermissionEmail] = (0, import_react9.useState)("");
-    const [panelLinkDraft, setPanelLinkDraft] = (0, import_react9.useState)({ enabled: false, label: "Enlace adicional", url: "https://" });
+    const [panelLinkDraft, setPanelLinkDraft] = (0, import_react9.useState)(DEFAULT_DJ_PANEL_LINKS);
     const [panelLinkOpen, setPanelLinkOpen] = (0, import_react9.useState)(false);
     const [panelLinkBusy, setPanelLinkBusy] = (0, import_react9.useState)(false);
     const [drivePermissionBusy, setDrivePermissionBusy] = (0, import_react9.useState)(false);
@@ -39580,20 +39586,36 @@
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("button", { type: "button", onClick: () => setPanelLinkOpen((open) => !open), className: "flex w-full items-center justify-between gap-3 text-left", "aria-expanded": panelLinkOpen, children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("span", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "flex items-center gap-2 font-bold text-violet-100", children: "Botón adicional del Panel de DJ" }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mt-1 block text-xs leading-5 text-white/55", children: "Configura el botón que aparecerá junto a Maleta Dj." })
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "mt-1 block text-xs leading-5 text-white/55", children: "Configura cuatro botones del Panel de DJ y conserva protegido el enlace de Maleta Dj." })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { className: "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-violet-300/50 bg-black/20 text-xl font-black text-violet-100", children: panelLinkOpen ? "−" : "+" })
         ] }),
-        panelLinkOpen && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "inline-flex items-center gap-2 text-xs font-bold text-turquoise", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: Boolean(panelLinkDraft.enabled), onChange: (e) => setPanelLinkDraft((current) => ({ ...current, enabled: e.target.checked })), className: "h-5 w-5 accent-turquoise" }),
-            "Mostrar botón"
+        panelLinkOpen && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 space-y-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "rounded-2xl border border-turquoise/25 bg-turquoise/10 p-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Maleta Dj." }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "inline-flex items-center gap-2 text-xs font-bold text-turquoise", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: Boolean(panelLinkDraft.drive?.enabled), onChange: (e) => setPanelLinkDraft((current) => ({ ...current, drive: { ...current.drive, enabled: e.target.checked } })), className: "h-5 w-5 accent-turquoise" }),
+                "Activar"
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "mt-2 block text-xs font-semibold text-white/60", children: ["Nombre visible", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: panelLinkDraft.drive?.label || "Maleta Dj.", onChange: (e) => setPanelLinkDraft((current) => ({ ...current, drive: { ...current.drive, label: e.target.value } })), className: "input-dark mt-1", placeholder: "Maleta Dj." })] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-2 text-[11px] leading-5 text-white/50", children: "El ícono, enlace oficial de Google Drive y permisos de solo lectura se mantienen protegidos." })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3 grid gap-3 sm:grid-cols-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-xs font-semibold text-white/60", children: ["Nombre del botón", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: panelLinkDraft.label, onChange: (e) => setPanelLinkDraft((current) => ({ ...current, label: e.target.value })), className: "input-dark mt-1", placeholder: "Nombre del botón" })] }),
-            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-xs font-semibold text-white/60", children: ["Dirección URL", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "url", value: panelLinkDraft.url, onChange: (e) => setPanelLinkDraft((current) => ({ ...current, url: e.target.value })), className: "input-dark mt-1", placeholder: "https://ejemplo.com" })] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: savePanelLink, disabled: panelLinkBusy, className: "btn-primary mt-3", children: panelLinkBusy ? "Guardando…" : "Guardar botón" })
+          panelLinkDraft.buttons.map((button, index) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "rounded-2xl border border-violet-300/25 bg-violet-300/[.06] p-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "flex flex-wrap items-center justify-between gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-violet-100", children: `Botón adicional ${index + 1}` }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "inline-flex items-center gap-2 text-xs font-bold text-turquoise", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: Boolean(button.enabled), onChange: (e) => setPanelLinkDraft((current) => ({ ...current, buttons: current.buttons.map((item, itemIndex) => itemIndex === index ? { ...item, enabled: e.target.checked } : item) })), className: "h-5 w-5 accent-turquoise" }),
+                "Activar"
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-2 grid gap-3 sm:grid-cols-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-xs font-semibold text-white/60", children: ["Nombre del botón", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { value: button.label || "", onChange: (e) => setPanelLinkDraft((current) => ({ ...current, buttons: current.buttons.map((item, itemIndex) => itemIndex === index ? { ...item, label: e.target.value } : item) })), className: "input-dark mt-1", placeholder: "Nombre del botón" })] }),
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "text-xs font-semibold text-white/60", children: ["Dirección URL", /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "url", value: button.url || "", onChange: (e) => setPanelLinkDraft((current) => ({ ...current, buttons: current.buttons.map((item, itemIndex) => itemIndex === index ? { ...item, url: e.target.value } : item) })), className: "input-dark mt-1", placeholder: "https://ejemplo.com" })] })
+            ] })
+          ] }, button.id || index)),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: savePanelLink, disabled: panelLinkBusy, className: "btn-primary mt-1", children: panelLinkBusy ? "Guardando…" : "Guardar botones" })
         ] })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-client-control", className: "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/10 p-3 sm:mb-7 sm:p-4", children: [
@@ -39957,7 +39979,8 @@
     const presenceNoticeTimer = (0, import_react10.useRef)(null);
     const [qrLoading, setQrLoading] = (0, import_react10.useState)(false);
     const activeEvent = events.find((event) => event.id === activeId) || events[0];
-    (0, import_react10.useEffect)(() => { getDjPanelLink().then((value) => setPanelLink(value)).catch(() => {}); }, []);
+    const [panelLinks, setPanelLinks] = (0, import_react10.useState)(DEFAULT_DJ_PANEL_LINKS);
+    (0, import_react10.useEffect)(() => { getDjPanelLink().then((value) => setPanelLinks(value)).catch(() => {}); }, []);
     const DJ_OVERLAY_KEY = "rcMusicDjOverlay";
     function syncDjOverlay(state = window.history.state) {
       const overlay = state?.[DJ_OVERLAY_KEY] || "";
@@ -40371,15 +40394,15 @@
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 16 })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: panelLink.enabled ? "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5" : "mb-5 w-full rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5", style: panelLink.enabled ? { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top", marginRight: "8px" } : { display: "block", width: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: panelLinks.drive?.enabled ? "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5" : "mb-5 w-full rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5", style: panelLinks.drive?.enabled ? { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top", marginRight: "8px" } : { display: "block", width: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(GoogleDriveIcon, { size: 18 }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Maleta Dj." }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: panelLinks.drive?.label || "Maleta Dj." }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
       ] }) }),
-      panelLink.enabled && panelLink.url && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 rounded-2xl border border-violet-300/25 bg-violet-300/[.06] px-3 py-2.5", style: { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.open(panelLink.url, "_blank", "noopener,noreferrer"), className: "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold transition hover:brightness-110", style: { background: "linear-gradient(90deg, #21d4d0 0%, #c58cff 52%, #b8ff3d 100%)", color: "#07111a", minHeight: "48px" }, children: [
+      panelLinks.buttons.filter((button) => button.enabled && button.url).map((button) => /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 rounded-2xl border border-violet-300/25 bg-violet-300/[.06] px-3 py-2.5", style: { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.open(button.url, "_blank", "noopener,noreferrer"), className: "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold transition hover:brightness-110", style: { background: "linear-gradient(90deg, #21d4d0 0%, #c58cff 52%, #b8ff3d 100%)", color: "#07111a", minHeight: "48px" }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 18 }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "whitespace-normal break-words text-center", children: String(panelLink.label || "Enlace adicional") })
-      ] }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "whitespace-normal break-words text-center", children: String(button.label || "Enlace adicional") })
+      ] }) }, button.id)),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mx-auto max-w-lg glass rounded-2xl p-6", children: [
       
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Headphones, { size: 28, className: "mx-auto mb-3 text-violet-200" }),
@@ -40499,15 +40522,15 @@
             /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("button", { onClick: removeActiveEvent, className: "rounded-xl border border-red-300/20 bg-red-400/10 p-2.5 text-red-200 transition hover:border-red-300/40 hover:bg-red-400/20", title: "Eliminar evento", "aria-label": "Eliminar evento", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Trash2, { size: 17 }) })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: panelLink.enabled ? "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5" : "mb-5 w-full rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5", style: panelLink.enabled ? { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top", marginRight: "8px" } : { display: "block", width: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: panelLinks.drive?.enabled ? "mb-5 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5" : "mb-5 w-full rounded-2xl border border-turquoise/20 bg-turquoise/[.06] px-3 py-2.5", style: panelLinks.drive?.enabled ? { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top", marginRight: "8px" } : { display: "block", width: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: openBackupDrive, className: "flex w-full items-center justify-center gap-2 rounded-xl bg-turquoise px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-turquoise/85", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(GoogleDriveIcon, { size: 18 }),
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: "Maleta Dj." }),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { children: panelLinks.drive?.label || "Maleta Dj." }),
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 14 })
         ] }) }),
-        panelLink.enabled && panelLink.url && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 rounded-2xl border border-violet-300/25 bg-violet-300/[.06] px-3 py-2.5", style: { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.open(panelLink.url, "_blank", "noopener,noreferrer"), className: "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold transition hover:brightness-110", style: { background: "linear-gradient(90deg, #21d4d0 0%, #c58cff 52%, #b8ff3d 100%)", color: "#07111a", minHeight: "48px" }, children: [
+        panelLinks.buttons.filter((button) => button.enabled && button.url).map((button) => /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("section", { className: "mb-5 rounded-2xl border border-violet-300/25 bg-violet-300/[.06] px-3 py-2.5", style: { display: "inline-block", width: "calc(50% - 0.5rem)", verticalAlign: "top" }, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => window.open(button.url, "_blank", "noopener,noreferrer"), className: "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold transition hover:brightness-110", style: { background: "linear-gradient(90deg, #21d4d0 0%, #c58cff 52%, #b8ff3d 100%)", color: "#07111a", minHeight: "48px" }, children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ExternalLink, { size: 18 }),
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "whitespace-normal break-words text-center", children: String(panelLink.label || "Enlace adicional") })
-        ] }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "whitespace-normal break-words text-center", children: String(button.label || "Enlace adicional") })
+        ] }) }, button.id)),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Stat, { icon: ListMusic, label: t("totalRequests"), value: activeEvent.requests?.length || 0, onClick: () => focusQueue("all") }),
           /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Stat, { icon: Clock3, label: t("queued"), value: pending, accent: "lime", onClick: () => focusQueue("pending") }),
