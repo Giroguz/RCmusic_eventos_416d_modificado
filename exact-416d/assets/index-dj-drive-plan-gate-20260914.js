@@ -39794,7 +39794,7 @@
         clearInterval(timer);
       };
     }, []);
-    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mt-2 text-[11px] font-semibold text-turquoise/80", children: plans.map((plan) => `${plan.label}: ${planPriceText(plan)} \xB7 ${planUsdPriceText(plan, 1)} \xB7 ${plan.days} d\xEDas`).join("  \xB7  ") });
+    return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mt-2 text-[11px] font-semibold text-turquoise/80", children: plans.map((plan) => `${plan.label}: ${planPriceText(plan)} - ${planUsdPriceText(plan, 1)}`).join("  \xB7  ") });
   }
   function Modal2({ children, onClose, title }) {
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("div", { className: "fixed inset-0 z-50 grid place-items-center bg-black/75 p-4 backdrop-blur-sm", onMouseDown: onClose, children: /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "glass max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[2rem] p-5 sm:p-7", onMouseDown: (e) => e.stopPropagation(), children: [
