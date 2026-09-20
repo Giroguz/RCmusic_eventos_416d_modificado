@@ -32834,15 +32834,16 @@
     return Number(data || 0);
   }
   async function getSubscriptionPlanPrices() {
+    let localFallback = [];
     try {
       const saved = JSON.parse(localStorage.getItem("rc_admin_subscription_settings_v1") || "null");
-      if (saved?.plans?.length) return saved.plans.map((plan) => ({ plan_type: plan.id || plan.planType || plan.plan_type, days: Number(plan.days), price_pen: Number(plan.pricePen ?? plan.price_pen), price_usd: Number(plan.priceUsd ?? plan.price_usd) }));
+      if (saved?.plans?.length) localFallback = saved.plans.map((plan) => ({ plan_type: plan.id || plan.planType || plan.plan_type, days: Number(plan.days), price_pen: Number(plan.pricePen ?? plan.price_pen), price_usd: Number(plan.priceUsd ?? plan.price_usd) }));
     } catch {
     }
-    if (!supabase) return [];
+    if (!supabase) return localFallback;
     const { data, error } = await supabase.rpc("get_subscription_plan_prices_v2");
-    if (error) return [];
-    return data || [];
+    if (!error && Array.isArray(data) && data.length) return data;
+    return localFallback;
   }
   async function adminGetSubscriptionPlanPrices(token) {
     if (!supabase || !token) return [];
