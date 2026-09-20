@@ -32836,24 +32836,24 @@
   async function getSubscriptionPlanPrices() {
     try {
       const saved = JSON.parse(localStorage.getItem("rc_admin_subscription_settings_v1") || "null");
-      if (saved?.plans?.length) return saved.plans.map((plan) => ({ plan_type: plan.id || plan.planType || plan.plan_type, days: Number(plan.days), price_pen: Number(plan.pricePen ?? plan.price_pen) }));
+      if (saved?.plans?.length) return saved.plans.map((plan) => ({ plan_type: plan.id || plan.planType || plan.plan_type, days: Number(plan.days), price_pen: Number(plan.pricePen ?? plan.price_pen), price_usd: Number(plan.priceUsd ?? plan.price_usd) }));
     } catch {
     }
     if (!supabase) return [];
-    const { data, error } = await supabase.rpc("get_subscription_plan_prices");
+    const { data, error } = await supabase.rpc("get_subscription_plan_prices_v2");
     if (error) return [];
     return data || [];
   }
   async function adminGetSubscriptionPlanPrices(token) {
     if (!supabase || !token) return [];
-    const { data, error } = await supabase.rpc("admin_get_subscription_plan_prices", { p_token: token });
+    const { data, error } = await supabase.rpc("admin_get_subscription_plan_prices_v2", { p_token: token });
     if (error) throw error;
     return data || [];
   }
   async function adminSetSubscriptionPlanPrices(prices, token) {
     if (!supabase || !token) throw new Error("Admin session required");
     const byType = Object.fromEntries((prices || []).map((item) => [item.planType || item.plan_type, item]));
-    const { data, error } = await supabase.rpc("admin_set_subscription_plan_prices", { p_token: token, p_fifteen_days: Number(byType.fifteen?.days), p_fifteen_price: Number(byType.fifteen?.pricePen ?? byType.fifteen?.price_pen), p_monthly_days: Number(byType.monthly?.days), p_monthly_price: Number(byType.monthly?.pricePen ?? byType.monthly?.price_pen), p_annual_days: Number(byType.annual?.days), p_annual_price: Number(byType.annual?.pricePen ?? byType.annual?.price_pen) });
+    const { data, error } = await supabase.rpc("admin_set_subscription_plan_prices_v2", { p_token: token, p_fifteen_days: Number(byType.fifteen?.days), p_fifteen_price: Number(byType.fifteen?.pricePen ?? byType.fifteen?.price_pen), p_fifteen_price_usd: Number(byType.fifteen?.priceUsd ?? byType.fifteen?.price_usd), p_monthly_days: Number(byType.monthly?.days), p_monthly_price: Number(byType.monthly?.pricePen ?? byType.monthly?.price_pen), p_monthly_price_usd: Number(byType.monthly?.priceUsd ?? byType.monthly?.price_usd), p_annual_days: Number(byType.annual?.days), p_annual_price: Number(byType.annual?.pricePen ?? byType.annual?.price_pen), p_annual_price_usd: Number(byType.annual?.priceUsd ?? byType.annual?.price_usd) });
     if (error) throw error;
     return data || [];
   }
@@ -38005,9 +38005,9 @@
 
   // src/lib/plans.js
   var PLAN_OPTIONS = [
-    { id: "fifteen", days: 15, pricePen: 25, label: "15 d\xEDas" },
-    { id: "monthly", days: 30, pricePen: 35, label: "Mensual" },
-    { id: "annual", days: 365, pricePen: 340, label: "Anual" }
+    { id: "fifteen", days: 15, pricePen: 25, priceUsd: 7.44, label: "15 d\xEDas" },
+    { id: "monthly", days: 30, pricePen: 35, priceUsd: 10.41, label: "Mensual" },
+    { id: "annual", days: 365, pricePen: 340, priceUsd: 101.13, label: "Anual" }
   ];
   function getPlanOption(planType, plans = PLAN_OPTIONS) {
     return plans.find((plan) => plan.id === planType) || null;
@@ -38016,8 +38016,9 @@
     const byType = Object.fromEntries(rows.map((row) => [row.plan_type || row.planType || row.id, row]));
     return PLAN_OPTIONS.map((plan) => {
       const rawPrice = Number(byType[plan.id]?.price_pen ?? byType[plan.id]?.pricePen);
+      const rawUsd = Number(byType[plan.id]?.price_usd ?? byType[plan.id]?.priceUsd);
       const legacyDefault = plan.id === "fifteen" && rawPrice === 16 || plan.id === "monthly" && rawPrice === 30 || plan.id === "annual" && rawPrice === 330;
-      return { ...plan, days: Number(byType[plan.id]?.days) || plan.days, pricePen: rawPrice > 0 && !legacyDefault ? rawPrice : plan.pricePen };
+      return { ...plan, days: Number(byType[plan.id]?.days) || plan.days, pricePen: rawPrice > 0 && !legacyDefault ? rawPrice : plan.pricePen, priceUsd: rawUsd >= 0 && Number.isFinite(rawUsd) ? rawUsd : plan.priceUsd };
     });
   }
   function formatCountdown(expiresAt2, now = Date.now()) {
@@ -38039,8 +38040,10 @@
     return new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
   }
   function planUsdPriceText(plan, usdRate) {
-    if (!Number.isFinite(Number(usdRate)) || Number(usdRate) <= 0) return "";
-    return "$/. " + (plan.pricePen * Number(usdRate)).toFixed(2);
+    const manual = Number(plan?.priceUsd);
+    const amount = Number.isFinite(manual) && manual >= 0 ? manual : Number(plan?.pricePen) * Number(usdRate);
+    if (!Number.isFinite(amount) || amount < 0) return "";
+    return "US$ " + amount.toFixed(2);
   }
 
   // src/components/DjLogin.jsx
@@ -38662,7 +38665,7 @@
   var ADMIN_SETTINGS_KEY = "rc_admin_subscription_settings_v1";
   function readAdminSettings() { try { var value = JSON.parse(localStorage.getItem(ADMIN_SETTINGS_KEY) || "null"); return value && typeof value === "object" ? value : null; } catch { return null; } }
   function writeAdminSettings(value) { try { localStorage.setItem(ADMIN_SETTINGS_KEY, JSON.stringify({ ...value, updatedAt: Date.now() })); } catch { } }
-  function draftFromPlans(plans) { return Object.fromEntries(plans.map((plan) => [plan.id, { days: plan.days, pricePen: plan.pricePen }])); }
+  function draftFromPlans(plans) { return Object.fromEntries(plans.map((plan) => [plan.id, { days: plan.days, pricePen: plan.pricePen, priceUsd: plan.priceUsd }])); }
   async function qrFileToDataUrl(file) {
     if (!file || !file.type.startsWith("image/")) throw new Error("invalid-image");
     const source = await new Promise((resolve, reject) => {
@@ -39332,7 +39335,7 @@
         /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-4 grid gap-3 rounded-2xl border border-violet/20 bg-violet/10 p-3 sm:p-4", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
             /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Planes disponibles" }),
-            planOptions.map((plan) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "mt-1 text-xs font-bold text-violet-100 sm:text-sm", children: [plan.label, " · S/ ", Number(plan.pricePen).toFixed(2), " · ", plan.days, " días"] }, plan.id))
+            planOptions.map((plan) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "mt-1 text-xs font-bold text-violet-100 sm:text-sm", children: [plan.label, " · S/ ", Number(plan.pricePen).toFixed(2), " · US$ ", Number(plan.priceUsd).toFixed(2), " · ", plan.days, " días"] }, plan.id))
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "grid gap-2 text-xs leading-5 text-white/65 sm:text-sm", children: [
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("p", { className: "rounded-xl border border-turquoise/20 bg-turquoise/10 px-3 py-2", children: ["✓ ", "Cuando el plan vence, el Panel DJ y el catálogo privado quedan restringidos automáticamente."] }),
@@ -39354,7 +39357,7 @@
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mt-4 grid grid-cols-3 gap-2 sm:gap-3", children: planOptions.map((plan) => /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "min-w-0 rounded-xl border border-white/10 bg-black/20 p-2 sm:rounded-2xl sm:p-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "truncate text-sm font-bold text-white sm:text-base", children: plan.label }),
-          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-2 grid grid-cols-2 gap-1.5 sm:mt-3 sm:gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-2 grid grid-cols-3 gap-1.5 sm:mt-3 sm:gap-2", children: [
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "min-w-0 text-[10px] text-white/45 sm:text-[11px]", children: [
               "D\xEDas",
               /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "1", max: "3650", value: priceDraft[plan.id]?.days || "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], days: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); writeAdminSettings({ plans: nextPlans, demoDays }); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
@@ -39362,9 +39365,14 @@
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "min-w-0 text-[10px] text-white/45 sm:text-[11px]", children: [
               "Precio S/",
               /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "0", step: "0.01", value: priceDraft[plan.id]?.pricePen || "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], pricePen: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); writeAdminSettings({ plans: nextPlans, demoDays }); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "min-w-0 text-[10px] text-white/45 sm:text-[11px]", children: [
+              "Precio US$",
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "0", step: "0.01", value: priceDraft[plan.id]?.priceUsd ?? "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], priceUsd: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); writeAdminSettings({ plans: nextPlans, demoDays }); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
             ] })
           ] })
         ] }, plan.id)) }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-3 text-xs text-white/50", children: "El precio en dólares se ingresa manualmente y se mostrará junto al precio en soles." }),
         /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mt-4 flex justify-end border-t border-white/10 pt-4", children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("button", { type: "button", onClick: savePlanPrices, disabled: pricesBusy, className: "btn-primary px-4 py-2.5 text-xs", children: pricesBusy ? "Guardando\u2026" : "Guardar planes" }) })
       ] })
         ] })
