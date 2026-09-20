@@ -32936,9 +32936,9 @@
     return data;
   }
   const DEFAULT_DJ_PANEL_BUTTONS = [
-    { id: "custom1", enabled: false, label: "Botón adicional 1", url: "https://" },
-    { id: "custom2", enabled: false, label: "Botón adicional 2", url: "https://" },
-    { id: "custom3", enabled: false, label: "Botón adicional 3", url: "https://" }
+    { id: "custom1", enabled: false, label: "Botón adicional 1", url: "https://ejemplo.com" },
+    { id: "custom2", enabled: false, label: "Botón adicional 2", url: "https://ejemplo.com" },
+    { id: "custom3", enabled: false, label: "Botón adicional 3", url: "https://ejemplo.com" }
   ];
   const DEFAULT_DJ_PANEL_LINKS = { drive: { enabled: true, label: "Maleta Dj." }, buttons: DEFAULT_DJ_PANEL_BUTTONS };
   async function getDjPanelLink() {
