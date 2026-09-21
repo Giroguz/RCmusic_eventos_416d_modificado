@@ -32845,6 +32845,19 @@
     if (!error && Array.isArray(data) && data.length) return data;
     return localFallback;
   }
+  async function getSubscriptionPaymentMethods() {
+    if (!supabase) return null;
+    const { data, error } = await supabase.rpc("get_subscription_payment_methods");
+    if (error) return null;
+    const row = Array.isArray(data) ? data[0] : data;
+    return row || null;
+  }
+  async function adminSetSubscriptionPaymentMethods(settings, token) {
+    if (!supabase || !token) throw new Error("Admin session required");
+    const { data, error } = await supabase.rpc("admin_set_subscription_payment_methods", { p_token: token, p_yape_enabled: Boolean(settings.yapeEnabled), p_mercado_enabled: Boolean(settings.mercadoEnabled), p_paypal_enabled: Boolean(settings.paypalEnabled) });
+    if (error) throw error;
+    return Array.isArray(data) ? data[0] : data;
+  }
   async function adminGetSubscriptionPlanPrices(token) {
     if (!supabase || !token) return [];
     const { data, error } = await supabase.rpc("admin_get_subscription_plan_prices_v2", { p_token: token });
@@ -38091,15 +38104,17 @@
       try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || localStorage.getItem("rc_paypal_settings_v1") || "null") || { yapeEnabled: true, mercadoEnabled: false, paypalEnabled: true, paypalAutomatic: true, yapeHolder: "", mercadoLink: "", mercadoPublicKey: "", paypalEmail: "", paypalCurrency: "USD", paypalLink: "" }; } catch { return { yapeEnabled: true, mercadoEnabled: false, paypalEnabled: true, paypalAutomatic: true, yapeHolder: "", mercadoLink: "", mercadoPublicKey: "", paypalEmail: "", paypalCurrency: "USD", paypalLink: "" }; }
     });
     (0, import_react8.useEffect)(() => {
-      const refreshPaymentSettings = () => {
+      const refreshPaymentSettings = async () => {
+        let next = null;
+        try { next = JSON.parse(localStorage.getItem("rc_payment_settings_v1") || localStorage.getItem("rc_paypal_settings_v1") || "null"); } catch { }
         try {
-          const next = JSON.parse(localStorage.getItem("rc_payment_settings_v1") || localStorage.getItem("rc_paypal_settings_v1") || "null");
-          if (next) setPaymentSettings((current) => JSON.stringify(current) === JSON.stringify(next) ? current : next);
-        } catch {
-        }
+          const remote = await getSubscriptionPaymentMethods();
+          if (remote) next = { ...(next || {}), yapeEnabled: remote.yape_enabled ?? true, mercadoEnabled: remote.mercado_enabled ?? false, paypalEnabled: remote.paypal_enabled ?? true };
+        } catch { }
+        if (next) setPaymentSettings((current) => JSON.stringify(current) === JSON.stringify(next) ? current : next);
       };
       refreshPaymentSettings();
-      const timer = setInterval(refreshPaymentSettings, 1500);
+      const timer = setInterval(refreshPaymentSettings, 30000);
       return () => clearInterval(timer);
     }, []);
     (0, import_react8.useEffect)(() => {
@@ -38821,11 +38836,10 @@
     function paymentSettingsPayload() {
       return { yapeEnabled, mercadoEnabled, paypalEnabled, paypalAutomatic, yapeHolder: yapeHolder.trim(), mercadoLink: mercadoLink.trim(), mercadoPublicKey: mercadoPublicKey.trim(), paypalEmail: paypalEmail.trim(), paypalCurrency, paypalLink: paypalLink.trim() };
     }
-    function savePaymentToggle(field, value) {
-      try {
-        localStorage.setItem("rc_payment_settings_v1", JSON.stringify({ ...paymentSettingsPayload(), [field]: value }));
-      } catch {
-      }
+    async function savePaymentToggle(field, value) {
+      const next = { ...paymentSettingsPayload(), [field]: value };
+      try { localStorage.setItem("rc_payment_settings_v1", JSON.stringify(next)); } catch { }
+      try { await adminSetSubscriptionPaymentMethods(next, session.token); setNotice("Método de pago actualizado para todos los usuarios."); } catch { setError("El método quedó guardado localmente, pero no se pudo sincronizar con el servidor."); }
     }
     async function saveYapeSettings() {
       try {
