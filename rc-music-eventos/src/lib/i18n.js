@@ -69,16 +69,17 @@ const chatTranslations = {
 }
 for (const [language, copy] of Object.entries(chatTranslations)) Object.assign(translations[language], copy)
 const fallback = es
+const LANGUAGE_STORAGE_KEY = typeof window !== 'undefined' && window.location.pathname.startsWith('/library/') ? 'pack_dj_library_language_v1' : 'rc_music_language'
 const LanguageContext = createContext(null)
 
 export function LanguageProvider({ children }) {
   const [language, setLanguageState] = useState(() => {
-    try { return localStorage.getItem('rc_music_language') || 'es' } catch { return 'es' }
+    try { return localStorage.getItem(LANGUAGE_STORAGE_KEY) || 'es' } catch { return 'es' }
   })
   const setLanguage = (next) => {
     const value = LANGUAGES.some((item) => item.code === next) ? next : 'es'
     setLanguageState(value)
-    try { localStorage.setItem('rc_music_language', value) } catch {}
+    try { localStorage.setItem(LANGUAGE_STORAGE_KEY, value) } catch {}
   }
   const value = useMemo(() => ({ language, setLanguage, t: (key) => translations[language]?.[key] || fallback[key] || key }), [language])
   return createElement(LanguageContext.Provider, { value }, children)

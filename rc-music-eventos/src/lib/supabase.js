@@ -1,18 +1,22 @@
 import { createClient } from '@supabase/supabase-js'
 
-const url = import.meta.env.VITE_SUPABASE_URL
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+export const djLibraryStandalone = typeof window !== 'undefined' && window.location.pathname.startsWith('/library/')
+const url = djLibraryStandalone ? import.meta.env.VITE_DJ_LIBRARY_SUPABASE_URL : import.meta.env.VITE_SUPABASE_URL
+const anonKey = djLibraryStandalone ? import.meta.env.VITE_DJ_LIBRARY_SUPABASE_ANON_KEY : import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabaseEnabled = Boolean(url && anonKey && !String(url).includes('tu-proyecto'))
 export const supabase = supabaseEnabled ? createClient(url, anonKey) : null
-const SESSION_KEY = 'rc_music_dj_session_v1'
+// Separate PACK DJ auth/session and verification state from RCmusic_eventos.
+export const DJ_SESSION_KEY = djLibraryStandalone ? 'pack_dj_session_v1' : 'rc_music_dj_session_v1'
+export const PENDING_TRIAL_KEY = djLibraryStandalone ? 'pack_dj_pending_trial_v1' : 'rc_pending_trial_v1'
+export const PENDING_RECOVERY_KEY = djLibraryStandalone ? 'pack_dj_pending_recovery_v1' : 'rc_pending_recovery_v1'
 
 export function getStoredDjSession() {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY)
+    const raw = sessionStorage.getItem(DJ_SESSION_KEY) || localStorage.getItem(DJ_SESSION_KEY)
     if (!raw) return null
     // Keep the in-tab copy available while also restoring the session after a reload.
-    if (!sessionStorage.getItem(SESSION_KEY)) sessionStorage.setItem(SESSION_KEY, raw)
+    if (!sessionStorage.getItem(DJ_SESSION_KEY)) sessionStorage.setItem(DJ_SESSION_KEY, raw)
     return JSON.parse(raw)
   } catch { return null }
 }
@@ -20,11 +24,11 @@ function storeDjSession(value) {
   try {
     if (value) {
       const raw = JSON.stringify(value)
-      sessionStorage.setItem(SESSION_KEY, raw)
-      localStorage.setItem(SESSION_KEY, raw)
+      sessionStorage.setItem(DJ_SESSION_KEY, raw)
+      localStorage.setItem(DJ_SESSION_KEY, raw)
     } else {
-      sessionStorage.removeItem(SESSION_KEY)
-      localStorage.removeItem(SESSION_KEY)
+      sessionStorage.removeItem(DJ_SESSION_KEY)
+      localStorage.removeItem(DJ_SESSION_KEY)
     }
   } catch {}
 }
@@ -42,7 +46,8 @@ export async function ensureAnonymousSession() {
 // a per-DJ code server-side and returns a short-lived, revocable session token.
 export async function sendEmailVerificationLink(email) {
   if (!supabase) throw new Error('Supabase is not configured')
-  const { error } = await supabase.auth.signInWithOtp({ email: email.trim().toLowerCase(), options: { shouldCreateUser: true, emailRedirectTo: window.location.origin } })
+  const emailRedirectTo = djLibraryStandalone ? `${window.location.origin}/library/#dj-login` : window.location.origin
+  const { error } = await supabase.auth.signInWithOtp({ email: email.trim().toLowerCase(), options: { shouldCreateUser: true, emailRedirectTo } })
   if (error) throw error
 }
 
@@ -208,6 +213,7 @@ export async function adminExtendDjPlan(id, days, token) { const { data, error }
 export async function getSubscriptionQr() { if (!supabase) return ''; const { data, error } = await supabase.rpc('get_subscription_qr'); if (error) return ''; return data || '' }
 export async function getSubscriptionYapeNumber() { if (!supabase) return ''; const { data, error } = await supabase.rpc('get_subscription_yape_number'); if (error) return ''; return data || '' }
 export async function submitSubscriptionProof(planType, proofImage, token) { if (!supabase || !token) throw new Error('DJ session required'); const { data, error } = await supabase.rpc('submit_subscription_proof', { p_token: token, p_plan_type: planType, p_proof_image: proofImage }); if (error) throw error; return data }
+export async function requestAdminCodeNotification(email) { if (!supabase) throw new Error('Supabase is not configured'); const { data, error } = await supabase.rpc('request_admin_code', { p_email: email.trim().toLowerCase() }); if (error) throw error; return data }
 export async function adminListSubscriptionProofs(token) { if (!supabase || !token) return []; const { data, error } = await supabase.rpc('admin_list_subscription_proofs', { p_token: token }); if (error) throw error; return data || [] }
 export async function adminReviewSubscriptionProof(id, status, notes, token) { if (!supabase || !token) throw new Error('Admin session required'); const { data, error } = await supabase.rpc('admin_review_subscription_proof', { p_token: token, p_proof_id: id, p_status: status, p_notes: notes || null }); if (error) throw error; return Array.isArray(data) ? data[0] : data }
 export async function sendSubscriptionEmail(input) { if (!supabase) throw new Error('Supabase is not configured'); const { data, error } = await supabase.functions.invoke('send-subscription-email', { body: input }); if (error) throw error; if (!data?.ok) throw new Error(data?.error || 'Email failed'); return data }

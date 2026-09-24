@@ -1,7 +1,16 @@
-const apiBase = String(import.meta.env.VITE_SPOTIFY_API_BASE_URL || '').replace(/\/$/, '')
+import { djLibraryStandalone } from './supabase'
+
+const apiBase = String((djLibraryStandalone ? import.meta.env.VITE_DJ_LIBRARY_API_BASE_URL : import.meta.env.VITE_SPOTIFY_API_BASE_URL) || '').replace(/\/$/, '')
+const DRIVE_SESSION_KEY = djLibraryStandalone ? 'pack_dj_drive_session_v1' : 'rc_drive_session'
+const DRIVE_RETURN_SCREEN_KEY = djLibraryStandalone ? 'pack_dj_drive_return_screen_v1' : 'rc_drive_return_screen'
+
+function apiUrl(path) {
+  if (djLibraryStandalone && !apiBase) throw new Error('DJ_LIBRARY_API_NOT_CONFIGURED')
+  return `${apiBase}${path}`
+}
 
 function getDriveSession() {
-  try { return localStorage.getItem('rc_drive_session') || sessionStorage.getItem('rc_drive_session') || '' } catch { return '' }
+  try { return localStorage.getItem(DRIVE_SESSION_KEY) || sessionStorage.getItem(DRIVE_SESSION_KEY) || '' } catch { return '' }
 }
 
 function captureDriveSession() {
@@ -9,8 +18,8 @@ function captureDriveSession() {
     const url = new URL(window.location.href)
     const session = url.searchParams.get('drive_session')
     if (session) {
-      localStorage.setItem('rc_drive_session', session)
-      sessionStorage.setItem('rc_drive_session', session)
+      localStorage.setItem(DRIVE_SESSION_KEY, session)
+      sessionStorage.setItem(DRIVE_SESSION_KEY, session)
       url.searchParams.delete('drive_session')
       url.searchParams.delete('drive')
       // Keep the SPA route state so Android/browser Back returns to the
@@ -22,9 +31,9 @@ function captureDriveSession() {
 
 captureDriveSession()
 
-function driveRequestHeaders() {
+function driveRequestHeaders(djToken = '') {
   const driveSession = getDriveSession()
-  return { 'Content-Type': 'application/json', ...(driveSession ? { 'X-Drive-Session': driveSession } : {}) }
+  return { 'Content-Type': 'application/json', ...(driveSession ? { 'X-Drive-Session': driveSession } : {}), ...(djToken ? { 'X-DJ-Session': djToken } : {}) }
 }
 
 async function driveFetch(url, options = {}, timeoutMs) {
@@ -45,34 +54,66 @@ async function driveFetch(url, options = {}, timeoutMs) {
 async function handleDriveResponse(response) {
   if (response.ok) return response
   const error = (await response.json().catch(() => null))?.error
-  if (response.status === 401 && error === 'DRIVE_AUTH_REQUIRED') {
-    try { localStorage.removeItem('rc_drive_session'); sessionStorage.removeItem('rc_drive_session'); localStorage.setItem('rc_drive_return_screen', 'dj') } catch {}
-    window.location.href = `${apiBase}/drive/auth?returnTo=${encodeURIComponent(window.location.href)}`
+  if (response.status === 401 && error === 'DRIVE_AUTH_REQUIRED' && !djLibraryStandalone) {
+    try { localStorage.removeItem(DRIVE_SESSION_KEY); sessionStorage.removeItem(DRIVE_SESSION_KEY); localStorage.setItem(DRIVE_RETURN_SCREEN_KEY, 'dj') } catch {}
+    window.location.href = `${apiUrl('/drive/auth')}?returnTo=${encodeURIComponent(window.location.href)}`
   }
   throw new Error(error || 'DOWNLOAD_FAILED')
 }
 
 export async function grantDriveFolderAccess(email) {
   captureDriveSession()
-  const response = await driveFetch(`${apiBase}/drive/grant-folder-access`, { method: 'POST', headers: driveRequestHeaders(), credentials: 'include', body: JSON.stringify({ email }) }, 120000)
+  const response = await driveFetch(apiUrl('/drive/grant-folder-access'), { method: 'POST', headers: driveRequestHeaders(), credentials: 'include', body: JSON.stringify({ email }) }, 120000)
   return handleDriveResponse(response).then((value) => value.json())
 }
 
-export async function searchDriveAudio(query, signal) {
+export async function getDriveStatus(djToken) {
   captureDriveSession()
-  const response = await driveFetch(`${apiBase}/drive/search?q=${encodeURIComponent(String(query || '').trim())}`, { headers: driveRequestHeaders(), credentials: 'include', signal }, 120000)
+  const response = await driveFetch(apiUrl('/drive/status'), { headers: driveRequestHeaders(djToken), credentials: 'include' }, 30000)
+  return handleDriveResponse(response).then((value) => value.json())
+}
+
+export function startDriveAuthorization() {
+  captureDriveSession()
+  window.location.href = `${apiUrl('/drive/auth')}?returnTo=${encodeURIComponent(window.location.href)}`
+}
+
+export async function getDriveFolderPermissions(adminToken) {
+  captureDriveSession()
+  const response = await driveFetch(apiUrl('/drive/folder-permissions'), { headers: driveRequestHeaders(adminToken), credentials: 'include' }, 120000)
+  return handleDriveResponse(response).then((value) => value.json())
+}
+
+export async function setDriveFolderPermission(email, enabled, durationDays, adminToken) {
+  captureDriveSession()
+  const response = await driveFetch(apiUrl('/drive/folder-permissions'), { method: 'POST', headers: driveRequestHeaders(adminToken), credentials: 'include', body: JSON.stringify({ email, enabled, durationDays }) }, 120000)
+  return handleDriveResponse(response).then((value) => value.json())
+}
+
+export async function listDriveAudioCatalog({ query = '', genre = '', offset = 0, limit = 60, refresh = false } = {}, signal, djToken) {
+  captureDriveSession()
+  const params = new URLSearchParams({ q: String(query || '').trim(), genre: String(genre || ''), offset: String(offset), limit: String(limit), refresh: refresh ? '1' : '0' })
+  const response = await driveFetch(`${apiUrl('/drive/catalog')}?${params}`, { headers: driveRequestHeaders(djToken), credentials: 'include', signal }, 120000)
+  return handleDriveResponse(response).then((value) => value.json())
+}
+
+export async function searchDriveAudio(query, signal, djToken = '') {
+  captureDriveSession()
+  const response = await driveFetch(`${apiUrl('/drive/search')}?q=${encodeURIComponent(String(query || '').trim())}`, { headers: driveRequestHeaders(djToken), credentials: 'include', signal }, 120000)
   const data = await handleDriveResponse(response).then((value) => value.json())
   return data.matches || []
 }
 
-export async function fetchDriveAudio(fileId) {
+export async function fetchDriveAudio(fileId, djToken = '', { download = false } = {}) {
   captureDriveSession()
-  const response = await driveFetch(`${apiBase}/drive/preview?id=${encodeURIComponent(fileId)}`, { headers: driveRequestHeaders(), credentials: 'include' }, 600000)
+  const params = new URLSearchParams({ id: String(fileId || '') })
+  if (download) params.set('download', '1')
+  const response = await driveFetch(`${apiUrl('/drive/preview')}?${params}`, { headers: driveRequestHeaders(djToken), credentials: 'include' }, 600000)
   return handleDriveResponse(response).then((value) => value.blob())
 }
 
-export async function downloadDriveAudio(fileId, fileName = 'cancion') {
-  const blob = await fetchDriveAudio(fileId)
+export async function downloadDriveAudio(fileId, fileName = 'cancion', djToken = '') {
+  const blob = await fetchDriveAudio(fileId, djToken, { download: djLibraryStandalone })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
@@ -88,7 +129,7 @@ export async function downloadYoutubeAudio(videoId, _format = 'mp3', fileName = 
     ? { videoId: cleanId }
     : { query: String(searchQuery || '').trim() }
   if (!body.videoId && !body.query) throw new Error('INVALID_DOWNLOAD_SOURCE')
-  const response = await fetch(`${apiBase}/youtube-download`, { method: 'POST', headers: driveRequestHeaders(), credentials: 'include', body: JSON.stringify(body) })
+  const response = await fetch(apiUrl('/youtube-download'), { method: 'POST', headers: driveRequestHeaders(), credentials: 'include', body: JSON.stringify(body) })
   const blob = await handleDriveResponse(response).then((value) => value.blob())
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
