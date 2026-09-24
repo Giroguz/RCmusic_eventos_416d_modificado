@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: pack-todos-los-generos-staging-api
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: SUPABASE_URL
+        value: https://uwvhpodseawpsqunplld.supabase.co
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: DRIVE_FOLDER_ID
+        value: 1UTIQESYvJcNdKXNsDdDs0dRCrDzs5JvF
+      - key: CORS_ORIGIN
+        sync: false
