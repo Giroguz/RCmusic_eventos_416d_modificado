@@ -1,10 +1,22 @@
-import { LogOut, Radio } from 'lucide-react'
+import { LogOut, Music2, Radio } from 'lucide-react'
+import { djLibraryStandalone } from '../lib/supabase'
 import rcMusicLogo from '../assets/1788413537933-832c4ec7.jpg'
 import { useLanguage } from '../lib/i18n'
 import LanguagePicker from './LanguagePicker'
 
 export function Brand({ compact = false }) {
   const { t } = useLanguage()
+  if (djLibraryStandalone) return (
+    <div className="flex items-center gap-3">
+      <div className="neon-orb grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border border-turquoise/30 bg-ink p-1 text-turquoise shadow-glow">
+        <Music2 size={30} strokeWidth={2.2} aria-hidden="true" />
+      </div>
+      <div className="min-w-0">
+        <p className="font-display text-xl font-extrabold leading-tight tracking-[.02em] text-white sm:text-2xl" aria-label="PACK TODOS LOS GÉNEROS">PACK</p>
+        {!compact && <p className="mt-1 text-[10px] font-semibold uppercase tracking-[.14em] text-white/45">TODOS LOS GÉNEROS · BIBLIOTECA DJ</p>}
+      </div>
+    </div>
+  )
   return (
     <div className="flex items-center gap-3">
       <div className="neon-orb grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border border-neon/30 bg-white p-1 shadow-glow">
