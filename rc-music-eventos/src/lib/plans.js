@@ -32,3 +32,8 @@ export function planPriceText(plan, currency = 'PEN', rate = 1) {
   const amount = plan.pricePen * rate
   return new Intl.NumberFormat(undefined, { style: 'currency', currency, maximumFractionDigits: currency === 'PEN' ? 2 : 0 }).format(amount)
 }
+
+export function planUsdPriceText(plan, rate = 1) {
+  const amount = plan.pricePen * rate
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(amount)
+}
