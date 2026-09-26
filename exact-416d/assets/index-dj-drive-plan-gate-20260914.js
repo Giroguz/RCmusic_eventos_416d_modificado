@@ -38916,7 +38916,7 @@
       const savedSettings = readAdminSettings();
       try {
         const prices = mergePlanOptions(await adminGetSubscriptionPlanPrices(session.token));
-        const nextPlans = savedSettings?.plans?.length ? mergePlanOptions(savedSettings.plans) : prices;
+        const nextPlans = prices;
         setPlanOptions(nextPlans);
         setPriceDraft(draftFromPlans(nextPlans));
       } catch {
@@ -38941,17 +38941,30 @@
     async function savePlanPrices() {
       setPricesBusy(true);
       setError("");
-      const requested = Object.entries(priceDraft).map(([planType, values]) => ({ planType, ...values }));
-      const saved = mergePlanOptions(requested);
-      writeAdminSettings({ plans: saved, demoDays });
-      setPlanOptions(saved);
-      setPriceDraft(draftFromPlans(saved));
+      setNotice("");
+      const requested = Object.entries(priceDraft).map(([planType, values]) => ({ planType, days: Number(values.days), pricePen: Number(values.pricePen), priceUsd: Number(values.priceUsd) }));
+      const validTypes = new Set(requested.map((item) => item.planType));
+      const valid = ["fifteen", "monthly", "annual"].every((type) => validTypes.has(type)) && requested.every((item) => Number.isFinite(item.days) && item.days >= 1 && item.days <= 3650 && Number.isFinite(item.pricePen) && item.pricePen >= 0 && Number.isFinite(item.priceUsd) && item.priceUsd >= 0);
+      if (!valid) {
+        setError("Revisa los días y precios de los tres planes antes de guardar.");
+        setPricesBusy(false);
+        return;
+      }
       try {
         await adminSetSubscriptionPlanPrices(requested, session.token);
-        setNotice("Precios y duraci\xF3n de planes actualizados.");
+        const persisted = mergePlanOptions(await adminGetSubscriptionPlanPrices(session.token));
+        const expected = Object.fromEntries(requested.map((item) => [item.planType, item]));
+        const confirmed = persisted.length === 3 && persisted.every((plan) => {
+          const item = expected[plan.id];
+          return item && Number(plan.days) === item.days && Math.abs(Number(plan.pricePen) - item.pricePen) < 0.005 && Math.abs(Number(plan.priceUsd) - item.priceUsd) < 0.005;
+        });
+        if (!confirmed) throw new Error("PRICE_SAVE_NOT_CONFIRMED");
+        writeAdminSettings({ plans: persisted, demoDays });
+        setPlanOptions(persisted);
+        setPriceDraft(draftFromPlans(persisted));
+        setNotice("Precios y duración guardados y verificados en el servidor.");
       } catch {
-        setNotice("Precios y duraci\xF3n guardados en este dispositivo. La sincronizaci\xF3n remota no respondi\xF3.");
-        setError("La configuraci\xF3n qued\xF3 conservada localmente; vuelve a intentarlo para sincronizarla con el servidor.");
+        setError("No se pudo confirmar el guardado de los precios en el servidor. Los valores siguen como borrador; vuelve a intentarlo y verifica el aviso antes de cerrar.");
       } finally {
         setPricesBusy(false);
       }
@@ -39375,15 +39388,15 @@
           /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-2 grid grid-cols-3 gap-1.5 sm:mt-3 sm:gap-2", children: [
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "min-w-0 text-[10px] text-white/45 sm:text-[11px]", children: [
               "D\xEDas",
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "1", max: "3650", value: priceDraft[plan.id]?.days || "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], days: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); writeAdminSettings({ plans: nextPlans, demoDays }); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "1", max: "3650", value: priceDraft[plan.id]?.days || "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], days: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "min-w-0 text-[10px] text-white/45 sm:text-[11px]", children: [
               "Precio S/",
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "0", step: "0.01", value: priceDraft[plan.id]?.pricePen || "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], pricePen: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); writeAdminSettings({ plans: nextPlans, demoDays }); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "0", step: "0.01", value: priceDraft[plan.id]?.pricePen || "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], pricePen: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "min-w-0 text-[10px] text-white/45 sm:text-[11px]", children: [
               "Precio US$",
-              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "0", step: "0.01", value: priceDraft[plan.id]?.priceUsd ?? "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], priceUsd: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); writeAdminSettings({ plans: nextPlans, demoDays }); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
+              /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "number", min: "0", step: "0.01", value: priceDraft[plan.id]?.priceUsd ?? "", onChange: (e) => setPriceDraft((current) => { const next = { ...current, [plan.id]: { ...current[plan.id], priceUsd: e.target.value } }; const nextPlans = mergePlanOptions(Object.entries(next).map(([planType, values]) => ({ planType, ...values }))); setPlanOptions(nextPlans); return next; }), className: "input-dark mt-1 min-w-0 px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" })
             ] })
           ] })
         ] }, plan.id)) }),
