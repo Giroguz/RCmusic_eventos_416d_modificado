@@ -38029,10 +38029,14 @@
   function mergePlanOptions(rows = []) {
     const byType = Object.fromEntries(rows.map((row) => [row.plan_type || row.planType || row.id, row]));
     return PLAN_OPTIONS.map((plan) => {
-      const rawPrice = Number(byType[plan.id]?.price_pen ?? byType[plan.id]?.pricePen);
-      const rawUsd = Number(byType[plan.id]?.price_usd ?? byType[plan.id]?.priceUsd);
-      const legacyDefault = plan.id === "fifteen" && rawPrice === 16 || plan.id === "monthly" && rawPrice === 30 || plan.id === "annual" && rawPrice === 330;
-      return { ...plan, days: Number(byType[plan.id]?.days) || plan.days, pricePen: rawPrice > 0 && !legacyDefault ? rawPrice : plan.pricePen, priceUsd: rawUsd >= 0 && Number.isFinite(rawUsd) ? rawUsd : plan.priceUsd };
+      const row = byType[plan.id] || {};
+      const hasManualUsd = Object.prototype.hasOwnProperty.call(row, "price_usd") || Object.prototype.hasOwnProperty.call(row, "priceUsd");
+      const hasPen = row.price_pen !== void 0 || row.pricePen !== void 0;
+      const rawPrice = Number(row.price_pen ?? row.pricePen);
+      const rawUsd = Number(row.price_usd ?? row.priceUsd);
+      const legacyDefault = !hasManualUsd && (plan.id === "fifteen" && rawPrice === 16 || plan.id === "monthly" && rawPrice === 30 || plan.id === "annual" && rawPrice === 330);
+      const hasUsd = row.price_usd !== void 0 || row.priceUsd !== void 0;
+      return { ...plan, days: Number(row.days) || plan.days, pricePen: hasPen && Number.isFinite(rawPrice) && rawPrice >= 0 && !legacyDefault ? rawPrice : plan.pricePen, priceUsd: hasUsd && Number.isFinite(rawUsd) && rawUsd >= 0 ? rawUsd : plan.priceUsd };
     });
   }
   function formatCountdown(expiresAt2, now = Date.now()) {
