@@ -26347,7 +26347,7 @@
     contact: "Contacto",
     contracting: "Contrataci\xF3n",
     quickTip: "Tip r\xE1pido",
-    writeSong: "Escribe una canci\xF3n o artista para encontrar tu pr\xF3ximo pedido.",
+    writeSong: "Escribe una canci\xF3n y el artista para encontrar tu pr\xF3ximo pedido.",
     noRequests: "Todav\xEDa no hay pedidos. \xA1S\xE9 el primero!",
     requestCount: "pedidos",
     order: "Pedir",
