@@ -26326,7 +26326,7 @@
     noDjs: "No hay DJs registrados.",
     codeOnce: "El c\xF3digo solo se muestra una vez al crearlo o regenerarlo.",
     attendeeSearch: "Busca tu canci\xF3n",
-    searchPlaceholder: "Canci\xF3n o artista...",
+    searchPlaceholder: "Escribe la canci\xF3n y el artista...",
     search: "Buscar",
     searching: "Buscando",
     liveRequests: "Pedidos en vivo",
