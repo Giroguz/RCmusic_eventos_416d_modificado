@@ -32889,6 +32889,23 @@
     if (error) return 1;
     return Number(data ?? 1);
   }
+  async function getSongPreviewEnabled() {
+    if (!supabase) return true;
+    const { data, error } = await supabase.rpc("get_song_preview_enabled");
+    if (error) throw error;
+    return data !== false;
+  }
+  async function adminSetSongPreviewEnabled(enabled, token) {
+    if (!supabase || !token) throw new Error("Admin session required");
+    const { data, error } = await supabase.rpc("admin_set_song_preview_enabled", { p_token: token, p_enabled: Boolean(enabled) });
+    if (error) throw error;
+    return data !== false;
+  }
+  function subscribeToSongPreviewSetting(callback) {
+    if (!supabase) return () => {};
+    const channel = supabase.channel("global-song-preview-setting").on("postgres_changes", { event: "UPDATE", schema: "public", table: "app_feature_settings", filter: "id=eq.1" }, ({ new: row }) => callback(row?.song_preview_enabled !== false)).subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }
   async function adminExtendDjPlan(id, days, token) {
     const { data, error } = await supabase.rpc("admin_extend_dj_plan", { p_token: token, p_dj_id: id, p_days: Number(days) });
     if (error) throw error;
@@ -37437,7 +37454,7 @@
       children
     ] }) });
   }
-  function SearchResult({ track, onPreview, onRequest, t }) {
+  function SearchResult({ track, onPreview, onRequest, t, previewEnabled = true }) {
     const sourceLabel = { youtube: "YouTube", deezer: "Deezer", soundcloud: "SoundCloud", spotify: "Spotify" }[track.source] || track.source;
     if (track.external) return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[.035] p-3", children: [
       /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "min-w-0", children: [
@@ -37450,10 +37467,10 @@
       /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("a", { href: track.externalUrl, target: "_blank", rel: "noreferrer", className: "shrink-0 rounded-xl bg-neon/10 px-2.5 py-2 text-xs font-bold text-neon transition hover:bg-neon hover:text-ink", children: t("openProvider") })
     ] });
     return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "search-result group grid min-w-0 grid-cols-[58px_minmax(0,1fr)_auto] items-center gap-2 rounded-2xl border border-white/10 bg-white/[.035] p-2.5 transition hover:border-white/20 hover:bg-white/[.06] sm:gap-3", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { type: "button", onClick: () => onPreview(track), className: "relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-white/10", "aria-label": `${t("preview")}: ${track.title}`, children: [
+      previewEnabled ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { type: "button", onClick: () => onPreview(track), className: "relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-white/10", "aria-label": `${t("preview")}: ${track.title}`, children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(MediaThumbnail, { src: track.thumbnail, alt: track.title, className: "h-full w-full object-cover opacity-85 transition group-hover:opacity-100" }),
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "absolute inset-0 grid place-items-center bg-black/20", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { className: "grid h-6 w-6 place-items-center rounded-full bg-white text-ink shadow-lg", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Play, { size: 11, fill: "currentColor" }) }) })
-      ] }),
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-white/10", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(MediaThumbnail, { src: track.thumbnail, alt: track.title, className: "h-full w-full object-cover" }) }),
       /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "min-w-0 py-0.5", children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "flex min-w-0 flex-wrap items-center gap-1.5", children: [
           /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "search-result__title min-w-0 text-[13px] font-semibold leading-[1.2]", style: { display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 2, overflow: "hidden" }, children: track.title }),
@@ -37464,12 +37481,12 @@
       /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { type: "button", onClick: () => onRequest(track), className: "shrink-0 rounded-lg bg-neon/10 px-2.5 py-2 text-[10px] font-bold text-neon transition hover:bg-neon hover:text-ink sm:px-3 sm:text-xs", children: t("order") })
     ] });
   }
-  function RequestCard({ request, liked, onLike, onPreview, readOnly, t }) {
+  function RequestCard({ request, liked, onLike, onPreview, readOnly, t, previewEnabled = true }) {
     const statusLabel = request.status === "played" ? t("alreadyPlayed") : request.status === "not-found" ? t("notLocated") : t("inQueue");
     const handled = request.status !== "pending";
     const statusTone = request.status === "played" ? "border-emerald-400/30 bg-emerald-400/[.06]" : request.status === "not-found" ? "border-[#ff2b6d]/40 bg-[#ff2b6d]/[.06]" : "border-amber-300/30 bg-amber-300/[.05]";
     const statusText = request.status === "played" ? "text-emerald-300" : request.status === "not-found" ? "text-[#ff4f86]" : "text-amber-300";
-    const playable = request.source === "deezer" || request.source === "youtube";
+    const playable = previewEnabled && (request.source === "deezer" || request.source === "youtube");
     return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("article", { className: `live-request-card flex min-w-0 items-center gap-2 rounded-2xl border px-2.5 py-2.5 transition ${statusTone}`, children: [
       playable ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("button", { onClick: () => onPreview({ id: request.videoId, source: request.source, spotifyId: request.spotifyId, title: request.title, artist: request.artist, thumbnail: request.thumbnail, previewUrl: request.previewUrl, externalUrl: request.externalUrl }), className: "relative h-14 w-[76px] shrink-0 overflow-hidden rounded-xl bg-white/10", "aria-label": `${t("preview")}: ${request.title}`, children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(MediaThumbnail, { src: request.thumbnail, alt: request.title, className: "h-full w-full object-cover" }),
@@ -37608,8 +37625,26 @@
     const [driveSearching, setDriveSearching] = (0, import_react7.useState)(false);
     const [driveNotice, setDriveNotice] = (0, import_react7.useState)("");
     const [chatOpen, setChatOpen] = (0, import_react7.useState)(false);
+    const [previewEnabled, setPreviewEnabled] = (0, import_react7.useState)(true);
+    const [previewSettingLoaded, setPreviewSettingLoaded] = (0, import_react7.useState)(false);
+    const canPreview = previewSettingLoaded && previewEnabled;
     (0, import_react7.useEffect)(() => subscribeToEventPresence(event.id, "attendee", () => {
     }, "event"), [event.id]);
+    (0, import_react7.useEffect)(() => {
+      let active = true;
+      let realtimeReceived = false;
+      const unsubscribe = subscribeToSongPreviewSetting((enabled) => {
+        realtimeReceived = true;
+        if (active) { setPreviewEnabled(enabled); setPreviewSettingLoaded(true); }
+      });
+      getSongPreviewEnabled().then((enabled) => { if (active && !realtimeReceived) setPreviewEnabled(enabled); }).catch(() => {}).finally(() => { if (active) setPreviewSettingLoaded(true); });
+      return () => { active = false; unsubscribe(); };
+    }, []);
+    (0, import_react7.useEffect)(() => {
+      if (canPreview || !selected) return;
+      setSelected(null);
+      if (window.history.state?.[OVERLAY_KEY] === "preview") { window.__rcSkipHistoryHomeOnce = true; window.history.back(); }
+    }, [canPreview, selected]);
     (0, import_react7.useEffect)(() => {
       if (!supabase || event.localOnly) return void 0;
       const channel = supabase.channel(`event-settings-${event.id}`).on("postgres_changes", { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${event.id}` }, ({ new: row }) => {
@@ -37840,7 +37875,8 @@
               /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("button", { className: "btn-primary", disabled: proofLoading, children: "Pedir canción" })
             ] })
           ] }),
-          results.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "mt-4 space-y-2", children: results.map((track) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(SearchResult, { track, t, onPreview: (track2) => {
+          results.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "mt-4 space-y-2", children: results.map((track) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(SearchResult, { track, t, previewEnabled: canPreview, onPreview: (track2) => {
+            if (!canPreview) return;
             pushOverlay("preview");
             setSelected(track2);
           }, onRequest: (track2) => {
@@ -37867,7 +37903,8 @@
               ] })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { className: "space-y-3", children: [
-              sortedRequests.map((request) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(RequestCard, { request, liked: likedIds.includes(request.id), onLike: likeRequest, onPreview: (track) => {
+              sortedRequests.map((request) => /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(RequestCard, { request, liked: likedIds.includes(request.id), onLike: likeRequest, previewEnabled: canPreview, onPreview: (track) => {
+                if (!canPreview) return;
                 pushOverlay("preview");
                 setSelected(track);
               }, readOnly: event.finalized, t }, request.id)),
@@ -37994,7 +38031,7 @@
           ] })
         ] })
       ] }),
-      selected && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(Modal, { title: t("preview"), onClose: () => closeOverlay(setSelected), children: [
+      selected && canPreview && /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(Modal, { title: t("preview"), onClose: () => closeOverlay(setSelected), children: [
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { className: "overflow-hidden rounded-2xl bg-black", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(PreviewFrame, { track: selected }) }),
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("h3", { className: "mt-4 font-bold", children: selected.title }),
         /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("p", { className: "mt-1 text-sm text-white/50", children: selected.artist })
@@ -38784,6 +38821,9 @@
     const [activationDraft, setActivationDraft] = (0, import_react9.useState)({ djId: "", email: "", displayName: "", accessCode: "", planType: "monthly", driveAccess: false, generatedCode: "" });
     const [activationBusy, setActivationBusy] = (0, import_react9.useState)(false);
     const [activationMessage, setActivationMessage] = (0, import_react9.useState)("");
+    const [songPreviewEnabled, setSongPreviewEnabled] = (0, import_react9.useState)(true);
+    const [songPreviewBusy, setSongPreviewBusy] = (0, import_react9.useState)(false);
+    const [songPreviewLoaded, setSongPreviewLoaded] = (0, import_react9.useState)(false);
     const [yapeEnabled, setYapeEnabled] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.yapeEnabled ?? true; } catch { return true; } });
     const [mercadoEnabled, setMercadoEnabled] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.mercadoEnabled ?? false; } catch { return false; } });
     const [paypalEnabled, setPaypalEnabled] = (0, import_react9.useState)(() => { try { return JSON.parse(localStorage.getItem("rc_payment_settings_v1") || "null")?.paypalEnabled ?? true; } catch { return true; } });
@@ -38891,6 +38931,7 @@
         setYapeNumberDraft(number);
       } catch {
       }
+      try { setSongPreviewEnabled(await getSongPreviewEnabled()); } catch {} finally { setSongPreviewLoaded(true); }
       try {
         const destinations = await adminGetNotificationSettings(session.token);
         setNotificationEmail(destinations.notification_email || "");
@@ -38926,6 +38967,17 @@
       if (summaryTarget === "proofs") document.getElementById("admin-proofs")?.scrollIntoView({ behavior: "smooth", block: "start" });
       if (summaryTarget !== "proofs") document.getElementById("admin-users")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, [summaryTarget]);
+    async function saveSongPreviewEnabled(enabled) {
+      setSongPreviewBusy(true);
+      setError("");
+      try {
+        const saved = await adminSetSongPreviewEnabled(enabled, session.token);
+        setSongPreviewEnabled(saved);
+        setNotice(saved ? "Previsualización activada para todos los usuarios." : "Previsualización desactivada para todos los usuarios.");
+      } catch {
+        setError("No se pudo guardar la configuración de previsualización. No se cambió el ajuste.");
+      } finally { setSongPreviewBusy(false); }
+    }
     async function savePlanPrices() {
       setPricesBusy(true);
       setError("");
@@ -39323,6 +39375,16 @@
         ] })
       ] }),
       error && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("div", { className: "mb-3 rounded-xl border border-red-400/20 bg-red-400/10 px-3 py-2 text-xs text-red-200 sm:text-sm", children: error }),
+      /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { className: "mb-4 flex flex-col gap-3 rounded-2xl border border-turquoise/20 bg-turquoise/[.06] p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "font-bold text-turquoise", children: "Previsualización de canciones" }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("p", { className: "mt-1 text-xs leading-5 text-white/55", children: "Al desactivarla, se oculta el botón de reproducción y no se reproducen vistas previas para asistentes ni DJs." })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("label", { className: "inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-xs font-bold text-white/80", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("input", { type: "checkbox", checked: songPreviewEnabled, disabled: songPreviewBusy || !songPreviewLoaded, onChange: (e) => saveSongPreviewEnabled(e.target.checked), className: "h-5 w-5 accent-[#b8ff3d]" }),
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: songPreviewBusy ? "Guardando…" : songPreviewEnabled ? "Activada" : "Desactivada" })
+        ] })
+      ] }),
       /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("section", { id: "admin-summary", className: "mb-5 rounded-2xl border border-violet-300/20 bg-violet-300/[.06] p-3 sm:mb-7 sm:p-4", children: [
         adminAccordionHeader("Resumen", "summary"),
         adminAccordionOpen.summary && /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { className: "mt-3", children: [
@@ -39862,7 +39924,7 @@
     if (track.source === "deezer") return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(DeezerPreview2, { track });
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("iframe", { title: track.title, src: `https://www.youtube-nocookie.com/embed/${track.videoId}?autoplay=1&rel=0`, className: "aspect-video w-full", allow: "autoplay; encrypted-media", allowFullScreen: true });
   }
-  function DjRequestRow({ request, onStatus, onPreview, onProof, onDriveSearch, onDriveCancel, searchingDrive, readOnly, t }) {
+  function DjRequestRow({ request, onStatus, onPreview, onProof, onDriveSearch, onDriveCancel, searchingDrive, readOnly, t, previewEnabled = true }) {
     const played = request.status === "played";
     const notFound = request.status === "not-found";
     const awaiting = request.status === "awaiting-payment";
@@ -39870,10 +39932,10 @@
     const statusText = awaiting ? t("paymentPending") : rejected ? "Rechazada" : played ? t("alreadyPlayed") : notFound ? t("notLocated") : t("inQueue");
     const statusTone = played ? "text-[#b8ff3d]" : notFound ? "text-[#ffe600]" : rejected ? "text-[#ff3b5f]" : awaiting ? "text-violet-200" : "text-amber-300";
     return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: `flex flex-col gap-4 border-b border-white/10 px-4 py-4 last:border-0 sm:flex-row sm:items-center ${played || rejected ? "opacity-55" : ""}`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { onClick: () => onPreview(request), className: "group relative h-16 w-full shrink-0 overflow-hidden rounded-xl bg-white/10 sm:w-24", children: [
+      previewEnabled ? /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("button", { type: "button", onClick: () => onPreview(request), className: "group relative h-16 w-full shrink-0 overflow-hidden rounded-xl bg-white/10 sm:w-24", "aria-label": `${t("preview")}: ${request.title}`, children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(MediaThumbnail2, { src: request.thumbnail, alt: request.title, className: "h-full w-full object-cover" }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { className: "absolute inset-0 grid place-items-center bg-black/30 opacity-0 transition group-hover:opacity-100", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Play, { size: 18, fill: "currentColor" }) })
-      ] }),
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("div", { className: "relative h-16 w-full shrink-0 overflow-hidden rounded-xl bg-white/10 sm:w-24", "aria-label": "Miniatura estándar sin reproducción", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(MediaThumbnail2, { src: request.thumbnail, alt: request.title, className: "h-full w-full object-cover" }) }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "min-w-0 flex-1", children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "flex items-start gap-3", children: [
           /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "min-w-0 flex-1", children: [
@@ -39991,6 +40053,9 @@
       html.style.removeProperty("overscroll-behavior");
     }, [showPlans, showAdmin]);
     const [preview, setPreview] = (0, import_react10.useState)(null);
+    const [previewEnabled, setPreviewEnabled] = (0, import_react10.useState)(true);
+    const [previewSettingLoaded, setPreviewSettingLoaded] = (0, import_react10.useState)(false);
+    const canPreview = previewSettingLoaded && previewEnabled;
     const [paymentProof, setPaymentProof] = (0, import_react10.useState)("");
     const [notice, setNotice] = (0, import_react10.useState)("");
     const [filter, setFilter] = (0, import_react10.useState)("all");
@@ -40051,6 +40116,21 @@
       if (window.history.state?.[DJ_OVERLAY_KEY]) { window.__rcSkipHistoryHomeOnce = true; window.history.back(); return; }
       fallback?.();
     }
+    (0, import_react10.useEffect)(() => {
+      let active = true;
+      let realtimeReceived = false;
+      const unsubscribe = subscribeToSongPreviewSetting((enabled) => {
+        realtimeReceived = true;
+        if (active) { setPreviewEnabled(enabled); setPreviewSettingLoaded(true); }
+      });
+      getSongPreviewEnabled().then((enabled) => { if (active && !realtimeReceived) setPreviewEnabled(enabled); }).catch(() => {}).finally(() => { if (active) setPreviewSettingLoaded(true); });
+      return () => { active = false; unsubscribe(); };
+    }, []);
+    (0, import_react10.useEffect)(() => {
+      if (canPreview || !preview) return;
+      setPreview(null);
+      if (window.history.state?.[DJ_OVERLAY_KEY] === "preview") { window.__rcSkipHistoryHomeOnce = true; window.history.back(); }
+    }, [canPreview, preview]);
     (0, import_react10.useEffect)(() => {
       syncDjOverlay();
       const handleDjPopState = (event) => syncDjOverlay(event.state);
@@ -40597,7 +40677,7 @@
               ] })
             ] })
           ] }),
-          requests.length ? requests.map((request) => /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(DjRequestRow, { request, onStatus: markStatus, onPreview: (request) => { openDjOverlay("preview", request); setPreview(request); }, onProof: (proof) => { openDjOverlay("payment", proof); setPaymentProof(proof); }, onDriveSearch: searchDriveForRequest, onDriveCancel: cancelDriveSearch, searchingDrive: driveSearchId === request.id, readOnly: activeEvent.finalized, t }, request.id)) : /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "px-5 py-14 text-center text-sm text-white/35", children: [
+          requests.length ? requests.map((request) => /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(DjRequestRow, { request, previewEnabled: canPreview, onStatus: markStatus, onPreview: (request) => { if (!canPreview) return; openDjOverlay("preview", request); setPreview(request); }, onProof: (proof) => { openDjOverlay("payment", proof); setPaymentProof(proof); }, onDriveSearch: searchDriveForRequest, onDriveCancel: cancelDriveSearch, searchingDrive: driveSearchId === request.id, readOnly: activeEvent.finalized, t }, request.id)) : /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { className: "px-5 py-14 text-center text-sm text-white/35", children: [
             /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Music2, { size: 25, className: "mx-auto mb-3 text-white/20" }),
             t("noSongs")
           ] })
@@ -40734,7 +40814,7 @@
           t("create")
         ] })
       ] }) }),
-      preview && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(Modal2, { title: t("preview"), onClose: () => closeDjOverlay(() => setPreview(null)), children: [
+      preview && canPreview && /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(Modal2, { title: t("preview"), onClose: () => closeDjOverlay(() => setPreview(null)), children: [
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("div", { className: "overflow-hidden rounded-2xl bg-black", children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PreviewFrame2, { track: preview }) }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("h3", { className: "mt-4 font-bold", children: preview.title }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("p", { className: "mt-1 text-sm text-white/50", children: preview.artist })

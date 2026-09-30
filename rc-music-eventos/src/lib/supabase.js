@@ -206,6 +206,13 @@ export async function adminSetSubscriptionPlanPrices(prices, token) { if (!supab
 export async function adminGetDemoDays(token) { if (!supabase || !token) return 1; const { data, error } = await supabase.rpc('admin_get_demo_days', { p_token: token }); if (error) throw error; return Number(data || 1) }
 export async function adminSetDemoDays(days, token) { if (!supabase || !token) throw new Error('Admin session required'); const { data, error } = await supabase.rpc('admin_set_demo_days', { p_token: token, p_demo_days: Number(days) }); if (error) throw error; return Number(data || days) }
 export async function getDemoDays() { if (!supabase) return 1; const { data, error } = await supabase.rpc('get_demo_days'); if (error) return 1; return Number(data || 1) }
+export async function getSongPreviewEnabled() { if (!supabase) return true; const { data, error } = await supabase.rpc('get_song_preview_enabled'); if (error) throw error; return data !== false }
+export async function adminSetSongPreviewEnabled(enabled, token) { if (!supabase || !token) throw new Error('Admin session required'); const { data, error } = await supabase.rpc('admin_set_song_preview_enabled', { p_token: token, p_enabled: Boolean(enabled) }); if (error) throw error; return data !== false }
+export function subscribeToSongPreviewSetting(callback) {
+  if (!supabase) return () => {}
+  const channel = supabase.channel('global-song-preview-setting').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'app_feature_settings', filter: 'id=eq.1' }, ({ new: row }) => callback(row?.song_preview_enabled !== false)).subscribe()
+  return () => { supabase.removeChannel(channel) }
+}
 export async function adminExtendDjPlan(id, days, token) { const { data, error } = await supabase.rpc('admin_extend_dj_plan', { p_token: token, p_dj_id: id, p_days: Number(days) }); if (error) throw error; return account(Array.isArray(data) ? data[0] : data) }
 export async function getSubscriptionQr() { if (!supabase) return ''; const { data, error } = await supabase.rpc('get_subscription_qr'); if (error) return ''; return data || '' }
 export async function getSubscriptionYapeNumber() { if (!supabase) return ''; const { data, error } = await supabase.rpc('get_subscription_yape_number'); if (error) return ''; return data || '' }
