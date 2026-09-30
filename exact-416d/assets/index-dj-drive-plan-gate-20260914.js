@@ -32554,8 +32554,8 @@
   };
 
   // src/lib/supabase.js
-  var url = "https://fzqpmpgbubpmongodcat.supabase.co";
-  var anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6cXBtcGdidWJwbW9uZ29kY2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5NzI5MzIsImV4cCI6MjEwMzU0ODkzMn0.pLJfo5jpfMNRQCAbKC1dEW_INuBJan_eoyB_hWpChdw";
+  var url = "https://crvgoyqqujjbdfxqsvpt.supabase.co";
+  var anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNydmdveXFxdWpqYmRmeHFzdnB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3MzI5ODAsImV4cCI6MjEwNjMwODk4MH0.44xKfCE-BBS-E_yyHspA6uztNXOUOqPxoKCIpouFDzA";
   var supabaseEnabled = Boolean(url && anonKey && !String(url).includes("tu-proyecto"));
   var supabase = supabaseEnabled ? createClient(url, anonKey) : null;
   var SESSION_KEY = "rc_music_dj_session_v1";
@@ -32665,14 +32665,23 @@
   }
   const TIP_CURRENCY_SYMBOLS = { PEN: "S/", USD: "$", EUR: "€", BRL: "R$", CNY: "¥", JPY: "¥" };
   function tipAmountLabel(amount, currency) { const value = Number(amount); if (!Number.isFinite(value) || value <= 0) return ""; return `${TIP_CURRENCY_SYMBOLS[String(currency || "PEN").toUpperCase()] || currency} ${value.toFixed(2)}`; }
+  const joinedPublicEventIds = /* @__PURE__ */ new Map();
   async function getPublicEvent(query) {
     if (!supabase) return null;
     await ensureAnonymousSession();
     const normalized = query.trim().toUpperCase();
-    const { data: event, error } = await supabase.from("events").select("*").eq("code", normalized).maybeSingle();
+    let eventId = joinedPublicEventIds.get(normalized);
+    if (!eventId) {
+      const { data: joinedId, error: joinError } = await supabase.rpc("attendee_join_event", { p_code: normalized });
+      if (joinError) throw joinError;
+      if (!joinedId) return null;
+      eventId = joinedId;
+      joinedPublicEventIds.set(normalized, eventId);
+    }
+    const { data: event, error } = await supabase.from("events").select("id,code,name,dj_name,contact,yape_number,thank_you,qr_image_url,tips_required,finalized_at,tip_currency,tip_amount,created_at").eq("id", eventId).maybeSingle();
     if (error) throw error;
     if (!event) return null;
-    const { data: requests, error: requestsError } = await supabase.from("song_requests").select("id,video_id,title,artist,thumbnail,requester,dedication,likes,status,created_at").eq("event_id", event.id).order("likes", { ascending: false });
+    const { data: requests, error: requestsError } = await supabase.from("song_requests").select("id,event_id,video_id,title,artist,thumbnail,requester,dedication,likes,status,created_at").eq("event_id", event.id).order("likes", { ascending: false });
     if (requestsError) throw requestsError;
     return mapEvent(event, requests || []);
   }

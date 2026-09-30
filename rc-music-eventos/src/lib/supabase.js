@@ -98,14 +98,32 @@ export function mapEvent(row, requests = []) {
   return { id: row.id, code: row.code, name: row.name, djName: row.dj_name, contact: row.contact || '', yapeNumber: row.yape_number || '', thankYou: row.thank_you || '', qrImage: row.qr_image_url || '', tipsRequired: Boolean(row.tips_required), tipCurrency: String(row.tip_currency || 'PEN').toUpperCase(), tipAmount: Number(row.tip_amount || 0), finalized: Boolean(row.finalized_at || row.finalized), finalizedAt: row.finalized_at || null, createdAt: row.created_at, requests: requests.map(mapRequest) }
 }
 
+const joinedPublicEventIds = new Map()
+
 export async function getPublicEvent(query) {
   if (!supabase) return null
   await ensureAnonymousSession()
   const normalized = query.trim().toUpperCase()
-  const { data: event, error } = await supabase.from('events').select('*').eq('code', normalized).maybeSingle()
+  let eventId = joinedPublicEventIds.get(normalized)
+  if (!eventId) {
+    const { data: joinedId, error: joinError } = await supabase.rpc('attendee_join_event', { p_code: normalized })
+    if (joinError) throw joinError
+    if (!joinedId) return null
+    eventId = joinedId
+    joinedPublicEventIds.set(normalized, eventId)
+  }
+  const { data: event, error } = await supabase
+    .from('events')
+    .select('id,code,name,dj_name,contact,yape_number,thank_you,qr_image_url,tips_required,finalized_at,tip_currency,tip_amount,created_at,is_live')
+    .eq('id', eventId)
+    .maybeSingle()
   if (error) throw error
   if (!event) return null
-  const { data: requests, error: requestsError } = await supabase.from('song_requests').select('id,video_id,title,artist,thumbnail,requester,dedication,likes,status,created_at').eq('event_id', event.id).order('likes', { ascending: false })
+  const { data: requests, error: requestsError } = await supabase
+    .from('song_requests')
+    .select('id,event_id,video_id,title,artist,thumbnail,requester,dedication,likes,status,created_at')
+    .eq('event_id', event.id)
+    .order('likes', { ascending: false })
   if (requestsError) throw requestsError
   return mapEvent(event, requests || [])
 }
