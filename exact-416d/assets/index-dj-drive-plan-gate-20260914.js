@@ -32594,10 +32594,8 @@
     if (error) throw error;
     return data.session;
   }
-  async function sendEmailVerificationLink(email) {
-    if (!supabase) throw new Error("Supabase is not configured");
-    const { error } = await supabase.auth.signInWithOtp({ email: email.trim().toLowerCase(), options: { shouldCreateUser: true, emailRedirectTo: window.location.origin } });
-    if (error) throw error;
+  async function sendEmailVerificationLink(_email) {
+    throw new Error("Email sending is disabled in the security preview");
   }
   async function startDjTrial(email, displayName) {
     if (!supabase) throw new Error("Supabase is not configured");
@@ -32607,15 +32605,18 @@
     if (!row?.generated_code) throw new Error("Trial unavailable");
     return row;
   }
-  async function djProxyOrSupabase(path, rpc, payload) {
-    try {
-      const proxyResponse = await fetch(`https://rc-music-eventos-dj-proxy.gianfranguz.workers.dev${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      if (proxyResponse.ok) return proxyResponse.json();
-    } catch {}
-    const directResponse = await fetch(`${url}/rest/v1/rpc/${rpc}`, { method: "POST", headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-    const directData = await directResponse.json().catch(() => null);
-    if (!directResponse.ok) throw new Error(directData?.message || directData?.error_description || "Invalid DJ credentials");
-    return directData;
+  async function djProxyOrSupabase(_path, rpc, payload) {
+    if (!supabase || !url || !anonKey || !String(url).includes("crvgoyqqujjbdfxqsvpt.supabase.co")) {
+      throw new Error("Security preview staging backend is not configured");
+    }
+    const response = await fetch(`${url}/rest/v1/rpc/${rpc}`, {
+      method: "POST",
+      headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(data?.message || data?.error_description || "Invalid DJ credentials");
+    return data;
   }
   async function signInDj(email, code) {
     if (!supabase || !url || !anonKey) throw new Error("Supabase is not configured");
@@ -32956,12 +32957,8 @@
     if (error) throw error;
     return Array.isArray(data) ? data[0] : data;
   }
-  async function sendSubscriptionEmail(input) {
-    if (!supabase) throw new Error("Supabase is not configured");
-    const { data, error } = await supabase.functions.invoke("send-subscription-email", { body: input });
-    if (error) throw error;
-    if (!data?.ok) throw new Error(data?.error || "Email failed");
-    return data;
+  async function sendSubscriptionEmail(_input) {
+    throw new Error("Email sending is disabled in the security preview");
   }
   async function adminDeleteSubscriptionProof(id, token) {
     if (!supabase || !token) throw new Error("Admin session required");
@@ -33178,7 +33175,7 @@
 
 
   // src/lib/download.js
-  var apiBase = String("https://rcmusic-eventos-dev-proxy.onrender.com/api").replace(/\/$/, "");
+  var apiBase = String("https://preview-drive.invalid/api").replace(/\/$/, "");
   function getDriveSession() {
     try {
       return localStorage.getItem("rc_drive_session") || sessionStorage.getItem("rc_drive_session") || "";
