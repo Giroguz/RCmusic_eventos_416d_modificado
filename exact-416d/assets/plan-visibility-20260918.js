@@ -1,5 +1,5 @@
 (()=>{
-const U='https://fzqpmpgbubpmongodcat.supabase.co',K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6cXBtcGdidWJwbW9uZ29kY2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5NzI5MzIsImV4cCI6MjEwMzU0ODkzMn0.pLJfo5jpfMNRQCAbKC1dEW_INuBJan_eoyB_hWpChdw';
+const U='https://crvgoyqqujjbdfxqsvpt.supabase.co',K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNydmdveXFxdWpqYmRmeHFzdnB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3MzI5ODAsImV4cCI6MjEwNjMwODk4MH0.44xKfCE-BBS-E_yyHspA6uztNXOUOqPxoKCIpouFDzA';
 const headers={'apikey':K,'Authorization':'Bearer '+K,'Content-Type':'application/json'};let visible=true,ready=false;
 async function load(){try{const r=await fetch(U+'/rest/v1/rpc/get_plans_visibility',{method:'POST',headers,body:'{}'});const j=await r.json();visible=typeof j==='boolean'?j:(j?.plans_visible??j?.[0]?.plans_visible??true);}catch{}ready=true;apply();mountAdmin();}
 function apply(){const box=document.querySelector('.rcp-plans');if(box)box.style.display=visible?'':'none';}
