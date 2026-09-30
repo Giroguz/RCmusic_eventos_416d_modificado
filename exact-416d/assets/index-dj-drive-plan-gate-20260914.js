@@ -33108,14 +33108,6 @@
   var import_react7 = __toESM(require_react(), 1);
 
   // src/lib/music.js
-  var MOCK_TRACKS = [
-    { id: "dQw4w9WgXcQ", title: "Never Gonna Give You Up", artist: "Rick Astley", duration: "3:33", source: "youtube" },
-    { id: "9bZkp7q19f0", title: "Gangnam Style", artist: "PSY", duration: "4:13", source: "youtube" },
-    { id: "kJQP7kiw5Fk", title: "Despacito", artist: "Luis Fonsi ft. Daddy Yankee", duration: "4:42", source: "youtube" },
-    { id: "JGwWNGJdvx8", title: "Shape of You", artist: "Ed Sheeran", duration: "4:24", source: "youtube" },
-    { id: "fJ9rUzIMcZQ", title: "Bohemian Rhapsody", artist: "Queen", duration: "5:55", source: "youtube" },
-    { id: "OPf0YbXqDm0", title: "Uptown Funk", artist: "Mark Ronson ft. Bruno Mars", duration: "4:30", source: "youtube" }
-  ];
   function withMedia(track) {
     if (track.source === "spotify") {
       return { ...track, thumbnail: track.thumbnail || "", spotifyUrl: track.url || `https://open.spotify.com/track/${track.id}`, embedUrl: `https://open.spotify.com/embed/track/${track.id}` };
@@ -33125,31 +33117,19 @@
     }
     return { ...track, source: "youtube", thumbnail: track.thumbnail || `https://img.youtube.com/vi/${track.id}/hqdefault.jpg`, videoUrl: track.videoUrl || `https://www.youtube-nocookie.com/embed/${track.id}?autoplay=1&rel=0` };
   }
-  function decodeHtml(value = "") {
-    if (typeof document === "undefined") return value;
-    const element = document.createElement("textarea");
-    element.innerHTML = value;
-    return element.value;
-  }
-  async function searchYoutube(query) {
-    const apiKey = "AIzaSyD2WYJozIKKeIAYS1VknXroIJieG3didCs";
-    if (!apiKey) {
-      const normalized = query.toLowerCase();
-      const matched = MOCK_TRACKS.filter((track) => `${track.title} ${track.artist}`.toLowerCase().includes(normalized));
-      const fallback2 = matched.length ? matched : MOCK_TRACKS.slice(0, 4).map((track, index2) => ({ ...track, title: `${query} \u2014 selecci\xF3n ${index2 + 1}` }));
-      return fallback2.map(withMedia);
+  async function searchDeezer(query) {
+    const endpoint = "/api/deezer-search?q=" + encodeURIComponent(query);
+    try {
+      const response = await fetch(endpoint);
+      if (!response.ok) return [];
+      const data = await response.json();
+      const items = data.tracks || data.data || [];
+      return items.map((item) => withMedia({ id: String(item.id || ""), title: item.title || "", artist: item.artist?.name || item.artist || "", duration: item.duration || "", thumbnail: item.thumbnail || item.album?.cover_medium || item.album?.cover || "", url: item.link || item.url || "", previewUrl: item.previewUrl || item.preview || item.preview_url || "", source: "deezer" }));
+    } catch {
+      return [];
     }
-    const params = new URLSearchParams({ part: "snippet", maxResults: "8", q: query, type: "video", videoCategoryId: "10", key: apiKey });
-    const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`);
-    if (!response.ok) {
-      const normalized = query.toLowerCase();
-      const matched = MOCK_TRACKS.filter((track) => `${track.title} ${track.artist}`.toLowerCase().includes(normalized));
-      return (matched.length ? matched : MOCK_TRACKS.slice(0, 4).map((track, index2) => ({ ...track, title: `${query} \u2014 selecci\xF3n ${index2 + 1}` }))).map(withMedia);
-    }
-    const data = await response.json();
-    return (data.items || []).filter((item) => item.id?.videoId).map((item) => withMedia({ id: item.id.videoId, title: decodeHtml(item.snippet.title), artist: decodeHtml(item.snippet.channelTitle), duration: "YouTube", source: "youtube" }));
   }
-  var SEARCH_CACHE_KEY = "rcMusicSearchCache:v5";
+  var SEARCH_CACHE_KEY = "rcMusicSearchCache:v6";
   var SEARCH_CACHE_TTL = 7 * 24 * 60 * 60 * 1e3;
   var SEARCH_CACHE_LIMIT = 120;
   var SEARCH_PENDING = /* @__PURE__ */ new Map();
@@ -33159,8 +33139,16 @@
   function writeSearchCache(key, data) { try { var cache = JSON.parse(localStorage.getItem(SEARCH_CACHE_KEY) || "{}"); cache[key] = { at: Date.now(), data }; localStorage.setItem(SEARCH_CACHE_KEY, JSON.stringify(pruneSearchCache(cache))); } catch { } }
   function runWithTimeout(fn, ms) { return Promise.race([Promise.resolve().then(fn), new Promise((resolve) => setTimeout(() => resolve([]), ms))]); }
   async function cachedSearch(key, fn) { var old = readSearchCache(key); if (old) return old; if (SEARCH_PENDING.has(key)) return SEARCH_PENDING.get(key); var pending = runWithTimeout(fn, 5500).then((items) => items || []).catch(() => []).then((items) => { writeSearchCache(key, items); return items; }).finally(() => SEARCH_PENDING.delete(key)); SEARCH_PENDING.set(key, pending); return pending; }
-  async function searchExternalProvider(provider, query) { var base = "https://rcmusic-eventos-dev-proxy.onrender.com/api"; if (provider === "soundcloud") return []; var endpoint = provider === "deezer" ? "/api/deezer-search?q=" + encodeURIComponent(query) : base + "/spotify-search?q=" + encodeURIComponent(query); try { var response = await fetch(endpoint); if (!response.ok) return []; var data = await response.json(); var items = data.tracks || data.data || []; return items.map((item) => withMedia({ id: String(item.id || ""), title: item.title || item.name || "", artist: item.artist?.name || item.artist || "", duration: item.duration || "", thumbnail: item.thumbnail || item.album?.cover_medium || item.album?.cover || "", url: item.link || item.url || "", previewUrl: item.previewUrl || item.preview || item.preview_url || "", source: provider })); } catch { return []; } }
-  async function searchTracks(query) { var normalized = normalizeSearch(query); if (!normalized) return []; var all = readSearchCache("all:" + normalized); if (all) return all; for (var provider of ["deezer", "spotify", "soundcloud"]) { var items = await cachedSearch(provider + ":" + normalized, () => searchExternalProvider(provider, normalized)); if (items.length) { writeSearchCache("all:" + normalized, items); return items; } } var youtube = await cachedSearch("youtube:" + normalized, () => searchYoutube(normalized)); writeSearchCache("all:" + normalized, youtube); return youtube; }
+  async function searchTracks(query) {
+    var normalized = normalizeSearch(query);
+    if (!normalized) return [];
+    var cached = readSearchCache("all:" + normalized);
+    if (cached) return cached.filter((item) => item?.source === "deezer");
+    var items = await cachedSearch("deezer:" + normalized, () => searchDeezer(normalized));
+    var deezerItems = (items || []).filter((item) => item?.source === "deezer");
+    writeSearchCache("all:" + normalized, deezerItems);
+    return deezerItems;
+  }
 
 
   // src/lib/download.js
@@ -38029,14 +38017,10 @@
   function mergePlanOptions(rows = []) {
     const byType = Object.fromEntries(rows.map((row) => [row.plan_type || row.planType || row.id, row]));
     return PLAN_OPTIONS.map((plan) => {
-      const row = byType[plan.id] || {};
-      const hasManualUsd = Object.prototype.hasOwnProperty.call(row, "price_usd") || Object.prototype.hasOwnProperty.call(row, "priceUsd");
-      const hasPen = row.price_pen !== void 0 || row.pricePen !== void 0;
-      const rawPrice = Number(row.price_pen ?? row.pricePen);
-      const rawUsd = Number(row.price_usd ?? row.priceUsd);
-      const legacyDefault = !hasManualUsd && (plan.id === "fifteen" && rawPrice === 16 || plan.id === "monthly" && rawPrice === 30 || plan.id === "annual" && rawPrice === 330);
-      const hasUsd = row.price_usd !== void 0 || row.priceUsd !== void 0;
-      return { ...plan, days: Number(row.days) || plan.days, pricePen: hasPen && Number.isFinite(rawPrice) && rawPrice >= 0 && !legacyDefault ? rawPrice : plan.pricePen, priceUsd: hasUsd && Number.isFinite(rawUsd) && rawUsd >= 0 ? rawUsd : plan.priceUsd };
+      const rawPrice = Number(byType[plan.id]?.price_pen ?? byType[plan.id]?.pricePen);
+      const rawUsd = Number(byType[plan.id]?.price_usd ?? byType[plan.id]?.priceUsd);
+      const legacyDefault = plan.id === "fifteen" && rawPrice === 16 || plan.id === "monthly" && rawPrice === 30 || plan.id === "annual" && rawPrice === 330;
+      return { ...plan, days: Number(byType[plan.id]?.days) || plan.days, pricePen: rawPrice > 0 && !legacyDefault ? rawPrice : plan.pricePen, priceUsd: rawUsd >= 0 && Number.isFinite(rawUsd) ? rawUsd : plan.priceUsd };
     });
   }
   function formatCountdown(expiresAt2, now = Date.now()) {
