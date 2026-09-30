@@ -32579,6 +32579,8 @@
         sessionStorage.removeItem(SESSION_KEY);
         localStorage.removeItem(SESSION_KEY);
         localStorage.removeItem("rcMusicSearchCache:v5");
+        localStorage.removeItem("rcMusicSearchCache:v6");
+        localStorage.removeItem("rcMusicSearchCache:v7");
         localStorage.removeItem(EVENTS_KEY);
         localStorage.removeItem(LIKES_KEY);
         Object.keys(localStorage).filter((key) => key.startsWith("rc_music_chat_history_v1_") || key.startsWith("rc_music_chat_name_v1_")).forEach((key) => localStorage.removeItem(key));
@@ -33146,7 +33148,7 @@
       return [];
     }
   }
-  var SEARCH_CACHE_KEY = "rcMusicSearchCache:v6";
+  var SEARCH_CACHE_KEY = "rcMusicSearchCache:v7";
   var SEARCH_CACHE_TTL = 7 * 24 * 60 * 60 * 1e3;
   var SEARCH_CACHE_LIMIT = 120;
   var SEARCH_PENDING = /* @__PURE__ */ new Map();
