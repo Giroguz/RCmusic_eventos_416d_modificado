@@ -16,7 +16,7 @@
   };
   window.fetch = async (input, init = {}) => {
     const url = typeof input === 'string' ? input : input?.url || '';
-    if (!url.includes('/rest/v1/rpc/submit_subscription_proof')) return originalFetch(input, init);
+    if (!/\/rest\/v1\/rpc\/submit_subscription_proof(?:\?|$)/.test(url)) return originalFetch(input, init);
     try {
       const token = await freshToken();
       if (token && typeof init.body === 'string') {
